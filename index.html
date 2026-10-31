@@ -1104,12 +1104,12 @@ function refreshSteps(ch){
   const n=ch.len||total();let h='';for(let i=0;i<n;i++)h+=stepHTML(ch,i);row.innerHTML=h;applySel();
   nowEls=[];if(playing&&nowI>=0)setNow(nowI);
 }
-function soundOptions(sel){return GROUPS.map(([g,ids])=>'<optgroup label="'+g+'">'+ids.map(id=>'<option value="'+id+'"'+(id===sel?' selected':'')+'>'+SOUNDS[id].label+'</option>').join('')+'</optgroup>').join('');}
+function soundOptions(sel,ch){return GROUPS.map(([g,ids])=>'<optgroup label="'+g+'">'+ids.map(id=>'<option value="'+id+'"'+(id===sel?' selected':'')+'>'+(id==='gm'&&ch&&ch.gm&&id===sel?esc(gmLabel(ch.gm)):SOUNDS[id].label)+'</option>').join('')+'</optgroup>').join('');}
 function noteOptions(sel){let h='';for(let m=24;m<=96;m++)h+='<option value="'+m+'"'+(m===sel?' selected':'')+'>'+noteName(m)+'</option>';return h;}
 function rowHTML(ch){
   const n=ch.len||total();let st='';for(let i=0;i<n;i++)st+=stepHTML(ch,i);
   const chip=ch.kind==='sample'?'<canvas width="88" height="60"></canvas>':'<svg viewBox="0 0 20 20"><path d="M6 3l11 7-11 7z"/></svg>';
-  const nm=ch.kind==='sample'?'<span class="nm" title="'+esc(ch.name)+'">'+esc(ch.name)+'</span>':'<select data-act="sound" aria-label="Sound">'+soundOptions(ch.sound)+'</select>';
+  const nm=ch.kind==='sample'?'<span class="nm" title="'+esc(ch.name)+'">'+esc(ch.name)+'</span>':'<select data-act="sound" aria-label="Sound">'+soundOptions(ch.sound,ch)+'</select>';
   const third=ch.kind==='inst'?'<label><span class="lbl">Note</span><select data-act="note" aria-label="Note for new steps">'+noteOptions(ch.note)+'</select></label><button class="rollbtn" data-act="roll" aria-pressed="'+(rollCh===ch.id)+'" title="Open piano roll">Roll</button>'+(ch.sound==='custom'?'<button class="rollbtn" data-act="syn" aria-pressed="'+(synCh===ch.id)+'" title="Design the sound">Syn</button>':'')
     :'<label><span class="lbl">Pitch <span data-pv>'+(ch.pitch>0?'+':'')+ch.pitch+'</span></span><input type="range" data-act="pitch" min="-12" max="12" step="1" value="'+ch.pitch+'" aria-label="Pitch in semitones"></label>'+(ch.kind==='sample'?'<button class="rollbtn" data-act="edit" aria-pressed="'+(edCh===ch.id)+'" title="Trim, reverse and slice">Edit</button>':'');
   return '<div class="row'+(S.activeId===ch.id?' active':'')+'" data-id="'+ch.id+'" data-len="'+(ch.len||0)+'" style="--c:'+ch.color+'"><div class="head">'
@@ -1246,6 +1246,7 @@ rack.addEventListener('change',e=>{
     } else if(def.kind==='inst'){ch.note=def.root;}
     if(b.value==='custom'&&!ch.syn)ch.syn=Object.assign({},SYN_DEF);
     if(b.value==='gm'&&!ch.gm){ch.gm='acoustic_grand_piano';gmEnsure(ch);}
+    if(b.value==='gm')ch.name=gmLabel(ch.gm);
     render();preview(ch,ch.note);
   }
 });
