@@ -19,3 +19,17 @@ OPTIONAL SHARE SERVER (short links like /?s=Ab3dE)
 UPDATING
   sw.js caches the app. When you replace index.html, change the version string at the top of sw.js
   (const V='beats-...') so visitors get the new version.
+
+
+---- Short links, gallery, analytics (Vercel) ----
+1. Vercel dashboard > Storage > Create > Upstash for Redis (or KV). Connect it to this project.
+   That sets KV_REST_API_URL and KV_REST_API_TOKEN. Redeploy once.
+2. Optional: add env var ADMIN_KEY. Remove a gallery beat with:
+   curl -X DELETE -H "x-admin-key: YOUR_KEY" "https://YOURSITE/api/gallery?id=BEATID"
+3. Analytics: Vercel dashboard > Analytics > Enable. The script is already in index.html.
+4. Errors from visitors' browsers are logged by /api/log (Vercel > Logs, search "client-error").
+Without step 1, "Short link" and the gallery show a friendly "not set up" message; everything else works.
+
+---- Tests ----
+GitHub Actions runs tests/ on every push (.github/workflows/test.yml).
+Locally: cd tests && npm install && npx playwright install chromium && npm test
