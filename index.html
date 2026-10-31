@@ -245,6 +245,7 @@ body.lite *{transition:none!important;animation:none!important}
 #edWave{width:100%;height:120px;display:block;background:var(--field);border-radius:4px;cursor:col-resize;touch-action:none}
 .ed-info{font:500 12px var(--f-mono);color:var(--dim)}
 .chk{display:flex;gap:6px;align-items:center;font-weight:700}
+.vsep{width:1px;height:22px;background:var(--line);margin:0 4px}
 .patbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .pats{display:flex;gap:4px;flex-wrap:wrap}
 .pchip{background:var(--panel2);border:1px solid var(--line);border-bottom:3px solid var(--c);border-radius:5px;padding:5px 12px;font-weight:700}
@@ -349,7 +350,7 @@ body.lite *{transition:none!important;animation:none!important}
     <button class="btn sm" id="patNew" title="New empty pattern with the same tempo and time signature">+ New</button>
     <button class="btn sm mtool" id="patDup">Duplicate</button>
     <button class="btn sm mtool" id="patDel">Delete</button>
-        <span class="grow"></span>
+    <span class="vsep" aria-hidden="true"></span>
     <button class="btn sm mtool" id="themeBtn" aria-label="Switch between the dark and light theme">Light theme</button>
     <div class="seg" role="group" aria-label="View"><button id="viewRack" aria-pressed="true">Rack</button><button id="viewMixer" aria-pressed="false">Mixer</button><button id="viewPads" aria-pressed="false">Pads</button><button id="viewTl" aria-pressed="false">Timeline</button></div>
     <div class="seg" role="group" aria-label="Play mode"><button id="modePat" aria-pressed="true" title="Loop the selected pattern">Pattern</button><button id="modeSong" aria-pressed="false" title="Play the arranged song">Song</button></div>
