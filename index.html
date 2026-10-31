@@ -278,11 +278,27 @@ body.embed #embedBar{display:flex!important;align-items:center;gap:14px;position
 .tl-head{position:absolute;top:0;bottom:0;width:2px;background:var(--accent);z-index:6;pointer-events:none}
 body.learn input[type=range]{outline:2px dashed var(--accent);outline-offset:3px}
 body.learn input[type=range].learning{outline-style:solid;outline-color:#fff}
-.tour{position:fixed;inset:auto 0 18px 0;display:flex;justify-content:center;padding:0 14px;z-index:90;pointer-events:none}
-.tour-card{pointer-events:auto;background:var(--panel2);border:1px solid var(--accent);border-radius:10px;padding:14px 16px;max-width:460px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.55)}
-.tour-card b{font-size:16px;color:var(--accent)}.tour-card p{margin:6px 0 10px;line-height:1.45}
-.tour-btns{display:flex;gap:8px;align-items:center}
-.tour-hl{outline:3px solid var(--accent)!important;outline-offset:3px;border-radius:6px;position:relative;z-index:70}
+.welcome{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;background:radial-gradient(1100px 620px at 50% -10%,rgba(255,154,60,.18),transparent 62%),rgba(9,12,15,.95);overflow:auto}
+.welcome[hidden]{display:none}
+.wl-card{width:100%;max-width:840px;max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow:auto;background:var(--panel2);border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:16px;padding:28px 30px 22px;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.wl-logo{width:56px;height:56px;border-radius:12px;display:block}
+.wl-h{font-size:clamp(26px,5.2vw,42px);line-height:1.08;margin:12px 0 8px;font-weight:800;letter-spacing:-.02em}
+.wl-h em{color:var(--accent);font-style:normal}
+.wl-sub{color:var(--dim);font-size:17px;line-height:1.5;margin:0 0 20px;max-width:60ch}
+.wl-feats{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px;margin-bottom:22px}
+.wl-feat{background:var(--field);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:10px;padding:12px 14px}
+.wl-feat b{display:block;font-size:16px;margin-bottom:3px}.wl-feat span{color:var(--dim);font-size:14px;line-height:1.4}
+.wl-rows{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.wl-row{display:flex;gap:12px;align-items:center;background:var(--field);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.wl-row .n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#10151a;font:800 14px var(--f-mono);display:grid;place-items:center}
+.wl-row .tx{flex:1;min-width:0}.wl-row b{display:block}.wl-row small{display:block;color:var(--dim);font-size:13px;line-height:1.4}
+.wl-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:4px}
+.wl-dots{display:flex;gap:6px;margin:0 auto}.wl-dots i{width:9px;height:9px;border-radius:50%;background:var(--line)}.wl-dots i.on{background:var(--accent)}
+.wl-big{padding:11px 22px;font-size:16px}
+.wl-link{background:none;border:0;color:var(--dim);text-decoration:underline;cursor:pointer;font:inherit;padding:6px 2px}
+.wl-moods .tpl[aria-pressed=true]{outline:2px solid var(--c);background:color-mix(in srgb,var(--c) 18%,var(--panel2))}
+.wl-note{color:var(--dim);font-size:14px;line-height:1.45;margin:12px 0 16px}
+@media (max-width:700px){.wl-card{padding:20px 16px 16px}.wl-sub{font-size:15px}.wl-foot .wl-dots{order:5;width:100%;justify-content:center;margin:4px 0 0}}
 body.lite *{transition:none!important;animation:none!important}
 .lyr{display:flex;gap:6px;padding:8px 14px;overflow-x:auto}
 .lyr input{flex:1 0 140px;min-width:120px;background:var(--field);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit}
@@ -731,7 +747,7 @@ body.lite *{transition:none!important;animation:none!important}
       <span class="hint">Reads the chords on the channel you pick, in the current pattern, and writes a bass line that changes with them. Run it again after you edit the chords.</span></div>
   </div></div></div>
 <div class="modal" id="guideMod" hidden role="dialog" aria-modal="true" aria-labelledby="guideT">
-  <div class="modal-box guide-box"><div class="roll-bar"><strong id="guideT">Guide</strong><span class="hint">Pick a topic. “Show me” jumps to the real control.</span><span class="grow"></span><button class="btn sm" id="guideClose">Close</button></div>
+  <div class="modal-box guide-box"><div class="roll-bar"><strong id="guideT">Guide</strong><span class="hint">Pick a topic. “Show me” jumps to the real control.</span><span class="grow"></span><button class="btn sm" id="guideWelcome" title="Play the welcome introduction again">▶ Play welcome again</button><button class="btn sm" id="guideClose">Close</button></div>
   <div class="guide-body"><nav id="guideNav" class="guide-nav" role="tablist" aria-label="Guide topics"></nav><article id="guidePane" class="guide-pane" role="tabpanel"></article></div></div></div>
 <div class="modal" id="presetMod" hidden role="dialog" aria-modal="true" aria-labelledby="presetT">
   <div class="modal-box"><div class="roll-bar"><strong id="presetT">Presets</strong><span class="hint" id="presetCtx"></span><span class="grow"></span><button class="btn sm" id="presetClose">Close</button></div>
@@ -762,10 +778,10 @@ body.lite *{transition:none!important;animation:none!important}
 <div class="modal" id="help" hidden role="dialog" aria-modal="true" aria-labelledby="helpT">
   <div class="modal-box">
     <div class="roll-bar"><strong id="helpT">Keyboard shortcuts</strong><button class="btn sm" id="helpClose">Close</button></div>
-    <div class="lib-body"><div class="keys-grid" id="keysGrid"></div><div class="egrp" style="margin-top:14px"><button class="btn sm" id="tourBtn">Replay the quick tour</button><button class="btn sm toggle" id="liteBtn" aria-pressed="false" title="Draws meters and the spectrum less often. Helps on slow phones and laptops.">Lite mode</button><button class="btn sm" id="installBtn" hidden>Install as an app</button></div></div>
+    <div class="lib-body"><div class="keys-grid" id="keysGrid"></div><div class="egrp" style="margin-top:14px"><button class="btn sm" id="tourBtn">Play the welcome again</button><button class="btn sm toggle" id="liteBtn" aria-pressed="false" title="Draws meters and the spectrum less often. Helps on slow phones and laptops.">Lite mode</button><button class="btn sm" id="installBtn" hidden>Install as an app</button></div></div>
   </div>
 </div>
-<div class="tour" id="tour" hidden role="dialog" aria-label="Quick tour"><div class="tour-card"><b id="tourT"></b><p id="tourP"></p><div class="tour-btns"><span class="hint" id="tourN"></span><span class="grow"></span><button class="btn sm" id="tourSkip">Skip</button><button class="btn sm" id="tourDemo" hidden>Load demo beat</button><button class="btn sm primary" id="tourNext">Next</button></div></div></div>
+<div class="welcome" id="welcome" hidden role="dialog" aria-modal="true" aria-labelledby="wlH"><div class="wl-card" id="wlCard"></div></div>
 <div id="drop">Drop audio files to import</div>
 <div id="embedBar" role="region" aria-label="Beat player"><button id="emPlay" aria-pressed="false" aria-label="Play">▶</button><div class="em-info"><b id="emTitle">thebeatsynth beat</b><span id="emMeta"></span><div class="em-prog"><i id="emBar"></i></div></div><a id="emOpen" target="_blank" rel="noopener">Open in thebeatsynth</a></div>
 <div id="toast" role="status"></div>
@@ -3646,7 +3662,7 @@ const GUIDE=(()=>{
   const T=[
    {id:'start',t:'Start here',sub:'Your first minute',intro:'thebeatsynth is a step sequencer. You build a beat from channels, each one a sound, and turn steps on to decide when it plays.',
     steps:['Press the orange Play button, or Space, to hear the starter beat.','Click squares in the Channel Rack to turn steps on or off. It changes while it plays.','Press + Add channel (bottom) to add another sound.','Your beat saves itself in this browser. Use Project, then Save, to keep a copy as a file.'],
-    acts:[{l:'Play the starter beat',run:()=>{closeGuide();$('#play').click();}},show('#play','Play and stop. Space does the same.'),{l:'Replay the quick tour',run:()=>{closeGuide();$('#tourBtn').click();}}]},
+    acts:[{l:'Play the starter beat',run:()=>{closeGuide();$('#play').click();}},show('#play','Play and stop. Space does the same.'),{l:'Play the welcome message again',run:()=>{closeGuide();$('#tourBtn').click();}}]},
    {id:'make',t:'Make me a beat',sub:'Pick a mood, get a starter',intro:'Not sure where to begin? Choose a mood and the app writes a whole starter for you: drums, chords, a bass line and a melody, in a key that fits.',
     steps:['Press Make me a beat (in Start from, at the bottom).','Pick a mood: Chill, Dark, Hype, Dreamy, Sad, Happy, Groovy or Night drive. Each one chooses its own drum style, key, tempo, chords, bass and melody sound.','Choose a loop length of 1, 2 or 4 bars. Turn the melody off if you only want the backing. Tick Build a full song too to get an intro, verse, build, drop and outro.','Press Make it, or Surprise me to let the app choose the mood. Then press Play.','Not quite right? Press Make me a beat again. Every try is different. Your previous beat is saved in the Library first, so nothing is lost.','Everything it writes is normal channels and notes. Open any piano roll to change the melody, or swap a sound with the channel menu.'],
     acts:[{l:'Open Make me a beat',run:()=>{closeGuide();$('#mmbBtn').click();}},show('#mmbBtn','Make me a beat: pick a mood and get a full starter.',tools,'Show me where')]},
@@ -4954,25 +4970,84 @@ $('#midiOutBtn').onclick=()=>{
   const unlock=()=>{try{ensureCtx();const b=ctx.createBuffer(1,1,22050),sr=ctx.createBufferSource();sr.buffer=b;sr.connect(ctx.destination);sr.start(0);}catch(e){}};
   ['touchend','pointerdown','keydown'].forEach(ev=>window.addEventListener(ev,function f(){unlock();if(ctx&&ctx.state==='running')window.removeEventListener(ev,f,true);},true));
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&ctx&&ctx.state!=='running')ctx.resume();});
-  // tour
-  const STEPS=[['Welcome','This is a step sequencer. Each row is a channel. Click the squares to place sounds, then press play.','#play'],
-   ['Channels','Add drums, instruments or your own audio files. Open FX for filters, delay, reverb and more, and ROLL for notes.','.rack-scroll'],
-   ['Views','Switch between the rack, a mixer, drum pads and a song timeline.','#viewRack'],
-   ['Tools','Edit, Compose and Play tabs hold randomizers, chord and melody writers, recording and the on-screen piano.','.editbar .seg'],
-   ['Save and share','Export WAV, MP3 or MIDI, and keep projects in the library. Press ? any time for shortcuts.','#expBtn']];
-  let ti=0,hl=null;
-  function showTour(){
-    if(hl)hl.classList.remove('tour-hl');const st=STEPS[ti];
-    if(!st){endTour();return;}
-    $('#tour').hidden=false;$('#tourT').textContent=st[0];$('#tourP').textContent=st[1];$('#tourN').textContent=(ti+1)+' of '+STEPS.length;
-    hl=document.querySelector(st[2]);if(hl){hl.classList.add('tour-hl');hl.scrollIntoView({block:'nearest',behavior:'smooth'});}
-    const last=ti===STEPS.length-1;$('#tourNext').textContent=last?'Done':'Next';$('#tourDemo').hidden=!last;
+  // welcome
+  const W=$('#welcome'),wlSeen=()=>{try{return !!localStorage.getItem('beatsynth.tour');}catch(e){return false;}};
+  let wStep=0,wMood='chill',wPrev=null;
+  const LOGO='<svg class="wl-logo" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" fill="#1d232a"/><g fill="#ff9a3c"><rect x="96" y="96" width="76" height="76" rx="12"/><rect x="218" y="96" width="76" height="76" rx="12" opacity=".35"/><rect x="340" y="96" width="76" height="76" rx="12"/><rect x="96" y="218" width="76" height="76" rx="12" opacity=".35"/><rect x="218" y="218" width="76" height="76" rx="12"/><rect x="340" y="218" width="76" height="76" rx="12" opacity=".35"/><rect x="96" y="340" width="76" height="76" rx="12"/><rect x="218" y="340" width="76" height="76" rx="12" opacity=".35"/><rect x="340" y="340" width="76" height="76" rx="12"/></g></svg>';
+  const FEATS=[['Draw beats','Click squares in the Channel Rack to place drums and sounds. It changes while it plays.',COLORS[0]],
+    ['Play notes','A piano roll, plus chord, bass and melody writers that keep everything in key.',COLORS[2]],
+    ['Shape the sound','Mixer, effects, and a one-click Polish that makes the whole mix sound finished.',COLORS[4]],
+    ['Build and share','Patterns, songs and a live Perform mode. Export WAV, MP3 or MIDI, or share a link.',COLORS[3]]];
+  const phone=()=>matchMedia('(max-width:700px)').matches;
+  const openTools=()=>{if(phone()&&!$('.app').classList.contains('tools'))$('#toolsBtn').click();};
+  const ROWS=[['Play and tempo','Play starts and stops the music (Space does the same). Next to it you set the tempo, or press Tap in time with a song.','#play','Play and stop. Space does the same.'],
+    ['The Channel Rack','Each row is one sound. Click the squares to place hits, and drag a lit square up or down to change how hard it hits.','.rack-scroll','This is the Channel Rack. Click squares to draw a beat.'],
+    ['Views','Switch between the Rack, a Mixer, drum Pads, a song Timeline and Perform for live sets.','#viewRack','Views: Rack, Mixer, Pads, Timeline and Perform.'],
+    ['Tools','The Edit, Compose and Play tabs hold randomizers, chord and melody writers, recording and an on-screen piano.','.editbar .seg','Edit, Compose and Play tools live here.',openTools],
+    ['Get sounds and starters','Make me a beat, Templates, Import audio and Real instruments are along the bottom of the page.','#mmbBtn','Make me a beat writes a whole starter for you. Templates and imports are beside it.',openTools],
+    ['Save and export','Render to WAV or MP3, or export MIDI. Save and Open keep projects as files, and the Library remembers them for you.','#expBtn','Render exports your beat as WAV or MP3.'],
+    ['The Guide','Your help window. Every topic has Show me buttons that point at the real controls. You can replay this welcome from there any time.','#guideBtn','The Guide explains every feature, step by step.']];
+  function wlEnd(){W.hidden=true;try{localStorage.setItem('beatsynth.tour','1');}catch(e){}if(wPrev&&wPrev.focus){try{wPrev.focus();}catch(e){}}wPrev=null;}
+  function wlOpen(from){wPrev=document.activeElement;wStep=from||0;wlDraw();W.hidden=false;}
+  function wlDraw(){
+    const dots='<span class="wl-dots" aria-hidden="true">'+[0,1,2].map(i=>'<i class="'+(i===wStep?'on':'')+'"></i>').join('')+'</span>';
+    const skip='<button class="btn" data-w="skip" title="Close the welcome. You can play it again from the Guide.">Skip</button>';
+    let h='';
+    if(wStep===0){
+      h=LOGO+'<h1 class="wl-h" id="wlH">Welcome to <em>thebeatsynth</em></h1>'
+       +'<p class="wl-sub">Make beats right in your browser. There is nothing to install and no sign-up, and everything you make saves automatically on this device.</p>'
+       +'<div class="wl-feats">'+FEATS.map(f=>'<div class="wl-feat" style="--c:'+f[2]+'"><b>'+f[0]+'</b><span>'+f[1]+'</span></div>').join('')+'</div>'
+       +'<div class="wl-foot">'+skip+dots+'<button class="wl-link" data-w="jump">Just make me a beat</button><button class="btn primary wl-big" data-w="next" id="wlPrimary">Show me around →</button></div>';
+    }else if(wStep===1){
+      h='<h1 class="wl-h" id="wlH">Find your <em>way around</em></h1><p class="wl-sub">Seven places worth knowing. Press Show on any of them to see where it is, then you come straight back here.</p>'
+       +'<div class="wl-rows">'+ROWS.map((r,i)=>'<div class="wl-row"><span class="n">'+(i+1)+'</span><div class="tx"><b>'+r[0]+'</b><small>'+r[1]+'</small></div><button class="btn sm" data-w="show" data-i="'+i+'">Show</button></div>').join('')+'</div>'
+       +'<div class="wl-foot">'+skip+'<button class="btn" data-w="back">← Back</button>'+dots+'<button class="btn primary wl-big" data-w="next" id="wlPrimary">Next: make a beat →</button></div>';
+    }else{
+      h='<h1 class="wl-h" id="wlH">Let’s make your <em>first beat</em></h1><p class="wl-sub">Pick a mood. We will write drums, chords, a bass line and a melody that fit together, then press play for you.</p>'
+       +'<div class="tpls wl-moods" role="group" aria-label="Mood">'+MOODS.map(m=>'<button class="tpl" data-w="mood" data-m="'+m.id+'" aria-pressed="'+(m.id===wMood)+'" style="--c:'+m.c+'"><b>'+m.n+'</b><span>'+m.d+'</span></button>').join('')+'</div>'
+       +'<p class="wl-note">Everything it writes is normal channels and notes, so you can click squares or open a piano roll to change anything. Don’t like it? Press Make me a beat again for a new one. Your current beat is saved to the Library first.</p>'
+       +'<div class="wl-foot">'+skip+'<button class="btn" data-w="back">← Back</button>'+dots+'<button class="wl-link" data-w="demo">Load the demo beat instead</button><button class="btn" data-w="rand">Surprise me</button><button class="btn primary wl-big" data-w="make" id="wlPrimary">Make it and play</button></div>';
+    }
+    $('#wlCard').innerHTML=h;$('#wlCard').scrollTop=0;const pr=$('#wlPrimary');if(pr)pr.focus({preventScroll:true});
   }
-  function endTour(){if(hl)hl.classList.remove('tour-hl');hl=null;$('#tour').hidden=true;try{localStorage.setItem('beatsynth.tour','1');}catch(e){}}
-  $('#tourNext').onclick=()=>{ti++;showTour();};$('#tourSkip').onclick=endTour;
-  $('#tourDemo').onclick=()=>{backupCurrent();tplReset();seed();syncTransport();render();updateKbInfo();histReset();markDirty();endTour();toast('Demo beat loaded. Press play.');};
-  $('#tourBtn').onclick=()=>{$('#help').hidden=true;ti=0;showTour();};
-  window.__tour=()=>{let d=null;try{d=localStorage.getItem('beatsynth.tour');}catch(e){}if(!d&&!inFrame&&!EMBED){ti=0;showTour();}};
+  function wlPeek(i){
+    const r=ROWS[i];if(!r)return;W.hidden=true;if(r[4])r[4]();
+    setTimeout(()=>{
+      coach(r[2],r[3]);const bk=document.querySelector('#coach [data-c=back]');if(bk)bk.remove();
+      const iv=setInterval(()=>{if(!document.getElementById('coach')){clearInterval(iv);if(W.hidden&&!wlGone)W.hidden=false;}},250);
+    },phone()&&r[4]?250:30);
+  }
+  let wlGone=false;
+  function wlMake(id){
+    wlGone=true;const r=makeBeat(id,{bars:4,mel:true,song:false,pol:true});wlEnd();
+    if(!r){wlGone=false;return;}
+    start();toast(r.name+' beat: '+r.style+' drums, '+r.key+', '+r.bpm+' BPM. It is playing now.');
+    setTimeout(()=>{if(!playing)return;coach('#guideBtn','Stuck or curious? The Guide explains every feature, with Show me buttons. You can also replay the welcome from there.');const bk=document.querySelector('#coach [data-c=back]');if(bk)bk.textContent='Open the Guide';},4200);
+    setTimeout(()=>{wlGone=false;},300);
+  }
+  $('#wlCard').addEventListener('click',e=>{
+    const b=e.target.closest('[data-w]');if(!b)return;const a=b.dataset.w;
+    if(a==='skip')wlEnd();
+    else if(a==='next'){wStep=Math.min(2,wStep+1);wlDraw();}
+    else if(a==='back'){wStep=Math.max(0,wStep-1);wlDraw();}
+    else if(a==='jump'){wStep=2;wlDraw();}
+    else if(a==='show')wlPeek(+b.dataset.i);
+    else if(a==='mood'){wMood=b.dataset.m;$('#wlCard').querySelectorAll('.wl-moods .tpl').forEach(x=>x.setAttribute('aria-pressed',x===b));}
+    else if(a==='make')wlMake(wMood);
+    else if(a==='rand'){wMood=MOODS[Math.floor(Math.random()*MOODS.length)].id;wlMake(wMood);}
+    else if(a==='demo'){backupCurrent();tplReset();seed();syncTransport();render();updateKbInfo();histReset();markDirty();wlEnd();toast('Demo beat loaded. Press play.');}
+  });
+  window.addEventListener('keydown',e=>{
+    if(W.hidden)return;
+    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();wlEnd();return;}
+    if(e.key==='Tab'){const f=[...W.querySelectorAll('button')].filter(x=>x.offsetParent!==null);if(!f.length)return;const i=f.indexOf(document.activeElement);
+      if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus();}else if(!e.shiftKey&&(i===f.length-1||i<0)){e.preventDefault();f[0].focus();}}
+    e.stopPropagation();
+  },true);
+  $('#tourBtn').onclick=()=>{$('#help').hidden=true;wlOpen(0);};
+  $('#guideWelcome').onclick=()=>{closeGuide();wlOpen(0);};
+  window.__welcome=wlOpen;
+  window.__tour=()=>{if(!wlSeen()&&!inFrame&&!EMBED)wlOpen(0);};
   // install + service worker (only on a real web server)
   let dip=null;
   window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dip=e;$('#installBtn').hidden=false;});
