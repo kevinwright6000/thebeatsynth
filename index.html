@@ -46,6 +46,20 @@ button{cursor:pointer}
 .transport{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch}
 .grp{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 10px}
 .fld{display:flex;flex-direction:column;gap:3px;min-width:0}
+/* layout: Simple / All tools */
+.seg.lay button{padding:7px 14px;font-size:14px}
+.app.simple .adv{display:none!important}
+.app.simple .editbar .egrp:not([data-tab="edit"]){display:none!important}
+.app:not(.more) .egrp.adv2{display:none!important}
+.dd{position:relative}
+.dd-btn[aria-expanded="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.dd-panel{display:none;position:absolute;top:calc(100% + 6px);right:0;z-index:60;flex-direction:column;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;box-shadow:0 10px 30px #0008;min-width:min(340px,calc(100vw - 24px))}
+.dd.open .dd-panel{display:flex}
+.ddrow{display:flex;gap:6px;flex-wrap:wrap}
+#fileDd .dd-panel{right:auto;left:0}
+.lbl{font-size:12px;color:var(--fg);opacity:.72}
+.gt{font-size:11px}
+.btn.sm{min-height:32px}
 .lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
 .btn-play,.btn-stop{width:46px;height:46px;border-radius:6px;border:1px solid var(--line);background:var(--panel2);display:grid;place-items:center;padding:0}
 .btn-play svg,.btn-stop svg{width:20px;height:20px;fill:var(--fg)}
@@ -245,10 +259,8 @@ body.embed #embedBar{display:flex!important;align-items:center;gap:14px;position
   .lenbox{align-self:flex-end;margin:2px 8px}
 }
 @media (max-width:520px){.wk{width:28px;height:100px}.strip{width:78px}.transport{gap:6px}.grp{padding:6px 8px;gap:8px}.kbd-bar select{min-width:0}}
-#toolsBtn{display:none}
 @media (max-width:700px){
-  #toolsBtn{display:inline-flex;align-items:center}
-  .app:not(.tools) .transport>.grp:nth-child(n+3),.app:not(.tools) .editbar .egrp,.app:not(.tools) .editbar .seg,.app:not(.tools) #helpBtn,.app:not(.tools) .editbar .hint,.app:not(.tools) .mtool{display:none!important}
+  .transport{position:relative}.dd{position:static}.dd-panel,#fileDd .dd-panel{left:0;right:0;min-width:0}
   .grp{flex-wrap:wrap}
   .patbar .grow{display:none}
   .rack-scroll{flex:none;min-height:min(560px,70vh)}
@@ -420,16 +432,16 @@ body.lite *{transition:none!important;animation:none!important}
         <svg viewBox="0 0 20 20" id="playIcon"><path d="M5 3l12 7-12 7z"/></svg>
       </button>
       <button class="btn-stop" id="stop" aria-label="Stop and rewind" title="Stop"><svg viewBox="0 0 20 20"><rect x="4" y="4" width="12" height="12" rx="1"/></svg></button>
-      <div class="fld"><span class="lbl">Bar:Beat:Step</span><div class="lcd" id="pos">01:1:1</div></div>
-      <button class="btn sm toggle" id="toolsBtn" aria-expanded="false" aria-pressed="false" title="Show or hide the extra tools">Tools ▾</button>
+      <div class="fld adv"><span class="lbl">Bar:Beat:Step</span><div class="lcd" id="pos">01:1:1</div></div>
+      <div class="seg lay" role="group" aria-label="Layout"><button id="layS" aria-pressed="true" title="Just the essentials: draw a beat, hear it, save it">Simple</button><button id="layF" aria-pressed="false" title="Show every tool: timeline, Perform, composing tools, time signatures and more">All tools</button></div>
     </div>
     <div class="grp">
       <div class="fld"><span class="lbl">Tempo</span><div class="lcd"><input id="bpm" type="number" min="40" max="240" step="1" value="120" aria-label="Tempo in BPM"></div></div>
       <button class="btn sm" id="tapBtn" title="Tap this in time with the music to set the tempo. Needs at least two taps.">Tap</button>
-      <div class="fld"><span class="lbl">Time signature</span>
+      <div class="fld adv"><span class="lbl">Time signature</span>
         <div class="lcd sig"><input id="num" type="number" min="1" max="16" step="1" value="4" aria-label="Beats per bar" style="width:3.6ch"><span class="slash">/</span>
           <select id="den" aria-label="Beat unit"><option>2</option><option selected>4</option><option>8</option><option>16</option></select></div></div>
-      <div class="fld"><span class="lbl">Bars</span><div class="lcd"><select id="bars" aria-label="Pattern length in bars"><option>1</option><option>2</option><option>4</option><option>8</option></select></div></div>
+      <div class="fld adv"><span class="lbl">Bars</span><div class="lcd"><select id="bars" aria-label="Pattern length in bars"><option>1</option><option>2</option><option>4</option><option>8</option></select></div></div>
     </div>
     <div class="grp">
       <div class="ctl"><span class="lbl">Swing</span><input class="w120" id="swing" type="range" min="0" max="0.6" step="0.01" value="0" aria-label="Swing"></div>
@@ -439,8 +451,8 @@ body.lite *{transition:none!important;animation:none!important}
       <button class="btn sm guide" id="guideBtn" aria-haspopup="dialog" title="Learn how everything works: short lessons with buttons that jump to the real controls"><b>?</b>Guide</button>
     </div>
     <div class="grp">
-      <div class="ctl"><span class="lbl">Project</span><div style="display:flex;gap:6px"><button class="btn sm" id="newBtn">New</button><button class="btn sm" id="openBtn">Open</button><button class="btn sm" id="saveBtn">Save</button><button class="btn sm" id="zipBtn" title="Save the project and its imported audio as a ZIP">ZIP</button><button class="btn sm primary" id="libBtn" title="Starter templates, saved projects and share links">Library</button></div></div>
-      <div class="ctl"><span class="lbl">Export</span><div style="display:flex;gap:6px"><select id="expLufs" class="btn sm" aria-label="Loudness target" title="Set the exported loudness"><option value="0">Loudness: as is</option><option value="-14">-14 LUFS (streaming)</option><option value="-16">-16 LUFS (podcast)</option><option value="-9">-9 LUFS (loud)</option></select><select id="expFmt" class="btn sm" aria-label="File format"><option value="wav">WAV</option><option value="loop">WAV, loop-ready</option><option value="mp3">MP3</option></select><select id="expRep" class="btn sm" aria-label="Loops to render"><option value="1">1 loop</option><option value="2">2 loops</option><option value="4">4 loops</option><option value="song">Whole song</option></select><button class="btn sm primary" id="expBtn">Render</button><button class="btn sm" id="stemBtn" title="One WAV per channel, in a zip file">Stems</button><button class="btn sm" id="vidBtn" title="Render a visualizer video (WebM) of the export">Video</button><button class="btn sm" id="midiOutBtn" title="Standard MIDI file with a track per channel">MIDI</button></div></div>
+      <div class="dd" id="fileDd"><button class="btn sm dd-btn" aria-haspopup="true" aria-expanded="false" title="New, Open, Save and the Library">File ▾</button><div class="dd-panel" role="group" aria-label="File"><span class="lbl">Project</span><div class="ddrow"><button class="btn sm" id="newBtn">New</button><button class="btn sm" id="openBtn">Open</button><button class="btn sm" id="saveBtn">Save</button><button class="btn sm" id="zipBtn" title="Save the project and its imported audio as a ZIP">ZIP</button><button class="btn sm primary" id="libBtn" title="Starter templates, saved projects and share links">Library</button></div></div></div>
+      <div class="dd" id="expDd"><button class="btn sm dd-btn primary" aria-haspopup="true" aria-expanded="false" title="Render your beat to WAV or MP3, or export MIDI and stems">Export ▾</button><div class="dd-panel" role="group" aria-label="Export"><span class="lbl">Export</span><div class="ddrow"><select id="expLufs" class="btn sm" aria-label="Loudness target" title="Set the exported loudness"><option value="0">Loudness: as is</option><option value="-14">-14 LUFS (streaming)</option><option value="-16">-16 LUFS (podcast)</option><option value="-9">-9 LUFS (loud)</option></select><select id="expFmt" class="btn sm" aria-label="File format"><option value="wav">WAV</option><option value="loop">WAV, loop-ready</option><option value="mp3">MP3</option></select><select id="expRep" class="btn sm" aria-label="Loops to render"><option value="1">1 loop</option><option value="2">2 loops</option><option value="4">4 loops</option><option value="song">Whole song</option></select><button class="btn sm primary" id="expBtn">Render</button><button class="btn sm" id="stemBtn" title="One WAV per channel, in a zip file">Stems</button><button class="btn sm" id="vidBtn" title="Render a visualizer video (WebM) of the export">Video</button><button class="btn sm" id="midiOutBtn" title="Standard MIDI file with a track per channel">MIDI</button></div></div></div>
       <input type="file" id="projFile" accept=".json,.zip,application/json,application/zip" hidden>
     </div>
   </header>
@@ -449,13 +461,13 @@ body.lite *{transition:none!important;animation:none!important}
     <span class="lbl">Pattern</span>
     <div class="pats" id="pats" role="group" aria-label="Patterns" title="Tempo, time signature and bars belong to the selected pattern. Double-click or right-click a name to rename."></div>
     <button class="btn sm" id="patNew" title="New empty pattern with the same tempo and time signature">+ New</button>
-    <button class="btn sm mtool" id="patDup">Duplicate</button>
-    <button class="btn sm mtool" id="patDel">Delete</button>
-    <span class="vsep" aria-hidden="true"></span>
-    <button class="btn sm mtool" id="themeBtn" aria-label="Switch between the dark and light theme">Light theme</button>
-    <span class="lbl">View</span><div class="seg" role="group" aria-label="View"><button id="viewRack" aria-pressed="true">Rack</button><button id="viewMixer" aria-pressed="false">Mixer</button><button id="viewPads" aria-pressed="false">Pads</button><button id="viewTl" aria-pressed="false">Timeline</button><button id="viewPerf" aria-pressed="false" title="Launch patterns live like clips, and record the take as your song">Perform</button></div>
-    <span class="lbl">Plays</span><div class="seg" role="group" aria-label="Play mode"><button id="modePat" aria-pressed="true" title="Loop the selected pattern">Pattern</button><button id="modeSong" aria-pressed="false" title="Play the arranged song">Song</button></div>
-    <button class="btn sm toggle" id="songToggle" aria-pressed="false">Arrange ▾</button>
+    <button class="btn sm adv" id="patDup">Duplicate</button>
+    <button class="btn sm adv" id="patDel">Delete</button>
+    <span class="vsep adv" aria-hidden="true"></span>
+    <button class="btn sm adv" id="themeBtn" aria-label="Switch between the dark and light theme">Light theme</button>
+    <span class="lbl">View</span><div class="seg" role="group" aria-label="View"><button id="viewRack" aria-pressed="true">Rack</button><button id="viewMixer" aria-pressed="false">Mixer</button><button id="viewPads" aria-pressed="false">Pads</button><button id="viewTl" class="adv" aria-pressed="false">Timeline</button><button id="viewPerf" class="adv" aria-pressed="false" title="Launch patterns live like clips, and record the take as your song">Perform</button></div>
+    <span class="lbl adv">Plays</span><div class="seg adv" role="group" aria-label="Play mode"><button id="modePat" aria-pressed="true" title="Loop the selected pattern">Pattern</button><button id="modeSong" aria-pressed="false" title="Play the arranged song">Song</button></div>
+    <button class="btn sm toggle adv" id="songToggle" aria-pressed="false">Arrange ▾</button>
   </div>
   <div class="song" id="song" hidden>
     <div class="song-clips" id="clips"></div>
@@ -473,9 +485,9 @@ body.lite *{transition:none!important;animation:none!important}
     <div class="tabrow">
       <button class="btn sm" id="undoBtn" disabled title="Undo (Ctrl+Z)">Undo</button>
       <button class="btn sm" id="redoBtn" disabled title="Redo (Ctrl+Shift+Z)">Redo</button>
-      <span class="lbl">Tools</span><div class="seg" role="group" aria-label="Tool tabs"><button data-t="edit" aria-pressed="true">Edit</button><button data-t="compose" aria-pressed="false">Compose</button><button data-t="play" aria-pressed="false">Play</button></div>
-      <button class="btn sm" id="helpBtn" title="Keyboard shortcuts (?)">Shortcuts</button>
-      <span class="hint" id="kbInfo"></span>
+      <span class="lbl adv">Tools</span><div class="seg adv" role="group" aria-label="Tool tabs"><button data-t="edit" aria-pressed="true">Edit</button><button data-t="compose" aria-pressed="false">Compose</button><button data-t="play" aria-pressed="false">Play</button></div>
+      <button class="btn sm adv" id="helpBtn" title="Keyboard shortcuts (?)">Shortcuts</button>
+      <button class="btn sm toggle adv" id="moreBtn" aria-pressed="false" aria-expanded="false" title="Rhythm, variation, transitions, mutate and automation tools">More tools ▾</button><span class="hint" id="kbInfo"></span>
     </div>
     <div class="egrp" data-tab="edit" role="group" aria-label="Edit"><span class="gt">Steps</span>
       <button class="btn sm" id="copyBtn" title="Copy the selected steps or bar, or the whole active channel (Ctrl+C). Click a bar number above the rack to select a bar.">Copy</button>
@@ -487,26 +499,26 @@ body.lite *{transition:none!important;animation:none!important}
       <span class="lbl">Density</span><input type="range" id="rndDens" min="10" max="90" value="45" style="width:80px" aria-label="Density of random notes">
       <button class="btn sm" id="rndBtn" title="Fill the active channel, or the selected steps, with a random pattern in the chosen key and scale">Randomize</button>
     </div>
-    <div class="egrp" data-tab="edit" role="group" aria-label="Beat tools"><span class="gt">Rhythm</span>
+    <div class="egrp adv2" data-tab="edit" role="group" aria-label="Beat tools"><span class="gt">Rhythm</span>
       <span class="lbl">Euclid</span><input type="number" id="eucHits" min="0" max="64" value="5" style="width:4.2ch" aria-label="Number of hits"><span class="lbl">of the steps · rotate</span><input type="number" id="eucRot" min="-64" max="64" value="0" style="width:4.2ch" aria-label="Rotation">
       <button class="btn sm" id="eucBtn" title="Spread hits as evenly as possible over the selected steps (or the whole active channel)">Euclid</button>
       <span class="lbl">Humanize</span><input type="range" id="human" min="0" max="1" step="0.01" value="0" style="width:80px" aria-label="Humanize timing and velocity">
     </div>
-    <div class="egrp" data-tab="edit" role="group" aria-label="Variations"><span class="gt">Variation</span>
+    <div class="egrp adv2" data-tab="edit" role="group" aria-label="Variations"><span class="gt">Variation</span>
       <select id="varKind" class="btn sm" aria-label="Variation type"><option value="fill">Drum fill</option><option value="break">Breakdown</option><option value="build">Build-up</option></select>
       <button class="btn sm" id="varBtn" title="Make a new pattern from this one with a fill, a breakdown or a build-up">Make variation</button>
     </div>
-    <div class="egrp" data-tab="edit" role="group" aria-label="Transitions"><span class="gt">Transitions</span>
+    <div class="egrp adv2" data-tab="edit" role="group" aria-label="Transitions"><span class="gt">Transitions</span>
       <select id="trKind" class="btn sm" aria-label="Transition type"><option value="fill">Drum fill at the end</option><option value="riser">Riser into the end</option><option value="drop">Drop transition</option></select>
       <button class="btn sm" id="trBtn" title="Writes it into this pattern. Fill: a snare roll that builds. Riser: a rising sweep. Drop: riser, a gap in the kick and bass, then a boom and crash on the first step so the loop restarts with a hit.">Add</button>
     </div>
-    <div class="egrp" data-tab="edit" role="group" aria-label="Mutate and notes"><span class="gt">Mutate and notes</span>
+    <div class="egrp adv2" data-tab="edit" role="group" aria-label="Mutate and notes"><span class="gt">Mutate and notes</span>
       <span class="lbl">Mutate</span><input type="range" id="mutAmt" min="5" max="60" value="20" style="width:80px" aria-label="Amount of change">
       <button class="btn sm" id="mutBtn" title="Make small random changes to the active channel in this pattern">Mutate</button>
       <button class="btn sm toggle" id="lyrBtn" aria-pressed="false" title="Write lyrics or notes for each bar of this pattern">Notes lane</button>
       <button class="btn sm" id="histBtn" title="See what you changed and jump back to any earlier point">History</button>
     </div>
-    <div class="egrp" data-tab="edit" role="group" aria-label="Automation"><span class="gt">Automation</span>
+    <div class="egrp adv2" data-tab="edit" role="group" aria-label="Automation"><span class="gt">Automation</span>
       <button class="btn sm toggle" id="autoBtn" aria-pressed="false" title="Record automation: press play, then move a channel's volume, pan or filter cutoff. The moves are stored per step and played back.">● Auto</button>
       <button class="btn sm" id="autoEd" title="Draw automation by hand for the active channel">Edit lanes</button>
       <button class="btn sm" id="autoClr" title="Remove the automation of the active channel in this pattern">Clear auto</button>
@@ -661,13 +673,13 @@ body.lite *{transition:none!important;animation:none!important}
       <button class="btn" id="importBtn">Import audio…</button>
       <button class="btn" id="gmBtn" title="Real recorded piano, strings, brass, guitars and more">Real instruments</button>
       <button class="btn" id="sbBtn" title="Search and audition every built-in sound, then add it or drag it onto a pad">Browse sounds</button>
-      <button class="btn" id="packBtn" title="Ready-made one-shot sets, made inside the app">Sound packs…</button></div>
+      <button class="btn adv" id="packBtn" title="Ready-made one-shot sets, made inside the app">Sound packs…</button></div>
     <div class="agrp"><span class="gt">Start from</span>
       <button class="btn primary" id="mmbBtn" title="Pick a mood and the app writes drums, chords, bass and a melody together in a key that fits">Make me a beat</button>
       <button class="btn" id="tplBtn" title="Start from a ready-made beat in a style">Templates</button>
-      <button class="btn" id="midiInBtn" title="Open a .mid file as a new pattern">Import MIDI…</button><input type="file" id="midiFile" accept=".mid,.midi,audio/midi" hidden></div>
+      <button class="btn adv" id="midiInBtn" title="Open a .mid file as a new pattern">Import MIDI…</button><input type="file" id="midiFile" accept=".mid,.midi,audio/midi" hidden></div>
     <input type="file" id="file" accept="audio/*,.wav,.mp3,.ogg,.m4a,.flac,.aac" multiple hidden>
-    <span class="hint">Click or drag across steps to draw a beat; drag a lit step up or down to set its velocity. Shift-click selects a range to copy and paste. Play the active channel with the keys A to ; (Z and X change octave). Drop audio files anywhere to import them. Your beat autosaves in this browser.</span>
+    <span class="hint adv">Click or drag across steps to draw a beat; drag a lit step up or down to set its velocity. Shift-click selects a range to copy and paste. Play the active channel with the keys A to ; (Z and X change octave). Drop audio files anywhere to import them. Your beat autosaves in this browser.</span>
   </div>
 </div>
 <div class="pop" id="stepPop" hidden role="dialog" aria-label="Step settings">
@@ -2400,7 +2412,36 @@ function doRandom(){
 }
 $('.editbar .seg').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(!b)return;$('.editbar').dataset.tab=b.dataset.t;$('.editbar .seg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));});
 $('#stepOptBtn').onclick=e=>{S.stepOpt=!S.stepOpt;e.currentTarget.setAttribute('aria-pressed',S.stepOpt);if(S.stepOpt)toast('Click a lit step to set its chance and ratchet.');};
-$('#toolsBtn').onclick=e=>{const o=$('.app').classList.toggle('tools');e.currentTarget.setAttribute('aria-expanded',o);e.currentTarget.setAttribute('aria-pressed',o);e.currentTarget.textContent=o?'Tools ▴':'Tools ▾';};
+/* layout switch: Simple / All tools, plus File and Export menus */
+let layMode='simple',moreOn=false;
+function setMore(o){moreOn=!!o;$('.app').classList.toggle('more',moreOn);const b=$('#moreBtn');b.setAttribute('aria-pressed',moreOn);b.setAttribute('aria-expanded',moreOn);b.textContent=moreOn?'More tools ▴':'More tools ▾';try{localStorage.setItem('beatsynth.more',moreOn?'1':'0');}catch(e){}}
+function setLayout(m,quiet){
+  layMode=m==='full'?'full':'simple';const A=$('.app');A.classList.toggle('simple',layMode==='simple');
+  $('#layS').setAttribute('aria-pressed',layMode==='simple');$('#layF').setAttribute('aria-pressed',layMode==='full');
+  try{localStorage.setItem('beatsynth.layout',layMode);}catch(e){}
+  if(layMode==='simple'){
+    const v=$('#viewRack');if($('#viewTl').getAttribute('aria-pressed')==='true'||$('#viewPerf').getAttribute('aria-pressed')==='true')v.click();
+    const e=document.querySelector('.seg [data-t="edit"]');if(e&&e.getAttribute('aria-pressed')!=='true')e.click();
+  }
+  if(!quiet&&typeof toast==='function')toast(layMode==='simple'?'Simple view: just the essentials. Press All tools to see everything.':'All tools are showing.');
+}
+function closeDd(){document.querySelectorAll('.dd.open').forEach(d=>{d.classList.remove('open');d.querySelector('.dd-btn').setAttribute('aria-expanded','false');});}
+function openDd(d){if(d.classList.contains('open'))return;closeDd();d.classList.add('open');d.querySelector('.dd-btn').setAttribute('aria-expanded','true');}
+function revealEl(el){
+  if(!el)return;const d=el.closest('.dd');if(d)openDd(d);
+  if(!el.getClientRects().length){if(layMode==='simple')setLayout('full',true);if(el.closest('.adv2')&&!moreOn)setMore(true);}
+}
+$('#layS').onclick=()=>setLayout('simple');$('#layF').onclick=()=>setLayout('full');
+$('#moreBtn').onclick=()=>setMore(!moreOn);
+document.querySelectorAll('.dd-btn').forEach(b=>b.onclick=e=>{e.stopPropagation();const d=b.parentElement;d.classList.contains('open')?closeDd():openDd(d);});
+document.querySelectorAll('.dd-panel').forEach(p=>p.addEventListener('click',e=>{if(e.target.closest('button'))setTimeout(closeDd,0);}));
+document.addEventListener('click',e=>{if(!e.target.closest('.dd'))closeDd();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.querySelector('.dd.open')){const d=document.querySelector('.dd.open .dd-btn');closeDd();if(d)d.focus();}});
+try{
+  const sv=localStorage.getItem('beatsynth.layout'),seen=!!localStorage.getItem('beatsynth.tour');
+  setLayout(sv||(seen?'full':'simple'),true);setMore(localStorage.getItem('beatsynth.more')==='1');
+}catch(e){setLayout('simple',true);setMore(false);}
+window.__layout=setLayout;window.__more=setMore;
 $('#undoBtn').onclick=undo;$('#redoBtn').onclick=redo;$('#copyBtn').onclick=doCopy;$('#pasteBtn').onclick=doPaste;$('#clearBtn').onclick=doClear;$('#rndBtn').onclick=doRandom;
 window.addEventListener('keydown',e=>{
   const tg=e.target,tag=tg.tagName;
@@ -3653,16 +3694,16 @@ function writeBass(src,dst,style,replace){
 
 /* ---------- guide window and coach marks ---------- */
 const GUIDE=(()=>{
-  const tab=t=>{const b=document.querySelector('.seg [data-t="'+t+'"]');if(b&&b.getAttribute('aria-pressed')!=='true')b.click();};
-  const tools=()=>{if(matchMedia('(max-width:700px)').matches&&!$('.app').classList.contains('tools'))$('#toolsBtn').click();};
-  const view=id=>{const b=$('#'+id);if(b&&b.getAttribute('aria-pressed')!=='true')b.click();};
+  const tab=t=>{setLayout('full',true);const b=document.querySelector('.seg [data-t="'+t+'"]');if(b&&b.getAttribute('aria-pressed')!=='true')b.click();};
+  const tools=()=>{setLayout('full',true);setMore(true);};
+  const view=id=>{if(id==='viewTl'||id==='viewPerf')setLayout('full',true);const b=$('#'+id);if(b&&b.getAttribute('aria-pressed')!=='true')b.click();};
   const firstInst=()=>{const a=activeCh();return a&&a.kind==='inst'?a:S.channels.find(c=>c.kind==='inst')||null;};
   const needInst=()=>{const c=firstInst();if(!c)toast('Add a piano or other instrument channel first.');return c;};
   const show=(sel,text,pre,label)=>({l:label||'Show me',run:()=>{if(pre)pre();coach(sel,text);}});
   const T=[
    {id:'start',t:'Start here',sub:'Your first minute',intro:'thebeatsynth is a step sequencer. You build a beat from channels, each one a sound, and turn steps on to decide when it plays.',
-    steps:['Press the orange Play button, or Space, to hear the starter beat.','Click squares in the Channel Rack to turn steps on or off. It changes while it plays.','Press + Add channel (bottom) to add another sound.','Your beat saves itself in this browser. Use Project, then Save, to keep a copy as a file.'],
-    acts:[{l:'Play the starter beat',run:()=>{closeGuide();$('#play').click();}},show('#play','Play and stop. Space does the same.'),{l:'Play the welcome message again',run:()=>{closeGuide();$('#tourBtn').click();}}]},
+    steps:['Press the orange Play button, or Space, to hear the starter beat.','Click squares in the Channel Rack to turn steps on or off. It changes while it plays.','Press + Add channel (bottom) to add another sound.','Your beat saves itself in this browser. Use File, then Save, to keep a copy as a file.','New here? You are in Simple view, which shows only the essentials. Press All tools (top left) any time to see the timeline, Perform, composing tools and more.'],
+    acts:[{l:'Play the starter beat',run:()=>{closeGuide();$('#play').click();}},show('#play','Play and stop. Space does the same.'),show('.seg.lay','Simple shows the essentials. All tools shows everything.',null,'Show Simple / All tools'),{l:'Play the welcome message again',run:()=>{closeGuide();$('#tourBtn').click();}}]},
    {id:'make',t:'Make me a beat',sub:'Pick a mood, get a starter',intro:'Not sure where to begin? Choose a mood and the app writes a whole starter for you: drums, chords, a bass line and a melody, in a key that fits.',
     steps:['Press Make me a beat (in Start from, at the bottom).','Pick a mood: Chill, Dark, Hype, Dreamy, Sad, Happy, Groovy or Night drive. Each one chooses its own drum style, key, tempo, chords, bass and melody sound.','Choose a loop length of 1, 2 or 4 bars. Turn the melody off if you only want the backing. Tick Build a full song too to get an intro, verse, build, drop and outro.','Press Make it, or Surprise me to let the app choose the mood. Then press Play.','Not quite right? Press Make me a beat again. Every try is different. Your previous beat is saved in the Library first, so nothing is lost.','Everything it writes is normal channels and notes. Open any piano roll to change the melody, or swap a sound with the channel menu.'],
     acts:[{l:'Open Make me a beat',run:()=>{closeGuide();$('#mmbBtn').click();}},show('#mmbBtn','Make me a beat: pick a mood and get a full starter.',tools,'Show me where')]},
@@ -3710,7 +3751,7 @@ const GUIDE=(()=>{
     acts:[show('#keysBtn','Keys, MIDI, Record, Loop rec and the metronome are in the Play tools.',()=>{tools();tab('play');})]},
    {id:'save',t:'Save, export and share',sub:'Keep it, render it, send it',intro:'Project and Export sit at the top.',
     steps:['Save downloads your project. ZIP keeps imported audio inside it. Library holds saved beats, templates and the public gallery.','Export renders a WAV, MP3 or loop-ready file. Pick a loudness target first if you want streaming level. Stems exports each channel on its own. Video and MIDI export too.','In Library, Share makes a link anyone can open as their own copy. Short link needs the share server. Embed code gives a small player to put on a web page.','Imported audio is not included in links. Use ZIP to move a beat that contains your own audio.'],
-    acts:[show('#saveBtn','Project buttons are here. Export is beside them.'),{l:'Open the Library',run:()=>{closeGuide();$('#libBtn').click();}}]},
+    acts:[show('#saveBtn','The File menu holds New, Open, Save and the Library. Export is beside it.'),{l:'Open the Library',run:()=>{closeGuide();$('#libBtn').click();}}]},
    {id:'presets',t:'Presets',sub:'Save your sounds and reuse them',intro:'Save a channel\'s effects, a synth patch or a whole channel setup, then bring it back in any beat.',
     steps:['Open Presets from a channel\'s ⋯ menu, the FX panel (Presets) or the Synth designer (My presets).','Type a name and press Save effects, Save synth patch or Save channel setup. They are stored in this browser.','Apply to channel puts saved effects, or a patch, on the active channel. Add as new channel brings back a whole setup with its sound, volume, pan, pitch and effects.','Starter effects such as Lo-fi tape, Wide chorus and Dub echo are built in. Press one to apply it to the active channel.','Export my presets saves them to a file. Import presets loads that file in another browser or on another computer.','Imported audio files cannot be saved in a preset. Use ZIP to keep a beat that contains your own audio.'],
     acts:[{l:'Open Presets',run:()=>{closeGuide();openPresets();}}]},
@@ -3732,7 +3773,7 @@ $('#coffee a').addEventListener('click',()=>{try{localStorage.setItem('beatsynth
 let coachEl=null,coachSpot=null;
 function clearCoach(){if(coachEl){coachEl.remove();coachEl=null;}if(coachSpot){coachSpot.classList.remove('spot');coachSpot=null;}}
 function coach(sel,text){
-  clearCoach();const el=document.querySelector(sel);if(!el||el.hidden){toast('That is not on screen right now.');return;}
+  clearCoach();const el=document.querySelector(sel);revealEl(el);if(!el||el.hidden){toast('That is not on screen right now.');return;}
   el.scrollIntoView({block:'center',behavior:'smooth'});el.classList.add('spot');coachSpot=el;
   const b=document.createElement('div');b.id='coach';b.setAttribute('role','status');b.innerHTML='<p>'+esc(text)+'</p><div><button class="btn sm primary" data-c="ok">Got it</button><button class="btn sm" data-c="back">Back to guide</button></div>';
   document.body.appendChild(b);coachEl=b;
@@ -3771,9 +3812,6 @@ function closeGuide(){$('#guideMod').hidden=true;}
   });
   $('#guideNav').addEventListener('keydown',e=>{if(!['ArrowDown','ArrowUp','ArrowLeft','ArrowRight'].includes(e.key))return;e.preventDefault();const i=GUIDE.findIndex(x=>x.id===gTopic),n=GUIDE[Math.max(0,Math.min(GUIDE.length-1,i+(e.key==='ArrowDown'||e.key==='ArrowRight'?1:-1)))];drawGuide(n.id);const b=$('#gn_'+n.id);if(b)b.focus();});
   window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#guideMod').hidden){closeGuide();e.stopPropagation();}},true);
-  // on phones the Level group is tucked away, so keep Guide next to the Tools button
-  const mq=matchMedia('(max-width:700px)'),home=$('#guideBtn').parentElement,alt=$('#toolsBtn').parentElement;
-  const mv=()=>{(mq.matches?alt:home).appendChild($('#guideBtn'));};mq.addEventListener?mq.addEventListener('change',mv):mq.addListener(mv);mv();
   window.openGuide=openGuide;
 })();
 
@@ -4979,13 +5017,13 @@ $('#midiOutBtn').onclick=()=>{
     ['Shape the sound','Mixer, effects, and a one-click Polish that makes the whole mix sound finished.',COLORS[4]],
     ['Build and share','Patterns, songs and a live Perform mode. Export WAV, MP3 or MIDI, or share a link.',COLORS[3]]];
   const phone=()=>matchMedia('(max-width:700px)').matches;
-  const openTools=()=>{if(phone()&&!$('.app').classList.contains('tools'))$('#toolsBtn').click();};
+  const openTools=()=>{};
   const ROWS=[['Play and tempo','Play starts and stops the music (Space does the same). Next to it you set the tempo, or press Tap in time with a song.','#play','Play and stop. Space does the same.'],
     ['The Channel Rack','Each row is one sound. Click the squares to place hits, and drag a lit square up or down to change how hard it hits.','.rack-scroll','This is the Channel Rack. Click squares to draw a beat.'],
-    ['Views','Switch between the Rack, a Mixer, drum Pads, a song Timeline and Perform for live sets.','#viewRack','Views: Rack, Mixer, Pads, Timeline and Perform.'],
-    ['Tools','The Edit, Compose and Play tabs hold randomizers, chord and melody writers, recording and an on-screen piano.','.editbar .seg','Edit, Compose and Play tools live here.',openTools],
+    ['Views','Switch between the Rack, a Mixer and drum Pads. The song Timeline and Perform for live sets appear in All tools.','#viewRack','Views: Rack, Mixer and Pads.'],
+    ['Simple or All tools','You start with just the essentials. Press All tools when you want more: the Timeline, Perform, chord and melody writers, recording, time signatures and more. Your choice is remembered.','.seg.lay','Simple shows the essentials. All tools shows everything.'],
     ['Get sounds and starters','Make me a beat, Templates, Import audio and Real instruments are along the bottom of the page.','#mmbBtn','Make me a beat writes a whole starter for you. Templates and imports are beside it.',openTools],
-    ['Save and export','Render to WAV or MP3, or export MIDI. Save and Open keep projects as files, and the Library remembers them for you.','#expBtn','Render exports your beat as WAV or MP3.'],
+    ['Save and export','Export renders your beat to WAV or MP3. The File menu has New, Open, Save and the Library, where your beats are remembered.','#expDd .dd-btn','Export renders your beat to WAV or MP3. File saves and opens projects.'],
     ['The Guide','Your help window. Every topic has Show me buttons that point at the real controls. You can replay this welcome from there any time.','#guideBtn','The Guide explains every feature, step by step.']];
   function wlEnd(){W.hidden=true;try{localStorage.setItem('beatsynth.tour','1');}catch(e){}if(wPrev&&wPrev.focus){try{wPrev.focus();}catch(e){}}wPrev=null;}
   function wlOpen(from){wPrev=document.activeElement;wStep=from||0;wlDraw();W.hidden=false;}
