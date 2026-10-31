@@ -17,7 +17,7 @@
   --pad:#36414d; --pad2:#3f4b59; --fg:#e3e9ee; --dim:#8c9cab;
   --accent:#ff9a3c; --accent-ink:#2a1700; --now:#b7f36a; --danger:#ff6b5a;
   --lcd-bg:#12170f; --lcd-fg:#ffb454;
-  --sw:34px; --head:300px;
+  --sw:34px; --head:326px;
   --f-ui:'Rajdhani',system-ui,-apple-system,'Segoe UI',sans-serif;
   --f-mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
   --inset:#10151a; --field:#1b2128;
@@ -46,6 +46,29 @@ button{cursor:pointer}
 .transport{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch}
 .grp{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 10px}
 .fld{display:flex;flex-direction:column;gap:3px;min-width:0}
+
+/* header: Mix popover, undo/redo, tips */
+.app.simple .tabrow{display:none}
+.egrp[data-tab="play"] select.btn,.egrp[data-tab="compose"] select.btn{max-width:118px;min-width:0;text-overflow:ellipsis}
+@media (min-width:701px){
+  .mixdd .dd-btn{display:none}
+  .mixdd .dd-panel{display:flex;position:static;flex-direction:row;align-items:stretch;gap:10px;border:0;padding:0;box-shadow:none;background:none;min-width:0}
+}
+@media (max-width:700px){
+  .transport{gap:6px}.transport>.grp{flex:1 1 auto;padding:4px 6px;gap:6px}
+  .transport .btn-play,.transport .btn-stop{width:40px;height:40px}
+  .transport .lcd{font-size:20px}.transport .lbl{font-size:10px}
+  #addSound{max-width:150px}
+  .transport>.grp:nth-child(4){order:3}.transport>.grp:nth-child(3){order:4}
+  .mixdd .dd-panel{flex-direction:column;gap:10px;padding:12px}
+  .mixdd .dd-panel .ctl{flex-direction:row;align-items:center;gap:10px}
+  .mixdd .dd-panel .ctl .lbl{min-width:56px}.mixdd .dd-panel .w120{width:100%;flex:1}
+  .mixdd .dd-panel .meter{flex:1;width:auto}
+}
+#tipsBtn{margin-left:auto}
+@media (min-width:701px){.patbar{gap:6px}.patbar .seg button{padding:6px 10px}.patbar .lbl{margin-left:2px}}
+#keyScale{max-width:none!important}
+.adder .btn{padding:5px 10px;font-size:14px}
 /* layout: Simple / All tools */
 .seg.lay button{padding:7px 14px;font-size:14px}
 .app.simple .adv{display:none!important}
@@ -55,6 +78,7 @@ button{cursor:pointer}
 .more-strip button{flex:1;display:flex;align-items:center;gap:12px;background:transparent;border:0;color:var(--fg);padding:9px 14px;font-size:15px;text-align:left;cursor:pointer;border-radius:6px}
 .more-strip button:hover{background:var(--panel2)}
 .more-strip b{color:var(--accent);font-size:15px}
+:root[data-theme="light"] .more-strip b,:root[data-theme="light"] .gt{color:#a64d00}
 .more-strip span{color:var(--dim);font-size:13px}
 .more-strip button[aria-pressed="true"]{background:var(--panel2)}
 .dd{position:relative}
@@ -114,13 +138,14 @@ body.embed #embedBar{display:flex!important;align-items:center;gap:14px;position
 .chip svg{width:14px;height:14px;fill:#10151a;opacity:.8}
 .chip canvas{width:100%;height:100%;display:block;background:rgba(0,0,0,.35)}
 .name{grid-area:name;min-width:0}
-.name select{width:100%;background:var(--field);border:1px solid var(--line);border-radius:4px;padding:4px 6px;color:var(--fg);font-weight:700;font-size:15px}
+.name select{width:100%;background:var(--field);border:1px solid var(--line);border-radius:4px;padding:4px 6px;color:var(--fg);font-weight:700;font-size:14px;text-overflow:ellipsis}
 .name .nm{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:4px 2px;font-weight:700}
 .tgs{grid-area:tg;display:flex;gap:4px}
 .tg{width:24px;height:24px;border-radius:4px;border:1px solid var(--line);background:var(--field);color:var(--dim);font-size:12px;font-weight:700;padding:0}
 .tg[aria-pressed="true"].m{background:var(--danger);color:#2a0a05;border-color:var(--danger)}
 .tg[aria-pressed="true"].s{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .tg.x:hover{color:var(--danger);border-color:var(--danger)}
+.knobs .macro{display:grid;grid-template-columns:max-content 1fr;align-items:center;gap:8px;margin-top:2px}.knobs .macro .lbl{white-space:nowrap}
 .knobs{grid-area:knobs;display:grid;grid-template-columns:1fr 1fr 1.1fr;gap:8px;align-items:end}
 .knobs label{display:flex;flex-direction:column;gap:0;min-width:0}
 .knobs .lbl{font-size:10px}
@@ -280,7 +305,7 @@ body.embed #embedBar{display:flex!important;align-items:center;gap:14px;position
 .pad-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;max-width:640px;margin:0 auto}
 .pad{position:relative;aspect-ratio:1;border-radius:12px;border:2px solid var(--pc,var(--line));background:var(--field);display:flex;flex-direction:column;justify-content:space-between;padding:8px;touch-action:none;user-select:none;cursor:pointer;overflow:hidden;transition:filter .06s}
 .pad.sel{box-shadow:0 0 0 3px var(--accent)}
-.pad small{font:600 11px var(--f-mono);color:var(--pc,var(--dim))}
+.pad small{font:600 11px var(--f-mono);color:var(--fg);opacity:.75}
 .padtune{max-width:640px;margin:14px auto 0;display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
 .padtune .pt-name{font-weight:700;min-width:90px}
 .padtune .pt-note{font:700 15px var(--f-mono);min-width:5.5ch;text-align:center}
@@ -468,11 +493,14 @@ body.lite *{transition:none!important;animation:none!important}
       <div class="fld adv"><span class="lbl">Bars</span><div class="lcd"><select id="bars" aria-label="Pattern length in bars"><option>1</option><option>2</option><option>4</option><option>8</option></select></div></div>
     </div>
     <div class="grp">
+      <div class="dd mixdd"><button class="btn sm dd-btn mixbtn" aria-haspopup="true" aria-expanded="false" title="Swing, master volume and level meter">Mix ▾</button><div class="dd-panel mixpanel" role="group" aria-label="Mix">
       <div class="ctl"><span class="lbl">Swing</span><input class="w120" id="swing" type="range" min="0" max="0.6" step="0.01" value="0" aria-label="Swing"></div>
       <div class="ctl"><span class="lbl">Master</span><input class="w120" id="master" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Master volume"></div>
       <div class="ctl"><span class="lbl">Level</span><div class="meter"><i id="meter"></i></div></div>
+      </div></div>
       <button class="btn sm toggle" data-polish aria-pressed="false" title="One-click gentle master EQ, compression and limiting. Press again to hear your original mix (A/B).">Polish</button>
       <button class="btn sm guide" id="guideBtn" aria-haspopup="dialog" title="Learn how everything works: short lessons with buttons that jump to the real controls"><b>?</b>Guide</button>
+      <button class="btn sm" id="themeBtn" aria-label="Switch between the dark and light theme">Light theme</button>
     </div>
     <div class="grp">
       <div class="dd" id="fileDd"><button class="btn sm dd-btn" aria-haspopup="true" aria-expanded="false" title="New, Open, Save and the Library">File ▾</button><div class="dd-panel" role="group" aria-label="File"><span class="lbl">Project</span><div class="ddrow"><button class="btn sm" id="newBtn">New</button><button class="btn sm" id="openBtn">Open</button><button class="btn sm" id="saveBtn">Save</button><button class="btn sm" id="zipBtn" title="Save the project and its imported audio as a ZIP">ZIP</button><button class="btn sm primary" id="libBtn" title="Starter templates, saved projects and share links">Library</button></div></div></div>
@@ -485,10 +513,9 @@ body.lite *{transition:none!important;animation:none!important}
     <span class="lbl">Pattern</span>
     <div class="pats" id="pats" role="group" aria-label="Patterns" title="Tempo, time signature and bars belong to the selected pattern. Double-click or right-click a name to rename."></div>
     <button class="btn sm" id="patNew" title="New empty pattern with the same tempo and time signature">+ New</button>
+    <button class="btn sm" id="undoBtn" disabled title="Undo (Ctrl+Z)">Undo</button> <button class="btn sm" id="redoBtn" disabled title="Redo (Ctrl+Shift+Z)">Redo</button>
     <button class="btn sm adv" id="patDup">Duplicate</button>
     <button class="btn sm adv" id="patDel">Delete</button>
-    <span class="vsep adv" aria-hidden="true"></span>
-    <button class="btn sm adv" id="themeBtn" aria-label="Switch between the dark and light theme">Light theme</button>
     <span class="lbl">View</span><div class="seg" role="group" aria-label="View"><button id="viewRack" aria-pressed="true">Rack</button><button id="viewMixer" aria-pressed="false">Mixer</button><button id="viewPads" aria-pressed="false">Pads</button><button id="viewTl" class="adv" aria-pressed="false">Timeline</button><button id="viewPerf" class="adv" aria-pressed="false" title="Launch patterns live like clips, and record the take as your song">Perform</button></div>
     <span class="lbl adv">Plays</span><div class="seg adv" role="group" aria-label="Play mode"><button id="modePat" aria-pressed="true" title="Loop the selected pattern">Pattern</button><button id="modeSong" aria-pressed="false" title="Play the arranged song">Song</button></div>
     <button class="btn sm toggle adv" id="songToggle" aria-pressed="false">Arrange ▾</button>
@@ -507,8 +534,6 @@ body.lite *{transition:none!important;animation:none!important}
 
   <div class="editbar" data-tab="edit">
     <div class="tabrow">
-      <button class="btn sm" id="undoBtn" disabled title="Undo (Ctrl+Z)">Undo</button>
-      <button class="btn sm" id="redoBtn" disabled title="Redo (Ctrl+Shift+Z)">Redo</button>
       <span class="lbl adv">Tools</span><div class="seg adv" role="group" aria-label="Tool tabs"><button data-t="edit" aria-pressed="true">Edit</button><button data-t="compose" aria-pressed="false">Compose</button><button data-t="play" aria-pressed="false">Play</button></div>
       <button class="btn sm adv" id="helpBtn" title="Keyboard shortcuts (?)">Shortcuts</button>
       <span class="hint" id="kbInfo"></span>
@@ -706,7 +731,7 @@ body.lite *{transition:none!important;animation:none!important}
       <button class="btn" id="tplBtn" title="Start from a ready-made beat in a style">Templates</button>
       <button class="btn adv" id="midiInBtn" title="Open a .mid file as a new pattern">Import MIDI…</button><input type="file" id="midiFile" accept=".mid,.midi,audio/midi" hidden></div>
     <input type="file" id="file" accept="audio/*,.wav,.mp3,.ogg,.m4a,.flac,.aac" multiple hidden>
-    <span class="hint adv">Click or drag across steps to draw a beat; drag a lit step up or down to set its velocity. Shift-click selects a range to copy and paste. Play the active channel with the keys A to ;. They follow your key and scale (Z and X change octave). Drop audio files anywhere to import them. Your beat autosaves in this browser.</span>
+    <span class="hint" id="tipLine">Click or drag across the squares to draw a beat. Your beat saves itself.</span><button class="btn sm guide" id="tipsBtn" title="Open the Guide: drawing, notes, keys, drag and drop"><b>?</b>Tips</button>
   </div>
 </div>
 <div class="pop" id="stepPop" hidden role="dialog" aria-label="Step settings">
@@ -1491,7 +1516,7 @@ function macroHTML(ch){
 function rowHTML(ch){
   const n=ch.len||total();let st='';for(let i=0;i<n;i++)st+=stepHTML(ch,i);
   const chip=ch.kind==='sample'?'<canvas width="88" height="60"></canvas>':'<svg viewBox="0 0 20 20"><path d="M6 3l11 7-11 7z"/></svg>';
-  const nm=ch.kind==='sample'?'<span class="nm" title="'+esc(ch.name)+'">'+esc(ch.name)+'</span>':'<select data-act="sound" aria-label="Sound">'+soundOptions(ch.sound,ch)+'</select>';
+  const nm=ch.kind==='sample'?'<span class="nm" title="'+esc(ch.name)+'">'+esc(ch.name)+'</span>':'<select data-act="sound" aria-label="Sound" title="'+esc(ch.name)+'">'+soundOptions(ch.sound,ch)+'</select>';
   const third=ch.kind==='inst'?'<label><span class="lbl">Note</span><select data-act="note" aria-label="Note for new steps">'+noteOptions(ch.note)+'</select></label><button class="rollbtn" data-act="roll" aria-pressed="'+(rollCh===ch.id)+'" title="Open piano roll">Roll</button>'+(ch.sound==='custom'?'<button class="rollbtn" data-act="syn" aria-pressed="'+(synCh===ch.id)+'" title="Design the sound">Syn</button>':'')
     :'<label><span class="lbl">Pitch <span data-pv>'+(ch.pitch>0?'+':'')+ch.pitch+'</span></span><input type="range" data-act="pitch" min="-12" max="12" step="1" value="'+ch.pitch+'" aria-label="Pitch in semitones"></label>'+(ch.kind==='sample'?'<button class="rollbtn" data-act="edit" aria-pressed="'+(edCh===ch.id)+'" title="Trim, reverse and slice">Edit</button>':'');
   return '<div class="row'+(S.activeId===ch.id?' active':'')+'" data-id="'+ch.id+'" data-len="'+(ch.len||0)+'" style="--c:'+ch.color+'"><div class="head"><span class="grip" draggable="true" title="Drag to reorder" aria-hidden="true">⋮</span>'
@@ -2553,10 +2578,11 @@ function revealEl(el){
   if(!el)return;const d=el.closest('.dd');if(d)openDd(d);
   if(!el.getClientRects().length){if(layMode==='simple')setLayout('full',true);if(el.closest('.adv2')&&!moreOn)setMore(true);}
 }
+$('#tipsBtn').onclick=()=>openGuide('steps');
 $('#layS').onclick=()=>setLayout('simple');$('#layF').onclick=()=>setLayout('full');
 $('#moreBtn').onclick=()=>setMore(!moreOn);
 document.querySelectorAll('.dd-btn').forEach(b=>b.onclick=e=>{e.stopPropagation();const d=b.parentElement;d.classList.contains('open')?closeDd():openDd(d);});
-document.querySelectorAll('.dd-panel').forEach(p=>p.addEventListener('click',e=>{if(e.target.closest('button'))setTimeout(closeDd,0);}));
+document.querySelectorAll('.dd-panel').forEach(p=>p.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.id==='newBtn'&&b.textContent==='Sure?')return;setTimeout(closeDd,0);}));
 document.addEventListener('click',e=>{if(!e.target.closest('.dd'))closeDd();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.querySelector('.dd.open')){const d=document.querySelector('.dd.open .dd-btn');closeDd();if(d)d.focus();}});
 try{
@@ -3886,6 +3912,9 @@ const GUIDE=(()=>{
    {id:'start',t:'Start here',sub:'Your first minute',intro:'thebeatsynth is a step sequencer. You build a beat from channels, each one a sound, and turn steps on to decide when it plays.',
     steps:['Press the orange Play button, or Space, to hear the starter beat.','Click squares in the Channel Rack to turn steps on or off. It changes while it plays.','Press + Add channel (bottom) to add another sound.','Your beat saves itself in this browser. Use File, then Save, to keep a copy as a file.','New here? You are in Simple view, which shows only the essentials. Press All tools (top left) any time to see the timeline, Perform, composing tools and more.'],
     acts:[{l:'Play the starter beat',run:()=>{closeGuide();$('#play').click();}},show('#play','Play and stop. Space does the same.'),show('.seg.lay','Simple shows the essentials. All tools shows everything.',null,'Show Simple / All tools'),{l:'Play the welcome message again',run:()=>{closeGuide();$('#tourBtn').click();}}]},
+   {id:'layout',t:'Simple view and All tools',sub:'Start small, open up when you are ready',intro:'The page starts in Simple view so nothing gets in your way. Everything is still there, one press away.',
+    steps:['Simple shows what you need to make a beat: Play and Stop, tempo and Tap, Swing, Master, Polish, the Rack, Mixer and Pads views, Undo and Redo, Copy, Paste, Clear, Randomize, Add channel, Make me a beat and Templates.','All tools (top left) adds time signature and bars, Duplicate and Delete pattern, the Timeline and Perform views, song Arrange, the Edit, Compose and Play tabs, Shortcuts, Sound packs and MIDI import.','In All tools, the dashed More tools bar under Steps and Random opens Rhythm, Variation, Transitions, Mutate and Automation.','The File menu holds New, Open, Save, ZIP and the Library. The Export menu holds loudness, format, Render, Stems, Video and MIDI.','Your choice is remembered on this device. Switching back to Simple never deletes anything.'],
+    acts:[show('.seg.lay','Simple shows the essentials. All tools shows everything.',null,'Show the switch'),show('#moreBtn','More tools opens Rhythm, Variation, Transitions, Mutate and Automation.',null,'Show More tools'),show('#fileDd .dd-btn','New, Open, Save, ZIP and the Library.',null,'Show the File menu'),show('#expDd .dd-btn','Render, Stems, Video and MIDI.',null,'Show the Export menu')]},
    {id:'make',t:'Make me a beat',sub:'Pick a mood, get a starter',intro:'Not sure where to begin? Choose a mood and the app writes a whole starter for you: drums, chords, a bass line and a melody, in a key that fits.',
     steps:['Press Make me a beat (in Start from, at the bottom).','Pick a mood: Chill, Dark, Hype, Dreamy, Sad, Happy, Groovy or Night drive. Each one chooses its own drum style, key, tempo, chords, bass and melody sound.','Choose a loop length of 1, 2 or 4 bars. Turn the melody off if you only want the backing. Tick Build a full song too to get an intro, verse, build, drop and outro.','Press Make it, or Surprise me to let the app choose the mood. Then press Play.','Not quite right? Press Make me a beat again. Every try is different. Your previous beat is saved in the Library first, so nothing is lost.','Everything it writes is normal channels and notes. Open any piano roll to change the melody, or swap a sound with the channel menu.'],
     acts:[{l:'Open Make me a beat',run:()=>{closeGuide();$('#mmbBtn').click();}},show('#mmbBtn','Make me a beat: pick a mood and get a full starter.',tools,'Show me where')]},
@@ -3896,8 +3925,11 @@ const GUIDE=(()=>{
     steps:['Channel menu: right-click a channel header, or press its ⋯ button (the only way on a phone, along with a long-press). It has Rename, Duplicate, eight colours, Move up and down, Presets, Clear in this pattern and Delete channel. A new name shows in the rack right away and is saved with the beat.','Reorder: hover a channel and drag the dotted grip on its left edge up or down. An orange line shows where it will land. On a phone use Move up and Move down.','Select bars: click a bar number above the rack to select that bar on the active channel. Shift-click another number to select a range. Press Copy, click the bar you want, and press Paste. If you paste into a longer selection, the copy repeats to fill it.','Bar menu: right-click a bar number for Copy bar, Paste here, Duplicate to next bar, Duplicate on every channel, Clear bar and Double pattern.','Double pattern turns 1 bar into 2, 2 into 4, or 4 into 8, copying everything into the new half. The Bars box in the tempo group goes up to 8.','Patterns: right-click a pattern name for Rename, Duplicate and Delete. Double-click also renames.','Undo: after deleting a channel or pattern, clearing, or doubling, an Undo button appears for a few seconds. Ctrl+Z always works, and History lists every step you can jump back to.'],
     acts:[{l:'Open a channel menu',run:()=>{const c=activeCh()||S.channels[0];if(!c){toast('Add a channel first.');return;}closeGuide();view('viewRack');const b=document.querySelector('.row[data-id="'+c.id+'"] .tg.mn');if(b){b.scrollIntoView({block:'center'});const r=b.getBoundingClientRect();setActive(c.id);openChMenu(c,r.left,r.bottom+4);}}},show('.ruler .rc.bar','Click a bar number to select it. Right-click it for the bar menu.',null,'Show the bar numbers'),show('#bars','Bars: 1, 2, 4 or 8 for the selected pattern.',null,'Show the Bars box')]},
    {id:'sounds',t:'Add sounds',sub:'Built-in, recorded and your own',intro:'Everything you bring in sits along the bottom of the rack, in three groups.',
-    steps:['Add a channel: pick a built-in sound (drums, bass, synths, piano) and press + Add channel.','Get sounds: Import audio loads your own files. Real instruments has recorded piano, strings, brass and more. Browse sounds lets you audition everything. Sound packs adds ready-made one-shots.','Start from: Templates opens one of 21 ready-made beats, from trap, house and lo-fi to dubstep, phonk, Jersey club and amapiano. Import MIDI opens a .mid file as a new pattern.'],
+    steps:['Add a channel: pick a built-in sound (drums, bass, synths, piano) and press + Add channel.','Get sounds: Import audio loads your own files. Real instruments has recorded piano, strings, brass and more. Browse sounds lets you audition everything. Sound packs adds ready-made one-shots.','Sound menus are grouped: Drums, 808 and percussion, Real instruments, Instruments, Synth basses, Synth leads, keys and pads, and Effects.','Start from: Templates opens one of 21 ready-made beats, from trap, house and lo-fi to dubstep, phonk, Jersey club and amapiano. Import MIDI opens a .mid file as a new pattern.'],
     acts:[show('.adder','Add and import sounds here.'),{l:'Open Real instruments',run:()=>{closeGuide();$('#gmBtn').click();}},{l:'Open Browse sounds',run:()=>{closeGuide();$('#sbBtn').click();}}]},
+   {id:'synths',t:'Synths, macros and arpeggiator',sub:'Wobble, evolving pads and moving notes',intro:'The built-in synths cover sub and wobble bass, plucks, leads, choir, mallets and evolving pads. Two tools make them move.',
+    steps:['Synth basses: Sub, Reese, Wobble and FM Bass. Synth leads, keys and pads: Chord Stab, PWM Lead, Choir, Flute, Kalimba, Vibraphone, Glass Pad, Evolving Pad and Drift Pad. Effects: Laser Zap, Arcade Blip, Downlifter and Reverse Cymbal.','Macro knob: Wobble, Reese, FM Bass, Choir and both pads show one extra slider on their rack row. It sets Wobble rate, Width, Bite, Vowel (ee, ah, oo), Morph time or Drift speed. Move it while the beat plays.','Evolving Pad morphs through four wavetables and opens its filter over each note. Drift Pad crossfades two layers slowly and never settles.','Arpeggiator: open FX on any instrument channel and find Arpeggiator. Pick Up, Down, Up and down or Random, a speed, 1 to 3 octaves and a note length. It plays the note, or the chord if you set one, as a running pattern.','Pair a chord with the arpeggiator to get movement from a single note. Turn the Pattern back to Off to hear the plain chord again.'],
+    acts:[{l:'Add a Wobble Bass',run:()=>{closeGuide();view('viewRack');$('#addSound').value='wobble';$('#add').click();const c=S.channels[S.channels.length-1];setTimeout(()=>coach('.row[data-id="'+c.id+'"] .macro','Move this macro knob to change the wobble rate.'),60);}},{l:'Add an Evolving Pad',run:()=>{closeGuide();view('viewRack');$('#addSound').value='evolve';$('#add').click();const c=S.channels[S.channels.length-1];setTimeout(()=>coach('.row[data-id="'+c.id+'"] .macro','Morph time sets how slowly the sound changes.'),60);}},{l:'Open FX for the arpeggiator',run:()=>{const c=needInst();if(c){closeGuide();view('viewRack');openPanel('fx',c);setTimeout(()=>coach('#fx_arp','Pick an arpeggiator pattern here.'),120);}}}]},
    {id:'roll',t:'Piano roll',sub:'Melodies, bass and chords by note',intro:'Instrument channels play notes. Press ROLL on a channel to open its piano roll.',
     steps:['Click to add a note. Drag right to make it longer. Click a note to delete it.','Drag the bars in the Vel lane to set how hard each note hits.','Slide glides into a note from the one before it.','Zoom with − and + or Ctrl and the mouse wheel.','Select turns on box-select: drag a box around notes, drag them to move, or press Delete. Edit notes quantizes, humanizes (small timing and velocity variation) and transposes the selected notes, or all of them if none are selected.'],
     acts:[{l:'Open a piano roll',run:()=>{const c=needInst();if(c){closeGuide();openPanel('roll',c);coach('#roll','This is the piano roll. Click to add notes.');}}}]},
@@ -3905,14 +3937,14 @@ const GUIDE=(()=>{
     steps:['Open a piano roll and press Select. The roll now selects instead of drawing.','Drag a box around notes to select them. Shift-click adds or removes one. Click empty space to clear the selection.','Drag any selected note to move all the selected notes together, in time and pitch. Press Delete to remove them (Undo brings them back).','Press Edit notes ▾. With nothing selected it works on every note.','Quantize pulls notes to the nearest step, every 2 steps or every beat, and tidies overlapping duplicates.','Humanize adds a small random timing and velocity change to each note, so a programmed part feels played. Reset timing puts them back on the grid.','Transpose moves by a semitone or an octave, or by one step of your scale so notes stay in key.','Copy notes with Ctrl+C (or Cut with Ctrl+X). Click a spot on the roll, where the orange dashed marker appears, and press Ctrl+V. Paste again to keep going. Ctrl+D duplicates the selection straight to the right.','Ghost shows faint notes from your other channels behind this roll, and the drum hits as soft columns, so you can line a melody up with the bass or the kick. Pick one channel or all of them.','Press Select again to go back to drawing notes.'],
     acts:[{l:'Open a roll and turn on Select',run:()=>{const c=needInst();if(c){closeGuide();openPanel('roll',c);setTimeout(()=>{const b=$('#rollSelBtn');if(b.getAttribute('aria-pressed')!=='true')b.click();coach('#rollEdit','Edit notes: copy, paste, quantize, humanize and transpose.');},120);}}},{l:'Open a roll with Ghost on',run:()=>{const c=needInst();if(c){closeGuide();openPanel('roll',c);setTimeout(()=>{window.__ghost('all');coach('#rollGhost','Ghost shows your other channels faintly behind this roll.');},120);}}}]},
    {id:'chords',t:'Chords, bass and melody',sub:'Let the app write music in your key',intro:'First set your key and scale in the Compose tools. Everything below follows them.',
-    steps:['In the piano roll, the chord picker turns every note you write into a chord. The extra chord notes show faintly and the chord name is written on the note.','Progression and bass (in the piano roll) writes a whole chord progression, with a bass line that follows it.','In the Compose tools, Chords, Bass and Melody write quick versions in one click. Bake arp turns chords into an arpeggio.','Scale lock keeps every note you draw or play inside the scale.'],
+    steps:['In the piano roll, the chord picker turns every note you write into a chord. The extra chord notes show faintly and the chord name is written on the note.','Progression and bass (in the piano roll) writes a whole chord progression, with a bass line that follows it.','In the Compose tools, Chords, Bass and Melody write quick versions in one click. Bake arp turns chords into an arpeggio. For a live arpeggio, use the Arpeggiator in a channel\'s FX.','Scale lock keeps every note you draw or play inside the scale.'],
     acts:[{l:'Open Progression and bass',run:()=>{const c=needInst();if(c){closeGuide();openPanel('roll',c);setTimeout(()=>$('#rollProg').click(),60);}}},show('#chBtn','Chords, Bass, Melody and Bake arp are here.',()=>{tools();tab('compose');})]},
    {id:'hum',t:'Hum to notes',sub:'Sing a melody into the roll',intro:'The app listens to your microphone, finds the pitch and writes notes into the piano roll.',
     steps:['Open a piano roll, then press Hum to notes.','Press Record. After a one-bar count-in it listens for one pattern length.','Sing or hum one note at a time, close to the mic. Headphones stop the click leaking in.','Snap to key pulls notes into your scale. Octave shift moves them up or down.'],
     acts:[{l:'Open Hum to notes',run:()=>{const c=needInst();if(c){closeGuide();openPanel('roll',c);setTimeout(()=>$('#rollHum').click(),60);}}}]},
    {id:'key',t:'Key and scale',sub:'Keep everything in tune together',intro:'Key and scale are project-wide. Generators, chords, scale lock and hum snapping all use them.',
-    steps:['Open Compose and pick a key and scale.','Turn on Scale lock to snap drawn and played notes to the scale.','Imported loops: in the sample editor, Detect key and Use for project set the key and tempo to match.'],
-    acts:[show('#keyRoot','Pick the key here, and the scale next to it.',()=>{tools();tab('compose');})]},
+    steps:['Pick a key and scale in the Compose or Play tools. They are the same setting in both places.','Keys follow scale (Play tools, on by default): the keys A to ; play only notes in your key and scale, so every key sounds right. Change the key or scale and the keys re-map at once. Turn it off for a normal piano layout.','Scale lock snaps drawn notes, and notes played from MIDI, the on-screen piano or pads, to the scale.','Imported loops: in the sample editor, Detect key and Use for project set the key and tempo to match.'],
+    acts:[show('#keyRoot','Pick the key here, and the scale next to it.',()=>{tools();tab('play');}),show('#kScaleBtn','Keep this on and the keys A to ; stay in your scale.',()=>{tools();tab('play');},'Show Keys follow scale')]},
    {id:'mixer',t:'Mixer and effects',sub:'Levels, EQ, compressor, space',intro:'The Mixer view shows every channel as a strip, with the master on the right.',
     steps:['Mixer view: each strip has pan, a volume fader with a level meter, mute, solo, delay and reverb sends, and sidechain (Duck).','FX on any channel opens its effects: filter, drive, delay, reverb, EQ with a live curve, a compressor (auto or manual) with a gain-reduction meter, crush, tape, chorus, phaser, widener, an LFO, chords and more.','The master side has EQ, group buses A to D, a limiter with a reduction meter, a peak readout and a clip light, and a spectrum.'],
     acts:[{l:'Open the Mixer',run:()=>{closeGuide();view('viewMixer');coach('#mixer','Every channel has a strip. The master is on the right.');}},{l:'Open a channel\'s FX',run:()=>{const c=activeCh()||S.channels[0];if(c){closeGuide();view('viewRack');openPanel('fx',c);coach('#fx','Effects for this channel.');}}}]},
@@ -3920,20 +3952,20 @@ const GUIDE=(()=>{
     steps:['Press Polish, next to the Level meter (it is also at the top of the Mixer\'s master section).','It adds a small low and high lift, a softer mid, smoother compression and slightly firmer limiting. It is not made louder, so the comparison is fair.','Press it again to hear your original. Your own master EQ and limiter settings come back exactly as they were.','Polish is saved with your project and is included when you Render.','Want more control? Open the Mixer and adjust the master EQ and limiter yourself.'],
     acts:[show('[data-polish]','Polish on or off. Try it while a beat plays.',()=>{if(matchMedia('(max-width:700px)').matches)tools();},'Show the Polish button'),{l:'Open the Mixer',run:()=>{closeGuide();view('viewMixer');coach('#mixer','The master section is on the right.');}}]},
    {id:'trans',t:'Fills, risers and drops',sub:'Transitions in one click',intro:'Transitions write the end-of-pattern moments that make a beat feel finished.',
-    steps:['Open the Edit tools and find Transitions.','Drum fill at the end: a snare or clap roll that builds, a short gap in the kick, a hat build, and toms if you have them.','Riser into the end: adds a Riser channel with one long sweeping note over the last bar (or half the pattern if it is one bar).','Drop transition: a riser, a short gap in the kick and bass, a snare roll, then a boom and crash on the first step so the loop restarts with a hit.','Each one is written into the current pattern. An Undo button appears right away.','Want a separate version? Use Make variation first, then add a transition to the copy.'],
+    steps:['Open the Edit tools, press More tools, and find Transitions.','Drum fill at the end: a snare or clap roll that builds, a short gap in the kick, a hat build, and toms if you have them.','Riser into the end: adds a Riser channel with one long sweeping note over the last bar (or half the pattern if it is one bar).','Drop transition: a riser, a short gap in the kick and bass, a snare roll, then a boom and crash on the first step so the loop restarts with a hit.','Each one is written into the current pattern. An Undo button appears right away.','Want a separate version? Use Make variation first, then add a transition to the copy.'],
     acts:[show('#trBtn','Pick a transition, then press Add.',()=>{tools();tab('edit');},'Show Transitions')]},
    {id:'pads',t:'Pads and samples',sub:'Tap, chop and edit audio',intro:'Pads view gives you 16 pads you can tap, click or play from the keyboard.',
-    steps:['Tap a pad. Tap higher on it for a harder hit. Keys 1 2 3 4, Q W E R, A S D F, Z X C V play the 16 pads.','Drop an audio file onto a pad to load it, or use Chop audio to cut a loop at its hits across the pads.','Import folder turns a folder of one-shots into channels.','Open an imported sample in the sample editor to trim it, slice it, detect its tempo and key, and fit it to your project.'],
-    acts:[{l:'Open Pads',run:()=>{closeGuide();view('viewPads');coach('#pads','Tap a pad, or use the keyboard.');}}]},
+    steps:['Tap a pad. Tap higher on it for a harder hit. Keys 1 2 3 4, Q W E R, A S D F, Z X C V play the 16 pads.','Drop an audio file onto a pad to load it, or use Chop audio to cut a loop at its hits across the pads.','Tune a pad: tap a pad to select it and the tuner appears under the grid. For an instrument, pick the note it plays. For your own audio, set Sample is to the note the recording really plays, then pick the note you want. Synth drums tune in semitones. Reset puts it back.','Import folder turns a folder of one-shots into channels.','Open an imported sample in the sample editor to trim it, slice it, detect its tempo and key, and fit it to your project.'],
+    acts:[{l:'Open Pads',run:()=>{closeGuide();view('viewPads');coach('#pads','Tap a pad, or use the keyboard.');}},{l:'Show the pad tuner',run:()=>{closeGuide();view('viewPads');setTimeout(()=>coach('#padTune','Tap a pad, then tune the note here.'),120);}}]},
    {id:'song',t:'Patterns and songs',sub:'Turn a loop into a track',intro:'A pattern is one loop. A song is patterns lined up in order.',
     steps:['+ New adds a pattern, Duplicate copies one. Double-click or right-click a name to rename it. Tempo, time signature and bars belong to the selected pattern.','Arrange opens the song bar: add patterns, move them, set how many times each repeats.','Timeline view shows the song as blocks you can drag.','Switch Plays from Pattern to Song to play the arranged song. Compose, then Build song, makes an intro, drop and outro for you.','Tempo changes: select a clip in the Timeline and type a Tempo for it, for example 70 for a slow intro and 140 for the drop. Ramp to speeds up or slows down smoothly across the clip. Leave them empty to use the pattern tempo.','Master automation (under the Timeline) draws a lane across the whole song for Volume, a Low-pass filter, a High-pass filter, Reverb or Delay. Click to add a point, drag to shape it, right-click a point to remove it. Quick shape fills in a sweep, a dip or a build-then-drop.','Lanes and clip tempos are heard when you play as Song and in a Render of the song.'],
     acts:[{l:'Show the pattern bar',run:()=>{closeGuide();coach('#pats','Patterns live here. Arrange opens the song bar.');}},{l:'Open Timeline',run:()=>{closeGuide();view('viewTl');coach('#timeline','Drag clips to arrange your song.');}},show('#clBpm','Give the selected clip its own tempo, or ramp it to a new one.',()=>{view('viewTl');},'Show clip tempo'),show('#mlCv','Draw a master lane here: volume, filters, reverb or delay across the song.',()=>{view('viewTl');},'Show master automation')]},
    {id:'live',t:'Play and record live',sub:'Keys, MIDI, recording, looper',intro:'The Play tools handle everything you perform.',
-    steps:['Keys plays the active channel from your computer keyboard. Z and X move the octave. Piano shows an on-screen keyboard.','Connect MIDI links a keyboard or controller. MIDI learn links a knob to any slider: click the slider, then move the knob.','Record writes what you play into the active channel while the pattern runs. Use Metronome and Count-in for timing.','Loop rec records the mic or the whole mix for 1 to 8 bars, exactly in time. Reference lets you A/B against a finished track.'],
+    steps:['Keys plays the active channel from your computer keyboard. Z and X move the octave. With Keys follow scale on, A to ; play only notes in your key and scale. Piano shows an on-screen keyboard.','Connect MIDI links a keyboard or controller. MIDI learn links a knob to any slider: click the slider, then move the knob.','Record writes what you play into the active channel while the pattern runs. Use Metronome and Count-in for timing.','Loop rec records the mic or the whole mix for 1 to 8 bars, exactly in time. Reference lets you A/B against a finished track.'],
     acts:[show('#keysBtn','Keys, MIDI, Record, Loop rec and the metronome are in the Play tools.',()=>{tools();tab('play');})]},
    {id:'save',t:'Save, export and share',sub:'Keep it, render it, send it',intro:'Project and Export sit at the top.',
-    steps:['Save downloads your project. ZIP keeps imported audio inside it. Library holds saved beats, templates and the public gallery.','Export renders a WAV, MP3 or loop-ready file. Pick a loudness target first if you want streaming level. Stems exports each channel on its own. Video and MIDI export too.','In Library, Share makes a link anyone can open as their own copy. Short link needs the share server. Embed code gives a small player to put on a web page.','Imported audio is not included in links. Use ZIP to move a beat that contains your own audio.'],
-    acts:[show('#saveBtn','The File menu holds New, Open, Save and the Library. Export is beside it.'),{l:'Open the Library',run:()=>{closeGuide();$('#libBtn').click();}}]},
+    steps:['Open the File menu: Save downloads your project, ZIP keeps imported audio inside it, and Library holds saved beats, templates and the public gallery.','Open the Export menu: Render makes a WAV, MP3 or loop-ready file. Pick a loudness target first if you want streaming level. Stems exports each channel on its own. Video and MIDI export too.','In Library, Share makes a link anyone can open as their own copy. Short link needs the share server. Embed code gives a small player to put on a web page.','Imported audio is not included in links. Use ZIP to move a beat that contains your own audio.'],
+    acts:[show('#saveBtn','The File menu holds New, Open, Save and the Library.'),show('#expBtn','Render, Stems, Video and MIDI are in the Export menu.',null,'Show Export'),{l:'Open the Library',run:()=>{closeGuide();$('#libBtn').click();}}]},
    {id:'presets',t:'Presets',sub:'Save your sounds and reuse them',intro:'Save a channel\'s effects, a synth patch or a whole channel setup, then bring it back in any beat.',
     steps:['Open Presets from a channel\'s ⋯ menu, the FX panel (Presets) or the Synth designer (My presets).','Type a name and press Save effects, Save synth patch or Save channel setup. They are stored in this browser.','Apply to channel puts saved effects, or a patch, on the active channel. Add as new channel brings back a whole setup with its sound, volume, pan, pitch and effects.','Starter effects such as Lo-fi tape, Wide chorus and Dub echo are built in. Press one to apply it to the active channel.','Export my presets saves them to a file. Import presets loads that file in another browser or on another computer.','Imported audio files cannot be saved in a preset. Use ZIP to keep a beat that contains your own audio.'],
     acts:[{l:'Open Presets',run:()=>{closeGuide();openPresets();}}]},
@@ -5195,7 +5227,7 @@ $('#midiOutBtn').onclick=()=>{
   let wStep=0,wMood='chill',wPrev=null;
   const LOGO='<svg class="wl-logo" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" fill="#1d232a"/><g fill="#ff9a3c"><rect x="96" y="96" width="76" height="76" rx="12"/><rect x="218" y="96" width="76" height="76" rx="12" opacity=".35"/><rect x="340" y="96" width="76" height="76" rx="12"/><rect x="96" y="218" width="76" height="76" rx="12" opacity=".35"/><rect x="218" y="218" width="76" height="76" rx="12"/><rect x="340" y="218" width="76" height="76" rx="12" opacity=".35"/><rect x="96" y="340" width="76" height="76" rx="12"/><rect x="218" y="340" width="76" height="76" rx="12" opacity=".35"/><rect x="340" y="340" width="76" height="76" rx="12"/></g></svg>';
   const FEATS=[['Draw beats','Click squares in the Channel Rack to place drums and sounds. It changes while it plays.',COLORS[0]],
-    ['Play notes','A piano roll, plus chord, bass and melody writers that keep everything in key.',COLORS[2]],
+    ['Play notes','A piano roll, chord, bass and melody writers, and keyboard keys that stay in your key.',COLORS[2]],
     ['Shape the sound','Mixer, effects, and a one-click Polish that makes the whole mix sound finished.',COLORS[4]],
     ['Build and share','Patterns, songs and a live Perform mode. Export WAV, MP3 or MIDI, or share a link.',COLORS[3]]];
   const phone=()=>matchMedia('(max-width:700px)').matches;
