@@ -392,9 +392,11 @@ body.lite *{transition:none!important;animation:none!important}
 .ed-info{font:500 12px var(--f-mono);color:var(--dim)}
 .chk{display:flex;gap:6px;align-items:center;font-weight:700}
 .vsep{width:1px;height:22px;background:var(--line);margin:0 4px}
-.patbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.patbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
 .seg[hidden],#helpBtn[hidden]{display:none!important}
 .patbar select.btn{min-width:0}
+.patbar{width:fit-content;max-width:100%}
+@media (max-width:700px){.patbar>.gt{display:none}}
 .pats{display:flex;gap:4px;flex-wrap:wrap}
 .pchip{background:var(--panel2);border:1px solid var(--line);border-bottom:3px solid var(--c);border-radius:5px;padding:5px 12px;font-weight:700}
 .pchip[aria-pressed="true"]{background:var(--c);color:#10151a;border-color:var(--c)}
@@ -595,14 +597,14 @@ body.lite *{transition:none!important;animation:none!important}
   <section class="kbd" id="kbd" hidden aria-label="On-screen piano"><div class="kbd-bar"><span class="lbl">Play with</span><select id="kbdInst" class="btn sm" aria-label="Instrument for the piano and keyboard"></select><select id="kbdPreset" class="btn sm" hidden aria-label="Custom synth preset"></select><span class="sep"></span><span class="kg"><span class="lbl">Chord</span><select id="kbdChord" class="btn sm" aria-label="Chord mode"><option value="off">Off</option><option value="maj">Major</option><option value="min">Minor</option><option value="dom7">Dominant 7th</option><option value="maj7">Major 7th</option><option value="min7">Minor 7th</option><option value="sus2">Sus 2</option><option value="sus4">Sus 4</option><option value="pow">Power (5th)</option><option value="dim">Diminished</option><option value="aug">Augmented</option><option value="add9">Add 9</option></select></span><span class="sep"></span><span class="kg"><span class="lbl">Arp</span><select id="kbdArp" class="btn sm" aria-label="Arpeggiator mode"><option value="off">Off</option><option value="up">Up</option><option value="down">Down</option><option value="ud">Up and down</option><option value="rnd">Random</option></select><select id="kbdRate" class="btn sm" aria-label="Arpeggiator rate"><option value="1">1/4</option><option value="0.5">1/8</option><option value="0.25" selected>1/16</option><option value="0.125">1/32</option></select><label class="chk" title="Keep the arpeggio going after you let go. Pressing a new key replaces it."><input type="checkbox" id="kbdLatch"> Latch</label></span></div><div class="kbd-keys" id="kbdKeys"></div></section>
 
   <div class="patbar">
-    <span class="lbl">Pattern</span>
+    <span class="gt">Pattern</span>
     <div class="pats" id="pats" role="group" aria-label="Patterns" title="Tempo, time signature and bars belong to the selected pattern. Double-click or right-click a name to rename."></div>
     <button class="btn sm" id="patNew" title="New empty pattern with the same tempo and time signature">+ New</button>
     <button class="btn sm" id="undoBtn" disabled title="Undo (Ctrl+Z)">Undo</button> <button class="btn sm" id="redoBtn" disabled title="Redo (Ctrl+Shift+Z)">Redo</button>
     <button class="btn sm adv" id="patDup">Duplicate</button>
     <button class="btn sm adv" id="patDel">Delete</button>
-    <span class="lbl">View</span><select id="viewSel" class="btn sm" aria-label="View" title="Switch between the Rack, Mixer, Pads and more"><option value="viewRack">Rack</option><option value="viewMixer">Mixer</option><option value="viewPads">Pads</option><option value="viewTl" class="adv" data-adv="1">Timeline</option><option value="viewPerf" class="adv" data-adv="1">Perform</option></select><div class="seg" id="viewSeg" role="group" aria-label="View buttons" hidden><button id="viewRack" aria-pressed="true">Rack</button><button id="viewMixer" aria-pressed="false">Mixer</button><button id="viewPads" aria-pressed="false">Pads</button><button id="viewTl" class="adv" aria-pressed="false">Timeline</button><button id="viewPerf" class="adv" aria-pressed="false" title="Launch patterns live like clips, and record the take as your song">Perform</button></div>
-    <span class="lbl adv">Plays</span><div class="seg adv" role="group" aria-label="Play mode"><button id="modePat" aria-pressed="true" title="Loop the selected pattern">Pattern</button><button id="modeSong" aria-pressed="false" title="Play the arranged song">Song</button></div>
+    <span class="gt">View</span><select id="viewSel" class="btn sm" aria-label="View" title="Switch between the Rack, Mixer, Pads and more"><option value="viewRack">Rack</option><option value="viewMixer">Mixer</option><option value="viewPads">Pads</option><option value="viewTl" class="adv" data-adv="1">Timeline</option><option value="viewPerf" class="adv" data-adv="1">Perform</option></select><div class="seg" id="viewSeg" role="group" aria-label="View buttons" hidden><button id="viewRack" aria-pressed="true">Rack</button><button id="viewMixer" aria-pressed="false">Mixer</button><button id="viewPads" aria-pressed="false">Pads</button><button id="viewTl" class="adv" aria-pressed="false">Timeline</button><button id="viewPerf" class="adv" aria-pressed="false" title="Launch patterns live like clips, and record the take as your song">Perform</button></div>
+    <span class="gt adv">Plays</span><div class="seg adv" role="group" aria-label="Play mode"><button id="modePat" aria-pressed="true" title="Loop the selected pattern">Pattern</button><button id="modeSong" aria-pressed="false" title="Play the arranged song">Song</button></div>
     <button class="btn sm toggle adv" id="songToggle" aria-pressed="false">Arrange ▾</button>
   </div>
   <div class="song" id="song" hidden>
