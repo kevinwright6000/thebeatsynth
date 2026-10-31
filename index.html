@@ -51,6 +51,12 @@ button{cursor:pointer}
 .app.simple .adv{display:none!important}
 .app.simple .editbar .egrp:not([data-tab="edit"]){display:none!important}
 .app:not(.more) .egrp.adv2{display:none!important}
+.egrp.more-strip{flex:1 1 100%;padding:0;border:1px dashed var(--accent);background:transparent}
+.more-strip button{flex:1;display:flex;align-items:center;gap:12px;background:transparent;border:0;color:var(--fg);padding:9px 14px;font-size:15px;text-align:left;cursor:pointer;border-radius:6px}
+.more-strip button:hover{background:var(--panel2)}
+.more-strip b{color:var(--accent);font-size:15px}
+.more-strip span{color:var(--dim);font-size:13px}
+.more-strip button[aria-pressed="true"]{background:var(--panel2)}
 .dd{position:relative}
 .dd-btn[aria-expanded="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .dd-panel{display:none;position:absolute;top:calc(100% + 6px);right:0;z-index:60;flex-direction:column;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;box-shadow:0 10px 30px #0008;min-width:min(340px,calc(100vw - 24px))}
@@ -403,6 +409,16 @@ body.lite *{transition:none!important;animation:none!important}
 .bk.on{background:var(--accent)}
 .bk small{position:absolute;bottom:4px;left:0;right:0;text-align:center;font:700 10px var(--f-ui);color:#8c9cab;pointer-events:none}
 .mixer{flex:1 1 300px;min-height:450px;overflow:auto;border:1px solid var(--line);border-radius:6px;background:var(--panel);display:flex;gap:6px;padding:10px;align-items:stretch}
+.strips{display:flex;gap:6px;flex:none;align-content:flex-start}
+.mixer.dense{flex:0 0 auto;min-height:0;overflow-y:visible}
+.mixer.dense .strips{flex-wrap:wrap;gap:5px}
+.mixer.dense .strip{width:76px;padding:5px 4px;gap:3px;border-top-width:3px}
+.mixer.dense .sname{font-size:11px;padding:2px 3px}
+.mixer.dense .fwrap{height:52px;gap:6px}
+.mixer.dense .sdsel{display:none}
+.mixer.dense .span .lbl{font-size:9px}
+.mixer.dense .fxbtn2{height:20px}
+.mixer.dense .tg{padding:2px 7px}
 .strip>*{flex:none}.strip{gap:5px}.strip .span{gap:0}
 .strip{flex:none;width:88px;background:var(--panel2);border:1px solid var(--line);border-top:4px solid var(--c);border-radius:5px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:8px}
 .strip.active{outline:2px solid var(--accent);outline-offset:1px}
@@ -487,7 +503,7 @@ body.lite *{transition:none!important;animation:none!important}
       <button class="btn sm" id="redoBtn" disabled title="Redo (Ctrl+Shift+Z)">Redo</button>
       <span class="lbl adv">Tools</span><div class="seg adv" role="group" aria-label="Tool tabs"><button data-t="edit" aria-pressed="true">Edit</button><button data-t="compose" aria-pressed="false">Compose</button><button data-t="play" aria-pressed="false">Play</button></div>
       <button class="btn sm adv" id="helpBtn" title="Keyboard shortcuts (?)">Shortcuts</button>
-      <button class="btn sm toggle adv" id="moreBtn" aria-pressed="false" aria-expanded="false" title="Rhythm, variation, transitions, mutate and automation tools">More tools ▾</button><span class="hint" id="kbInfo"></span>
+      <span class="hint" id="kbInfo"></span>
     </div>
     <div class="egrp" data-tab="edit" role="group" aria-label="Edit"><span class="gt">Steps</span>
       <button class="btn sm" id="copyBtn" title="Copy the selected steps or bar, or the whole active channel (Ctrl+C). Click a bar number above the rack to select a bar.">Copy</button>
@@ -499,6 +515,7 @@ body.lite *{transition:none!important;animation:none!important}
       <span class="lbl">Density</span><input type="range" id="rndDens" min="10" max="90" value="45" style="width:80px" aria-label="Density of random notes">
       <button class="btn sm" id="rndBtn" title="Fill the active channel, or the selected steps, with a random pattern in the chosen key and scale">Randomize</button>
     </div>
+    <div class="egrp more-strip adv" data-tab="edit"><button class="toggle" id="moreBtn" aria-pressed="false" aria-expanded="false" title="Show or hide the extra beat tools"><b>More tools ▾</b><span>Rhythm, variation, transitions, mutate, automation</span></button></div>
     <div class="egrp adv2" data-tab="edit" role="group" aria-label="Beat tools"><span class="gt">Rhythm</span>
       <span class="lbl">Euclid</span><input type="number" id="eucHits" min="0" max="64" value="5" style="width:4.2ch" aria-label="Number of hits"><span class="lbl">of the steps · rotate</span><input type="number" id="eucRot" min="-64" max="64" value="0" style="width:4.2ch" aria-label="Rotation">
       <button class="btn sm" id="eucBtn" title="Spread hits as evenly as possible over the selected steps (or the whole active channel)">Euclid</button>
@@ -2414,7 +2431,7 @@ $('.editbar .seg').addEventListener('click',e=>{const b=e.target.closest('[data-
 $('#stepOptBtn').onclick=e=>{S.stepOpt=!S.stepOpt;e.currentTarget.setAttribute('aria-pressed',S.stepOpt);if(S.stepOpt)toast('Click a lit step to set its chance and ratchet.');};
 /* layout switch: Simple / All tools, plus File and Export menus */
 let layMode='simple',moreOn=false;
-function setMore(o){moreOn=!!o;$('.app').classList.toggle('more',moreOn);const b=$('#moreBtn');b.setAttribute('aria-pressed',moreOn);b.setAttribute('aria-expanded',moreOn);b.textContent=moreOn?'More tools ▴':'More tools ▾';try{localStorage.setItem('beatsynth.more',moreOn?'1':'0');}catch(e){}}
+function setMore(o){moreOn=!!o;$('.app').classList.toggle('more',moreOn);const b=$('#moreBtn');b.setAttribute('aria-pressed',moreOn);b.setAttribute('aria-expanded',moreOn);b.querySelector('b').textContent=moreOn?'Fewer tools ▴':'More tools ▾';try{localStorage.setItem('beatsynth.more',moreOn?'1':'0');}catch(e){}}
 function setLayout(m,quiet){
   layMode=m==='full'?'full':'simple';const A=$('.app');A.classList.toggle('simple',layMode==='simple');
   $('#layS').setAttribute('aria-pressed',layMode==='simple');$('#layF').setAttribute('aria-pressed',layMode==='full');
@@ -2786,7 +2803,9 @@ function stripHTML(c){
 }
 function renderMixer(){
   const el=$('#mixer');
-  el.innerHTML=S.channels.map(stripHTML).join('')
+  const nCh=S.channels.length,dense=nCh>=10,cols=Math.min(10,Math.ceil(nCh/2));
+  el.classList.toggle('dense',dense);
+  el.innerHTML='<div class="strips"'+(dense?' style="width:'+(cols*76+(cols-1)*5)+'px"':'')+'>'+S.channels.map(stripHTML).join('')+'</div>'
     +'<div class="specbox"><span class="lbl">Spectrum</span><canvas id="spec" aria-label="Output spectrum"></canvas></div>'
     +'<div class="mfx"><span class="lbl">Master polish</span><button class="btn sm toggle" data-polish aria-pressed="'+S.polish+'" title="One-click gentle master EQ, compression and limiting. Press again to hear your original mix (A/B).">Polish: '+(S.polish?'on':'off')+'</button><span class="lbl">Master EQ</span>'+[['lo','Low',-12,12,.5,S.mEq[0]],['mid','Mid',-12,12,.5,S.mEq[1]],['hi','High',-12,12,.5,S.mEq[2]]].map(r=>'<label class="fxr"><span class="lbl">'+r[1]+'</span><input type="range" data-m="'+r[0]+'" min="'+r[2]+'" max="'+r[3]+'" step="'+r[4]+'" value="'+r[5]+'"><output>'+r[5].toFixed(1)+' dB</output></label>').join('')
     +'<details'+(S.grpOpen?' open':'')+' id="grpBox"><summary class="lbl">Groups A to D</summary>'+S.groups.map((q,k)=>'<span class="lbl">Group '+'ABCD'[k]+'</span><label class="fxr"><span class="lbl">Level</span><input type="range" data-g="'+k+':vol" min="0" max="1.2" step="0.01" value="'+q.vol+'"><label class="chk"><input type="checkbox" data-g="'+k+':mute"'+(q.mute?' checked':'')+'> Mute</label></label><label class="fxr"><span class="lbl">Filter</span><input type="range" data-g="'+k+':cut" min="0.1" max="1" step="0.01" value="'+q.cut+'"><span></span></label><label class="fxr"><span class="lbl">Glue</span><input type="range" data-g="'+k+':comp" min="0" max="1" step="0.01" value="'+q.comp+'"><span></span></label><label class="fxr"><span class="lbl">Reverb</span><input type="range" data-g="'+k+':rev" min="0" max="1" step="0.01" value="'+q.rev+'"><span></span></label>').join('')+'<span class="hint">Assign channels to a group in their FX panel under Routing.</span></details>'
