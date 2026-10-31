@@ -597,7 +597,7 @@ body.lite *{transition:none!important;animation:none!important}
       <button class="btn sm toggle" id="recBtn" aria-pressed="false" title="Record played notes into the active channel while the pattern plays">● Record</button>
       <button class="btn sm" id="refBtn" title="Load a finished track to compare your beat against">Reference…</button><button class="btn sm toggle" id="refAB" aria-pressed="false" title="Switch between your beat and the reference at matched loudness" disabled>A/B</button><input type="file" id="refFile" accept="audio/*" hidden>
       <button class="btn sm toggle" id="micBtn" aria-pressed="false" title="Record the microphone, or the whole mix, for a set number of bars starting exactly at the next bar 1. It becomes a sample channel that loops with the pattern.">● Loop rec</button>
-      <select id="loopSrc" class="btn sm" aria-label="Looper source"><option value="mic">Mic</option><option value="mix">Resample the mix</option></select><select id="loopMode" class="btn sm" aria-label="Looper mode"><option value="new">New take</option><option value="over">Overdub (layer)</option></select><button class="btn sm" id="loopUndo" disabled>Undo take</button><input id="loopLat" type="number" class="btn sm" min="0" max="500" step="1" placeholder="auto ms" aria-label="Mic latency in milliseconds" title="Latency compensation for the mic. Leave blank for automatic; raise it if your overdubs land late." style="width:84px">
+      <select id="loopSrc" class="btn sm" aria-label="Looper source"><option value="mic">Mic</option><option value="mix">Resample the mix</option></select><select id="micChain" class="btn sm" aria-label="Vocal chain for mic recordings" title="Applies cleanup, compression and a little reverb to new mic loops. Pick None to keep the raw recording."><option value="clean" selected>Vocal: clean</option><option value="rap">Vocal: rap</option><option value="sing">Vocal: sing</option><option value="space">Vocal: big space</option><option value="">Vocal: none</option></select><select id="loopMode" class="btn sm" aria-label="Looper mode"><option value="new">New take</option><option value="over">Overdub (layer)</option></select><button class="btn sm" id="loopUndo" disabled>Undo take</button><input id="loopLat" type="number" class="btn sm" min="0" max="500" step="1" placeholder="auto ms" aria-label="Mic latency in milliseconds" title="Latency compensation for the mic. Leave blank for automatic; raise it if your overdubs land late." style="width:84px">
       <select id="micBars" class="btn sm" aria-label="Mic loop length"><option value="1">1 bar</option><option value="2">2 bars</option><option value="4">4 bars</option><option value="8">8 bars</option></select>
       <button class="btn sm toggle" id="metroBtn" aria-pressed="false" title="Click track (M)">Metronome</button>
       <select id="countIn" class="btn sm" aria-label="Count-in before recording"><option value="0">No count-in</option><option value="1">1 bar count-in</option><option value="2">2 bars count-in</option></select>
@@ -728,6 +728,8 @@ body.lite *{transition:none!important;animation:none!important}
       <button class="btn adv" id="packBtn" title="Ready-made one-shot sets, made inside the app">Sound packs…</button></div>
     <div class="agrp"><span class="gt">Start from</span>
       <button class="btn primary" id="mmbBtn" title="Pick a mood and the app writes drums, chords, bass and a melody together in a key that fits">Make me a beat</button>
+      <button class="btn" id="surpriseBtn" title="Instant random beat: picks a mood and writes drums, chords, bass and a melody, then plays it">Surprise me</button>
+      <button class="btn" id="remixBtn" title="Make a variation of your beat in the same key, or swap the drum style">Remix this</button>
       <button class="btn" id="tplBtn" title="Start from a ready-made beat in a style">Templates</button>
       <button class="btn adv" id="midiInBtn" title="Open a .mid file as a new pattern">Import MIDI…</button><input type="file" id="midiFile" accept=".mid,.midi,audio/midi" hidden></div>
     <input type="file" id="file" accept="audio/*,.wav,.mp3,.ogg,.m4a,.flac,.aac" multiple hidden>
@@ -788,6 +790,22 @@ body.lite *{transition:none!important;animation:none!important}
         <label class="fxr" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="mmbSong"> Build a full song too</label>
         <label class="fxr" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="mmbPol" checked> Polish the master</label></div></div>
     <div class="lib-save" style="gap:8px;flex-wrap:wrap"><button class="btn sm primary" id="mmbGo">Make it</button><button class="btn sm" id="mmbRand">Surprise me</button><span class="hint" id="mmbOut" aria-live="polite"></span></div>
+  </div></div>
+</div>
+<div class="modal" id="rmxMod" hidden role="dialog" aria-modal="true" aria-labelledby="rmxT">
+  <div class="modal-box"><div class="roll-bar"><strong id="rmxT">Remix this</strong><span class="grow"></span><button class="btn sm" id="rmxClose">Close</button></div>
+  <div class="lib-body">
+    <p class="hint">Remix writes a new pattern next to your current one, so the original stays as it is. The key stays the same.</p>
+    <div class="lib-sec"><span class="lbl">What to change</span>
+      <div class="tpls" id="rmxMode" role="group" aria-label="What to change">
+        <button class="tpl" data-r="vary" aria-pressed="true" style="--c:#ff9a3c"><b>Variation</b><span>Tweak the drums, melody and bass line</span></button>
+        <button class="tpl" data-r="swap" aria-pressed="false" style="--c:#6fa0ff"><b>Swap the drums</b><span>New drum style under your music</span></button></div></div>
+    <div class="lib-sec"><span class="lbl">Options</span>
+      <div class="lib-save" style="flex-wrap:wrap;gap:12px">
+        <select id="rmxAmt" class="btn sm" aria-label="How much to change"><option value="1">Subtle</option><option value="2" selected>Medium</option><option value="3">Wild</option></select>
+        <select id="rmxStyle" class="btn sm" aria-label="Drum style" hidden></select>
+        <label class="fxr" id="rmxTempoL" style="display:none;gap:6px;align-items:center"><input type="checkbox" id="rmxTempo"> Use the new style tempo</label></div></div>
+    <div class="lib-save" style="gap:8px;flex-wrap:wrap"><button class="btn sm primary" id="rmxGo">Remix it</button><span class="hint" id="rmxOut" aria-live="polite"></span></div>
   </div></div>
 </div>
 <div class="modal" id="progMod" hidden role="dialog" aria-modal="true" aria-labelledby="progT">
@@ -2534,7 +2552,7 @@ const SCALES={minp:[0,3,5,7,10],majp:[0,2,4,7,9],min:[0,2,3,5,7,8,10],maj:[0,2,4
 const pcOf=m=>((m-S.key)%12+12)%12;
 const inScale=m=>SCALES[S.scale].includes(pcOf(m));
 function snapNote(m){if(!S.lock||inScale(m))return m;for(let d=1;d<=6;d++){if(inScale(m-d))return m-d;if(inScale(m+d))return m+d;}return m;}
-window.__bs={coffeeNudge,get audTakes(){return audTakes},get audStartFn(){return audStart},get audStopNow(){return audStopNow},get planList(){return planList},get renderPlan(){return renderPlan},get clipDur(){return clipDur},get planFromUI(){return planFromUI},get encodeWav(){return encodeWav},parseProg,degTones,chordEvents,bassNotes,writeBass,writeProgression,get SOUNDS(){return SOUNDS},yinPitch,pitchTrack,framesToNotes,notesToSteps,detectKey,chordTones,chordLabel,importMidi,parseMidi,readZip,clipAuto,detectBpm,findHits,stretchBuf,measureLufs,normalizeLufs,renderOne,get PACKS(){return PACKS},get S(){return S},inScale,snapNote,midi:(a)=>onMidi({data:a}),padHit,renderPlan,foldLoop,planList,encodeMp3,PRESETS:()=>PRESETS,setView,get playing(){return playing}};
+window.__bs={coffeeNudge,addChannel,render,renderMixer,get shareCard(){return shareCard},get audTakes(){return audTakes},get audStartFn(){return audStart},get audStopNow(){return audStopNow},get planList(){return planList},get renderPlan(){return renderPlan},get clipDur(){return clipDur},get planFromUI(){return planFromUI},get encodeWav(){return encodeWav},parseProg,degTones,chordEvents,bassNotes,writeBass,writeProgression,get SOUNDS(){return SOUNDS},yinPitch,pitchTrack,framesToNotes,notesToSteps,detectKey,chordTones,chordLabel,importMidi,parseMidi,readZip,clipAuto,detectBpm,findHits,stretchBuf,measureLufs,normalizeLufs,renderOne,get PACKS(){return PACKS},get S(){return S},inScale,snapNote,midi:(a)=>onMidi({data:a}),padHit,renderPlan,foldLoop,planList,encodeMp3,PRESETS:()=>PRESETS,setView,get playing(){return playing}};
 function scaleChanged(){if(!$('#kbd').hidden)buildKbd();if(rollCh)drawRoll();}
 $('#keyRoot').onchange=e=>{S.key=+e.target.value;scaleChanged();markDirty();};
 $('#keyScale').onchange=e=>{S.scale=e.target.value;scaleChanged();markDirty();};
@@ -3546,7 +3564,8 @@ async function finishLoop(){
       const n=S.channels.filter(c=>/^Loop \d+$/.test(c.name)).length+1,wav=await encodeWav(buf).arrayBuffer(),key=uid();idbPut(key,wav);
       const ch=addChannel({kind:'sample',name:'Loop '+n,buf,peaks:peaksOf(buf),raw:wav,audioKey:key});
       pd(ch,r.pid).steps[0]=100;LPU={kind:'new',id:ch.id};render();
-      toast('Recorded '+r.bars+' bar'+(r.bars>1?'s':'')+' as "'+ch.name+'". Record again in Overdub mode to layer more.');
+      const vc=src==='mic'?VOCAL_CHAINS[$('#micChain').value]:null,vf=vc&&FACTORY_FX.find(f=>f[0]===vc);if(vf)applyFxPreset(ch,vf[1]);
+      toast('Recorded '+r.bars+' bar'+(r.bars>1?'s':'')+' as "'+ch.name+'"'+(vf?' with the '+vf[0].toLowerCase()+' chain':'')+'. Record again in Overdub mode to layer more.');
     }
     loopUI();markDirty();
   }catch(err){toast('Could not use that recording.');}
@@ -3916,7 +3935,7 @@ const GUIDE=(()=>{
     steps:['Simple shows what you need to make a beat: Play and Stop, tempo and Tap, Swing, Master, Polish, the Rack, Mixer and Pads views, Undo and Redo, Copy, Paste, Clear, Randomize, Add channel, Make me a beat and Templates.','All tools (top left) adds time signature and bars, Duplicate and Delete pattern, the Timeline and Perform views, song Arrange, the Edit, Compose and Play tabs, Shortcuts, Sound packs and MIDI import.','In All tools, the dashed More tools bar under Steps and Random opens Rhythm, Variation, Transitions, Mutate and Automation.','The File menu holds New, Open, Save, ZIP and the Library. The Export menu holds loudness, format, Render, Stems, Video and MIDI.','Your choice is remembered on this device. Switching back to Simple never deletes anything.'],
     acts:[show('.seg.lay','Simple shows the essentials. All tools shows everything.',null,'Show the switch'),show('#moreBtn','More tools opens Rhythm, Variation, Transitions, Mutate and Automation.',null,'Show More tools'),show('#fileDd .dd-btn','New, Open, Save, ZIP and the Library.',null,'Show the File menu'),show('#expDd .dd-btn','Render, Stems, Video and MIDI.',null,'Show the Export menu')]},
    {id:'make',t:'Make me a beat',sub:'Pick a mood, get a starter',intro:'Not sure where to begin? Choose a mood and the app writes a whole starter for you: drums, chords, a bass line and a melody, in a key that fits.',
-    steps:['Press Make me a beat (in Start from, at the bottom).','Pick a mood: Chill, Dark, Hype, Dreamy, Sad, Happy, Groovy or Night drive. Each one chooses its own drum style, key, tempo, chords, bass and melody sound.','Choose a loop length of 1, 2 or 4 bars. Turn the melody off if you only want the backing. Tick Build a full song too to get an intro, verse, build, drop and outro.','Press Make it, or Surprise me to let the app choose the mood. Then press Play.','Not quite right? Press Make me a beat again. Every try is different. Your previous beat is saved in the Library first, so nothing is lost.','Everything it writes is normal channels and notes. Open any piano roll to change the melody, or swap a sound with the channel menu.'],
+    steps:['Press Make me a beat (in Start from, at the bottom).','Pick a mood: Chill, Dark, Hype, Dreamy, Sad, Happy, Groovy, Night drive, Romantic, Summer, Epic, Aggressive, Club, Retro, Mystery or Focus. Each one chooses its own drum style, key, tempo, chords, bass and melody sound.','Choose a loop length of 1, 2 or 4 bars. Turn the melody off if you only want the backing. Tick Build a full song too to get an intro, verse, build, drop and outro.','Press Make it, or Surprise me to let the app choose the mood. Then press Play.','Not quite right? Press Make me a beat again. Every try is different. Your previous beat is saved in the Library first, so nothing is lost.','Want a different take? Press Remix this on the main page. Vary keeps your key and changes the drums and notes a little (or a lot). Swap drums keeps the key and changes the drum style. Your original pattern is never touched.','The Surprise me button on the main page picks a mood and plays it at once.','Everything it writes is normal channels and notes. Open any piano roll to change the melody, or swap a sound with the channel menu.'],
     acts:[{l:'Open Make me a beat',run:()=>{closeGuide();$('#mmbBtn').click();}},show('#mmbBtn','Make me a beat: pick a mood and get a full starter.',tools,'Show me where')]},
    {id:'steps',t:'Make a beat',sub:'Steps, rows and the rack',intro:'Each row of the Channel Rack is one sound. Each square is a moment in the bar. A lit square plays.',
     steps:['Click or drag across squares to draw. Click a lit square again to turn it off.','Drag a lit square up or down to set how hard it hits.','To copy a bar: click the bar number above the rack, press Copy, click another bar number, press Paste. Select several bars (shift-click) to fill them with repeats. Shift-click two squares to select just part of a bar.','Right-click a lit square (or turn on Step options) for chance and ratchets.','M mutes a row, S plays only that row. VOL, PAN and PITCH sit under each name.','The LEN box gives one row its own loop length, so it can drift against the others.','Set the tempo by typing a number, or press Tap in time with the music a few times and it works out the BPM for you.','Channel menu, reordering and bar actions are in the next topic, Organize your rack.'],
@@ -3961,7 +3980,7 @@ const GUIDE=(()=>{
     steps:['+ New adds a pattern, Duplicate copies one. Double-click or right-click a name to rename it. Tempo, time signature and bars belong to the selected pattern.','Arrange opens the song bar: add patterns, move them, set how many times each repeats.','Timeline view shows the song as blocks you can drag.','Switch Plays from Pattern to Song to play the arranged song. Compose, then Build song, makes an intro, drop and outro for you.','Tempo changes: select a clip in the Timeline and type a Tempo for it, for example 70 for a slow intro and 140 for the drop. Ramp to speeds up or slows down smoothly across the clip. Leave them empty to use the pattern tempo.','Master automation (under the Timeline) draws a lane across the whole song for Volume, a Low-pass filter, a High-pass filter, Reverb or Delay. Click to add a point, drag to shape it, right-click a point to remove it. Quick shape fills in a sweep, a dip or a build-then-drop.','Lanes and clip tempos are heard when you play as Song and in a Render of the song.'],
     acts:[{l:'Show the pattern bar',run:()=>{closeGuide();coach('#pats','Patterns live here. Arrange opens the song bar.');}},{l:'Open Timeline',run:()=>{closeGuide();view('viewTl');coach('#timeline','Drag clips to arrange your song.');}},show('#clBpm','Give the selected clip its own tempo, or ramp it to a new one.',()=>{view('viewTl');},'Show clip tempo'),show('#mlCv','Draw a master lane here: volume, filters, reverb or delay across the song.',()=>{view('viewTl');},'Show master automation')]},
    {id:'live',t:'Play and record live',sub:'Keys, MIDI, recording, looper',intro:'The Play tools handle everything you perform.',
-    steps:['Keys plays the active channel from your computer keyboard. Z and X move the octave. With Keys follow scale on, A to ; play only notes in your key and scale. Piano shows an on-screen keyboard.','Connect MIDI links a keyboard or controller. MIDI learn links a knob to any slider: click the slider, then move the knob.','Record writes what you play into the active channel while the pattern runs. Use Metronome and Count-in for timing.','Loop rec records the mic or the whole mix for 1 to 8 bars, exactly in time. Reference lets you A/B against a finished track.'],
+    steps:['Keys plays the active channel from your computer keyboard. Z and X move the octave. With Keys follow scale on, A to ; play only notes in your key and scale. Piano shows an on-screen keyboard.','Connect MIDI links a keyboard or controller. MIDI learn links a knob to any slider: click the slider, then move the knob.','Record writes what you play into the active channel while the pattern runs. Use Metronome and Count-in for timing.','Loop rec records the mic or the whole mix for 1 to 8 bars, exactly in time. Mic loops get a vocal chain (clean, rap, sing or big space) that you can change or switch off. Reference lets you A/B against a finished track.'],
     acts:[show('#keysBtn','Keys, MIDI, Record, Loop rec and the metronome are in the Play tools.',()=>{tools();tab('play');})]},
    {id:'save',t:'Save, export and share',sub:'Keep it, render it, send it',intro:'Project and Export sit at the top.',
     steps:['Open the File menu: Save downloads your project, ZIP keeps imported audio inside it, and Library holds saved beats, templates and the public gallery.','Open the Export menu: Render makes a WAV, MP3 or loop-ready file. Pick a loudness target first if you want streaming level. Stems exports each channel on its own. Video and MIDI export too.','In Library, Share makes a link anyone can open as their own copy. Short link needs the share server. Embed code gives a small player to put on a web page.','Imported audio is not included in links. Use ZIP to move a beat that contains your own audio.'],
@@ -4396,8 +4415,13 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-polish]');
 const PRE_KEY='beatsynth.presets';
 const FACTORY_FX=[
  ['Lo-fi tape',{tape:.6,crush:.25,type:'lp',cut:.5,rev:.15},'Warm, wobbly and dusty'],['Wide chorus',{chor:.55,wide:.5,rev:.3},'Wide and shimmery'],['Telephone',{type:'bp',cut:.55,res:.45,crush:.2,drive:.2},'Thin, crunchy, band-limited'],
- ['Dub echo',{del:.5,rev:.3},'Long echoes with some space'],['Big room',{rev:.6},'Lots of reverb'],['Punch and glue',{comp:.5,drive:.15,eqL:2,eqH:1},'Tighter, louder, more bite'],['Dark and muffled',{type:'lp',cut:.25,rev:.2},'Soft and far away'],['Bright radio',{type:'hp',cut:.3,eqH:3,comp:.4},'Thin and forward']
+ ['Dub echo',{del:.5,rev:.3},'Long echoes with some space'],['Big room',{rev:.6},'Lots of reverb'],['Punch and glue',{comp:.5,drive:.15,eqL:2,eqH:1},'Tighter, louder, more bite'],['Dark and muffled',{type:'lp',cut:.25,rev:.2},'Soft and far away'],['Bright radio',{type:'hp',cut:.3,eqH:3,comp:.4},'Thin and forward'],
+ ['Vocal: clean',{type:'hp',cut:.17,res:.1,comp:.5,eqL:-2,eqM:1,eqH:2,rev:.1},'Cuts rumble, evens out the level, adds a little air'],
+ ['Vocal: rap',{type:'hp',cut:.2,res:.1,comp:.7,drive:.08,eqL:-3,eqM:1.5,eqH:3,rev:.07,del:.12},'Dry, tight and upfront, with a slap echo'],
+ ['Vocal: sing',{type:'hp',cut:.17,res:.1,comp:.45,eqL:-1,eqH:2.5,rev:.3,del:.12,chor:.12},'Warm and smooth, with a touch of space and shimmer'],
+ ['Vocal: big space',{type:'hp',cut:.18,res:.1,comp:.5,eqH:2,rev:.55,del:.3,wide:.3},'Airy and distant, for hooks and ad-libs']
 ];
+const VOCAL_CHAINS={clean:'Vocal: clean',rap:'Vocal: rap',sing:'Vocal: sing',space:'Vocal: big space'};
 let presets=[];
 function presLoad(){try{const a=JSON.parse(localStorage.getItem(PRE_KEY)||'[]');presets=Array.isArray(a)?a.filter(x=>x&&typeof x.name==='string'&&['fx','syn','ch'].includes(x.type)&&x.data&&typeof x.data==='object').slice(0,200):[];}catch(e){presets=[];}}
 function presSave(){try{localStorage.setItem(PRE_KEY,JSON.stringify(presets));return true;}catch(e){toast('Could not save presets here (browser storage is blocked or full).');return false;}}
@@ -4699,12 +4723,30 @@ $('#galPub').onclick=async()=>{
   window.addEventListener('unhandledrejection',e=>rep('rejection: '+(e.reason&&e.reason.message||e.reason),e.reason&&e.reason.stack));
 })();
 
+/* ---------- share preview card ---------- */
+const KEYN=NN;
+function shareCard(){
+  try{
+    const W=1200,H=630,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');
+    const gr=g.createLinearGradient(0,0,W,H);gr.addColorStop(0,'#14161d');gr.addColorStop(1,'#2a1d3a');g.fillStyle=gr;g.fillRect(0,0,W,H);
+    const cs=S.channels.filter(x=>x.kind!=='sample'||true).slice(0,8),pat=S.curPat,n=16,gx=70,gy=250,cw=(W-gx*2)/n,rh=Math.min(40,300/Math.max(cs.length,1));
+    cs.forEach((ch,ri)=>{const d=ch.pats[pat];g.fillStyle=ch.color||'#ff9a3c';
+      for(let i=0;i<n;i++){let on=false;if(d){if(ch.kind==='inst')on=d.notes.some(q=>Math.floor(q.i)===i);else on=!!d.steps[i];}
+        g.globalAlpha=on?1:.14;g.beginPath();g.roundRect(gx+i*cw+3,gy+ri*(rh+6),cw-6,rh,6);g.fill();}});
+    g.globalAlpha=1;g.fillStyle='#fff';g.font='700 64px system-ui,sans-serif';g.fillText('A beat on thebeatsynth',gx,130);
+    g.fillStyle='#b9bfd0';g.font='500 36px system-ui,sans-serif';
+    g.fillText(S.bpm+' BPM'+(S.key!=null?'  ·  '+KEYN[S.key]+' '+S.scale:'')+'  ·  '+S.channels.length+' channels',gx,190);
+    g.fillStyle='#ff9a3c';g.font='600 30px system-ui,sans-serif';g.fillText('Open it and press play  →  thebeatsynth.com',gx,H-40);
+    const o=document.createElement('canvas');o.width=600;o.height=315;o.getContext('2d').drawImage(c,0,0,600,315);
+    let u=o.toDataURL('image/jpeg',.82);return u.length<180000?u:null;
+  }catch(e){return null;}
+}
 /* ---------- optional share server ---------- */
 $('#shortBtn').onclick=async()=>{
   try{
     if(!S.channels.length)throw new Error('Add a channel first.');
     if(!/^https?:$/.test(location.protocol))throw new Error('Short links need the share server. Open the app from your web server.');
-    const r=await fetch(new URL('api/share',location.href),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(snapshot(false))});
+    const r=await fetch(new URL('api/share',location.href),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({project:snapshot(false),card:shareCard(),meta:{bpm:S.bpm,key:S.key!=null?KEYN[S.key]+' '+S.scale:'',ch:S.channels.length}})});
     if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.error||'The share server is not running here. Use "Create link" instead.');}
     const {id}=await r.json(),url=new URL(location.href);url.hash='';url.search='?s='+id;
     $('#shareOut').value=url.href;$('#shareOut').select();$('#shareHint').textContent='Short link. Audio you imported is not included.';
@@ -4805,7 +4847,15 @@ const MOODS=[
  {id:'sad',n:'Sad',d:'Slow and emotional',c:COLORS[2],styles:['lofi','boombap'],keys:[0,2,4,7,9],scale:'min',progs:[[1,6,3,7],[1,4,6,5],[6,4,1,5]],chord:'piano',comp:'sustained',seven:false,bass:'bass',bassStyle:'roots',mel:'epiano',dens:.3,rev:.4,del:.2,duck:0},
  {id:'happy',n:'Happy',d:'Bright and bouncy',c:COLORS[5],styles:['house','afrobeats','amapiano','reggaeton'],keys:[0,2,5,7,9,10],scale:'maj',progs:[[1,5,6,4],[1,6,4,5],[1,4,5,4]],chord:'piano',comp:'offbeat',seven:false,bass:'bass',bassStyle:'octave',mel:'marimba',dens:.65,rev:.2,del:.15,duck:1},
  {id:'groovy',n:'Groovy',d:'Funky and swung',c:COLORS[6],styles:['funk','afrobeats','amapiano'],keys:[0,2,4,7,9],scale:'dor',progs:[[1,4,1,4],[1,2,4,1],[1,7,4,1]],chord:'epiano',comp:'sync',seven:true,bass:'bass',bassStyle:'funk',mel:'pluck',dens:.5,rev:.2,del:.15,duck:0},
- {id:'night',n:'Night drive',d:'Neon and retro',c:COLORS[7%COLORS.length],styles:['synthwave','trance','house'],keys:[0,2,4,6,9],scale:'min',progs:[[1,6,3,7],[1,7,6,7],[6,7,1,1]],chord:'supersaw',comp:'sustained',seven:false,bass:'bass',bassStyle:'eighths',mel:'lead',dens:.5,rev:.35,del:.3,duck:1}
+ {id:'night',n:'Night drive',d:'Neon and retro',c:COLORS[7%COLORS.length],styles:['synthwave','trance','house'],keys:[0,2,4,6,9],scale:'min',progs:[[1,6,3,7],[1,7,6,7],[6,7,1,1]],chord:'supersaw',comp:'sustained',seven:false,bass:'bass',bassStyle:'eighths',mel:'lead',dens:.5,rev:.35,del:.3,duck:1},
+ {id:'romantic',n:'Romantic',d:'Smooth, warm R&B',c:COLORS[3],styles:['rnb','pop','ukg'],keys:[0,3,5,7,8,10],scale:'dor',progs:[[2,5,1,6],[1,4,2,5],[6,2,5,1]],chord:'epiano',comp:'sync',seven:true,bass:'bass808',bassStyle:'roots',mel:'vibes',dens:.28,rev:.4,del:.25,duck:0},
+ {id:'summer',n:'Summer',d:'Sunny, tropical and bouncy',c:COLORS[6],styles:['reggaeton','afrobeats','amapiano'],keys:[0,2,5,7,9],scale:'maj',progs:[[1,5,6,4],[1,4,5,4],[1,6,4,5]],chord:'piano',comp:'offbeat',seven:false,bass:'bass',bassStyle:'funk',mel:'marimba',dens:.45,rev:.25,del:.2,duck:0},
+ {id:'epic',n:'Epic',d:'Big, bold and cinematic',c:COLORS[5],styles:['trance','synthwave','techno'],keys:[0,2,3,5,7],scale:'min',progs:[[1,6,3,7],[6,7,1,1],[1,7,6,7]],chord:'strings',comp:'sustained',seven:false,bass:'bass',bassStyle:'octave',mel:'brass',dens:.3,rev:.45,del:.2,duck:1},
+ {id:'aggressive',n:'Aggressive',d:'Hard, gritty and fast',c:COLORS[7],styles:['drill','phonk','trap','jersey'],keys:[1,3,6,8],scale:'phr',progs:[[1,2,1,7],[1,1,2,2],[1,7,6,7]],chord:'stab',comp:'stabs',seven:false,bass:'reese',bassStyle:'eighths',mel:'pwm',dens:.4,rev:.15,del:.15,duck:1},
+ {id:'club',n:'Club',d:'Four on the floor, built to dance',c:COLORS[4],styles:['house','techno','disco','trance'],keys:[0,2,5,7,9,10],scale:'min',progs:[[1,6,7,7],[1,7,6,6],[1,4,6,7]],chord:'stab',comp:'offbeat',seven:false,bass:'bass',bassStyle:'eighths',mel:'pwm',dens:.5,rev:.2,del:.2,duck:1},
+ {id:'retro',n:'Retro',d:'Neon, nostalgic and 80s',c:COLORS[2],styles:['synthwave','disco','pop'],keys:[0,2,4,6,9],scale:'min',progs:[[1,6,3,7],[1,7,6,7],[6,7,1,1]],chord:'supersaw',comp:'stabs',seven:false,bass:'acid',bassStyle:'eighths',mel:'lead',dens:.4,rev:.35,del:.3,duck:1},
+ {id:'mystery',n:'Mysterious',d:'Eerie, slow and strange',c:COLORS[1],styles:['lofi','boombap','phonk'],keys:[1,3,6,8,10],scale:'har',progs:[[1,4,5,1],[1,6,5,5],[1,3,4,5]],chord:'glass',comp:'sustained',seven:true,bass:'sub',bassStyle:'roots',mel:'flute',dens:.22,rev:.5,del:.3,duck:0},
+ {id:'focus',n:'Focus',d:'Calm lo-fi for studying',c:COLORS[0],styles:['lofi','boombap'],keys:[0,2,5,7,9],scale:'dor',progs:[[2,5,1,6],[1,6,2,5],[1,4,1,5]],chord:'vibes',comp:'sustained',seven:true,bass:'sub',bassStyle:'roots',mel:'kalimba',dens:.2,rev:.3,del:.25,duck:0}
 ];
 function genMelody(ch,degrees,every,m){
   const T=total(),sp=spb(),sc=base7(),root=60+S.key,pitch=i=>root+sc[((i%7)+7)%7]+12*Math.floor(i/7);
@@ -4845,7 +4895,7 @@ function makeBeat(mood,o){
   const r=writeProgression(chords,{degrees,every,comp:M.comp,seven:M.seven,oct:12,lengthen:false,replace:true});
   const bass=addChannel({sound:M.bass,name:'Bass',vol:.85});writeBass(chords,bass,M.bassStyle,true);
   let mel=null,nn=0;
-  if(o.mel){mel=addChannel({sound:M.mel,name:'Melody',vol:.55});nn=genMelody(mel,degrees,every,{dens:M.dens,high:/bell|pluck|marimba/.test(M.mel)});mel.fx.del=M.del;}
+  if(o.mel){mel=addChannel({sound:M.mel,name:'Melody',vol:.55});nn=genMelody(mel,degrees,every,{dens:M.dens,high:/bell|pluck|marimba|kalimba|vibes|flute|pwm|lead/.test(M.mel)});mel.fx.del=M.del;}
   chords.fx.rev=M.rev;if(mel)mel.fx.rev=Math.min(1,M.rev+.1);
   if(M.duck)duckKick(chords,bass);
   S.channels.forEach(c=>applyFx(c,true));
@@ -4855,6 +4905,77 @@ function makeBeat(mood,o){
   S.activeId=(mel||chords).id;syncTransport();render();updateKbInfo();histReset();markDirty();
   return {name:M.n,style:STYLES[style].n,key:NN[S.key]+' '+({maj:'major',min:'minor',dor:'Dorian'}[S.scale]),bpm:S.bpm,chords:r.names||[],saved};
 }
+const stepScale=(m,k)=>{let x=m,c=0;const dir=k<0?-1:1;while(c<Math.abs(k)&&x>24&&x<108){x+=dir;if(S.scale==='chr'||inScale(x))c++;}return x;};
+function remixThis(o){
+  o=Object.assign({mode:'vary',amt:2,style:'',tempo:false},o||{});
+  if(!S.channels.length)return null;
+  const bpm0=S.bpm,sw0=S.swing,rnd=Math.random,pr=[.07,.15,.28][Math.max(0,Math.min(2,o.amt-1))];
+  const id=newPattern(true),pat=patById(id);
+  pat.name=('Remix '+S.patterns.filter(q=>/^Remix/.test(q.name)).length);
+  const T=total(),PB=perBar();let info='';
+  if(o.mode==='swap'){
+    const keys=Object.keys(STYLES),key=o.style&&STYLES[o.style]?o.style:keys[Math.floor(rnd()*keys.length)];
+    genBeat(key);
+    if(!o.tempo){S.bpm=bpm0;S.swing=sw0;$('#swing').value=sw0;syncTransport();}
+    info=STYLES[key].n+' drums';
+  }else{
+    let nd=0,nn=0;
+    S.channels.forEach(ch=>{
+      const d=pd(ch,id);
+      if(ch.kind==='drum'){
+        const sn=ch.sound||'',kick=/^kick/.test(sn),back=/snare|clap|snap|rim/.test(sn);
+        for(let i=0;i<T;i++){
+          const q=i%PB;
+          if(d.steps[i]){
+            if(!kick&&!back&&rnd()<pr*.8){d.steps[i]=0;nd++;}
+            else d.steps[i]=Math.max(35,Math.min(127,Math.round((d.steps[i]>1?d.steps[i]:100)+(rnd()-.5)*28)));
+          }else if(!kick&&!back&&q%spb()!==0&&rnd()<pr){d.steps[i]=45+Math.round(rnd()*35);nd++;}
+          else if(kick&&q%spb()!==0&&q>=PB-spb()*2&&rnd()<pr*.6){d.steps[i]=85;nd++;}
+          else if(back&&o.amt>=3&&q===PB-1&&rnd()<.6){d.steps[i]=80;nd++;}
+        }
+      }else if(ch.kind==='inst'&&d.notes.length){
+        const ms=d.notes.map(n=>n.m).sort((a,b)=>a-b),med=ms[Math.floor(ms.length/2)];
+        const same=new Map();d.notes.forEach(n=>same.set(n.i,(same.get(n.i)||0)+1));
+        const chordy=d.notes.length/same.size>1.4||(ch.fx.chord&&ch.fx.chord!=='off')||/chord/i.test(ch.name);
+        if(chordy)return;
+        if(med<54){
+          d.notes.forEach(n=>{if(rnd()<pr*.8){const up=n.m+12<=60?12:-12;n.m=Math.max(24,n.m+(n.m-12>=24&&rnd()<.5?-12:up));nn++;}});
+        }else{
+          const add=[];
+          d.notes.forEach(n=>{
+            if(rnd()<pr*1.6){n.m=stepScale(n.m,(rnd()<.5?-1:1)*(1+(rnd()<.35?1:0)));nn++;}
+            if(rnd()<pr*.5&&d.notes.length>4){n._drop=true;nn++;}
+            else if(rnd()<pr*.7&&n.l>=2&&n.i+n.l<=T){
+              const half=Math.max(1,Math.floor(n.l/2)),ni=n.i+half;
+              if(!d.notes.some(q=>q.i===ni)){add.push({i:ni,m:stepScale(n.m,rnd()<.5?1:-1),l:Math.max(1,n.l-half),v:Math.max(40,(n.v||100)-12)});n.l=half;nn++;}
+            }
+          });
+          d.notes=d.notes.filter(n=>!n._drop).concat(add);
+        }
+      }
+    });
+    info=nd+' drum hits and '+nn+' notes changed';
+  }
+  S.channels.forEach(c=>{if(rollCh===c.id)drawRoll();});
+  render();scheduleCommit();markDirty();
+  return {name:pat.name,info};
+}
+(()=>{
+  const mod=$('#rmxMod');let mode='vary';
+  const sel=$('#rmxStyle');sel.innerHTML='<option value="">Random style</option>'+Object.keys(STYLES).map(k=>'<option value="'+k+'">'+STYLES[k].n+'</option>').join('');
+  const sync=()=>{$('#rmxMode').querySelectorAll('.tpl').forEach(b=>{const on=b.dataset.r===mode;b.setAttribute('aria-pressed',on);b.style.outline=on?'2px solid var(--c)':'';});sel.hidden=mode!=='swap';$('#rmxTempoL').style.display=mode==='swap'?'inline-flex':'none';$('#rmxAmt').hidden=mode==='swap';};
+  const open=()=>{if(!S.channels.length){toast('Make or draw a beat first, then remix it.');return;}$('#rmxOut').textContent='';mod.hidden=false;sync();};
+  const close=()=>{mod.hidden=true;};
+  $('#remixBtn').onclick=open;$('#rmxClose').onclick=close;mod.addEventListener('pointerdown',e=>{if(e.target===mod)close();});
+  window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!mod.hidden){close();e.stopPropagation();}},true);
+  $('#rmxMode').addEventListener('click',e=>{const b=e.target.closest('.tpl');if(!b)return;mode=b.dataset.r;sync();});
+  $('#rmxGo').onclick=()=>{
+    const r=remixThis({mode,amt:+$('#rmxAmt').value,style:sel.value,tempo:$('#rmxTempo').checked});if(!r)return;
+    close();toast(r.name+' made: '+r.info+'. Your original pattern is unchanged. Use the pattern tabs to switch.');
+  };
+  window.__remix=remixThis;
+})();
+const confirmBeat=()=>true; // makeBeat saves the current beat to the Library first
 (()=>{
   const mod=$('#mmbMod');let cur='chill';
   $('#mmbMoods').innerHTML=MOODS.map(x=>'<button class="tpl" data-m="'+x.id+'" aria-pressed="'+(x.id===cur)+'" style="--c:'+x.c+'"><b>'+x.n+'</b><span>'+x.d+'</span></button>').join('');
@@ -4872,6 +4993,11 @@ function makeBeat(mood,o){
   };
   $('#mmbGo').onclick=()=>go(cur);
   $('#mmbRand').onclick=()=>{cur=MOODS[Math.floor(Math.random()*MOODS.length)].id;sync();go(cur);};
+  $('#surpriseBtn').onclick=()=>{
+    if(S.channels.length&&!confirmBeat())return;
+    const m=MOODS[Math.floor(Math.random()*MOODS.length)],r=makeBeat(m.id,{bars:4,mel:true,song:false,pol:true});if(!r)return;
+    toast(r.name+' beat: '+r.style+' drums, '+r.key+', '+r.bpm+' BPM. Playing now.'+(r.saved?' Your previous beat was saved to the Library.':''));start();
+  };
   window.__make=makeBeat;
 })();
 const TEMPLATES=[
