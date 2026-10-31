@@ -39,3 +39,12 @@ at https://gleitz.github.io/midi-js-soundfonts/. Keep the credit shown in that w
 Sound sets: the Real instruments window uses FluidR3_GM (CC BY 3.0) from midi-js-soundfonts.
 Salamander Grand Piano V3 by Alexander Holm (CC BY 3.0) is self-hosted in sounds/salamander/ (30 mp3 files, about 2 MB). Keep LICENSE.txt with them.
 If sounds/salamander/ is missing the app falls back to jsDelivr.
+
+---- Newer features ----
+Channel FX panel: EQ detail (band frequencies and width with a live curve), manual compressor (threshold, ratio, attack, release, makeup, with a gain-reduction meter), and Chords (per-channel chord type with strum).
+Mixer: limiter gain-reduction meter, peak readout and a clip light.
+Piano roll: chord picker (extra chord notes show faintly, chord name on each note) and "Hum to notes" (microphone pitch detection).
+Sample editor: Detect key and "Use for project" (sets project tempo and key). Imported loops of 3 seconds or more are analysed automatically.
+Embed: Share > Embed code gives an iframe. It uses ?embed=1 and shows a small player. Embeds never touch the viewer's saved beat.
+Gallery: tags, search, and a Listen button (needs the Upstash/KV setup described above). api/gallery.js was updated, so upload it too.
+Piano roll > "Progression and bass": write a chord progression in your key (presets or your own numbers/numerals, chord change rate, rhythm, 7ths), and a bass line (six styles) that follows the chords on any channel. Chords are written as root notes with the chord picker on, so the roll shows chord names.
