@@ -1,10 +1,10 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Beat Synthesizer: a step sequencer with drum pads, piano roll, mixer, effects and export. Runs in your browser."><meta name="theme-color" content="#1d232a">
-<meta property="og:title" content="Beat Synthesizer"><meta property="og:description" content="Make beats in your browser. Channels, pads, piano roll, mixer, effects, WAV, MP3 and MIDI export."><meta property="og:type" content="website"><meta property="og:image" content="https://www.thebeatsynth.com/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://www.thebeatsynth.com/og.png">
-<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icon-180.png"><meta name="apple-mobile-web-app-title" content="Beats"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="mobile-web-app-capable" content="yes"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="thebeatsynth: a step sequencer with drum pads, piano roll, mixer, effects and export. Runs in your browser."><meta name="theme-color" content="#1d232a">
+<meta property="og:title" content="thebeatsynth"><meta property="og:description" content="Make beats in your browser. Channels, pads, piano roll, mixer, effects, WAV, MP3 and MIDI export."><meta property="og:type" content="website"><meta property="og:image" content="https://www.thebeatsynth.com/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://www.thebeatsynth.com/og.png">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icon-180.png"><meta name="apple-mobile-web-app-title" content="thebeatsynth"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="mobile-web-app-capable" content="yes"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes">
 <script defer src="/_vercel/insights/script.js"></script>
 </head><body>
-<title>Beat Synthesizer</title>
+<title>thebeatsynth</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -294,14 +294,16 @@ body.lite *{transition:none!important;animation:none!important}
 .bk{position:absolute;top:0;width:22px;height:74px;background:#1b2128;border:1px solid #000;border-radius:0 0 3px 3px;z-index:2;padding:0}
 .bk.on{background:var(--accent)}
 .bk small{position:absolute;bottom:4px;left:0;right:0;text-align:center;font:700 10px var(--f-ui);color:#8c9cab;pointer-events:none}
-.mixer{flex:1 1 300px;min-height:340px;overflow:auto;border:1px solid var(--line);border-radius:6px;background:var(--panel);display:flex;gap:6px;padding:10px;align-items:stretch}
+.mixer{flex:1 1 300px;min-height:450px;overflow:auto;border:1px solid var(--line);border-radius:6px;background:var(--panel);display:flex;gap:6px;padding:10px;align-items:stretch}
+.strip>*{flex:none}.strip{gap:5px}.strip .span{gap:0}
 .strip{flex:none;width:88px;background:var(--panel2);border:1px solid var(--line);border-top:4px solid var(--c);border-radius:5px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:8px}
 .strip.active{outline:2px solid var(--accent);outline-offset:1px}
 .strip.master{--c:var(--accent);margin-left:auto}
+.sdsel{width:100%;font-size:11px;background:var(--field);border:1px solid var(--line);border-radius:4px;padding:2px;color:var(--fg)}
 .sname{width:100%;font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:var(--field);border:1px solid var(--line);border-radius:4px;padding:4px}
 .span{width:100%;display:flex;flex-direction:column}
 .span .lbl{font-size:10px}
-.fwrap{display:flex;gap:10px;height:160px;align-items:stretch}
+.fwrap{display:flex;gap:10px;height:112px;align-items:stretch}
 .fader{position:relative;width:28px;touch-action:none;cursor:ns-resize}
 .ftrack{position:absolute;left:50%;top:0;bottom:0;width:4px;margin-left:-2px;background:var(--inset);border-radius:2px}
 .fthumb{position:absolute;left:0;right:0;height:14px;background:var(--fg);border:1px solid #000;border-radius:3px}
@@ -428,8 +430,9 @@ body.lite *{transition:none!important;animation:none!important}
     <div class="egrp" data-tab="play" role="group" aria-label="Recording and metronome">
       <button class="btn sm toggle" id="recBtn" aria-pressed="false" title="Record played notes into the active channel while the pattern plays">● Record</button>
       <button class="btn sm" id="refBtn" title="Load a finished track to compare your beat against">Reference…</button><button class="btn sm toggle" id="refAB" aria-pressed="false" title="Switch between your beat and the reference at matched loudness" disabled>A/B</button><input type="file" id="refFile" accept="audio/*" hidden>
-      <button class="btn sm toggle" id="micBtn" aria-pressed="false" title="Record the microphone for a set number of bars, starting at the next bar 1, and add it as a sample channel. Use headphones.">● Mic loop</button>
-      <select id="micBars" class="btn sm" aria-label="Mic loop length"><option value="1">1 bar</option><option value="2">2 bars</option><option value="4">4 bars</option></select>
+      <button class="btn sm toggle" id="micBtn" aria-pressed="false" title="Record the microphone, or the whole mix, for a set number of bars starting exactly at the next bar 1. It becomes a sample channel that loops with the pattern.">● Loop rec</button>
+      <select id="loopSrc" class="btn sm" aria-label="Looper source"><option value="mic">Mic</option><option value="mix">Resample the mix</option></select><select id="loopMode" class="btn sm" aria-label="Looper mode"><option value="new">New take</option><option value="over">Overdub (layer)</option></select><button class="btn sm" id="loopUndo" disabled>Undo take</button><input id="loopLat" type="number" class="btn sm" min="0" max="500" step="1" placeholder="auto ms" aria-label="Mic latency in milliseconds" title="Latency compensation for the mic. Leave blank for automatic; raise it if your overdubs land late." style="width:84px">
+      <select id="micBars" class="btn sm" aria-label="Mic loop length"><option value="1">1 bar</option><option value="2">2 bars</option><option value="4">4 bars</option><option value="8">8 bars</option></select>
       <button class="btn sm toggle" id="metroBtn" aria-pressed="false" title="Click track (M)">Metronome</button>
       <select id="countIn" class="btn sm" aria-label="Count-in before recording"><option value="0">No count-in</option><option value="1">1 bar count-in</option><option value="2">2 bars count-in</option></select>
     </div>
@@ -452,6 +455,7 @@ body.lite *{transition:none!important;animation:none!important}
 
   <section class="padsv" id="pads" hidden aria-label="Drum pads">
     <div class="pads-bar"><span class="hint">Tap a pad, or use keys 1 2 3 4 / Q W E R / A S D F / Z X C V. Tap higher on a pad for a harder hit. Drop an audio file onto a pad to load it.</span><span class="grow"></span>
+      <button class="btn sm" id="padChopBtn" title="Pick a loop or a song. It is cut at its hits and spread across the 16 pads.">Chop audio…</button><input type="file" id="padChop" accept="audio/*" hidden>
       <button class="btn sm" id="padFolderBtn" title="Pick a folder of one-shot sounds. Each file becomes a sample channel and takes the next empty pad.">Import folder</button>
       <button class="btn sm" id="padReset" title="Clear all pad assignments and fill the pads from the channel list again">Reset pads</button>
       <input type="file" id="padFolder" webkitdirectory multiple hidden></div>
@@ -510,7 +514,7 @@ body.lite *{transition:none!important;animation:none!important}
       <label class="chk"><input type="checkbox" id="edRev"> Reverse</label>
       <label class="chk" title="Play this sample at different pitches from the keyboard, piano or MIDI, like a sampler"><input type="checkbox" id="edKeys"> Play across keys</label><span class="lbl">Root</span><select id="edRoot" class="btn sm" aria-label="Note at which the sample plays at original pitch"></select>
       <button class="btn sm" id="edPlay">Preview</button><button class="btn sm" id="edReset">Reset trim</button>
-      <span class="lbl">Slice into</span><select id="edSlices" class="btn sm" aria-label="Number of slices"><option>4</option><option selected>8</option><option>16</option></select><button class="btn sm" id="edSlice">Slice to steps</button><button class="btn sm" id="edHits" title="Cut at the loudest hits instead of equal parts. Uses the number in the box as the maximum.">Slice at hits</button>
+      <span class="lbl">Slice into</span><select id="edSlices" class="btn sm" aria-label="Number of slices"><option>4</option><option selected>8</option><option>16</option></select><button class="btn sm" id="edSlice">Slice to steps</button><button class="btn sm" id="edChop" title="Cut this sample at its hits and put up to 16 pieces on the pads">Chop to pads</button><button class="btn sm" id="edHits" title="Cut at the loudest hits instead of equal parts. Uses the number in the box as the maximum.">Slice at hits</button>
       <span class="lbl">Tempo</span><input type="number" id="edBpm" min="40" max="240" step="0.1" placeholder="BPM" style="width:7ch" aria-label="Tempo of this sample"><button class="btn sm" id="edDetect">Detect</button><button class="btn sm" id="edWarp" title="Stretch the sample to the project tempo without changing its pitch">Fit to project tempo</button>
       <button class="btn sm" id="edClose">Close</button></div>
     <div class="ed-body"><canvas id="edWave"></canvas><div class="ed-info" id="edInfo"></div>
@@ -529,6 +533,7 @@ body.lite *{transition:none!important;animation:none!important}
     <select id="addSound" aria-label="Sound for the new channel"></select>
     <button class="btn primary" id="add">+ Add channel</button>
     <button class="btn" id="importBtn">Import audio…</button>
+    <button class="btn" id="tplBtn" title="Start from a ready-made beat in a style">Templates</button>
     <button class="btn" id="sbBtn" title="Search and audition every built-in sound, then add it or drag it onto a pad">Browse sounds</button>
     <button class="btn" id="midiInBtn" title="Open a .mid file as a new pattern">Import MIDI…</button><input type="file" id="midiFile" accept=".mid,.midi,audio/midi" hidden>
     <button class="btn" id="packBtn" title="Ready-made one-shot sets, made inside the app">Sound packs…</button>
@@ -699,9 +704,9 @@ function applyFx(ch,imm){
   set(c.lg.gain,want==='f'?cutHz(x.cut)*d*.8:want==='p'?d:want==='v'?d/2:0);
   set(c.lv.gain,want==='v'?1-d/2:1);
 }
-function duckAt(t){
+function duckAt(srcId,t){
   S.channels.forEach(c=>{
-    const a=c.fx&&c.fx.duck||0;if(!a||!c.chain||!c.chain.dk||c.id===S.duckSrc)return;
+    const a=c.fx&&c.fx.duck||0;if(!a||!c.chain||!c.chain.dk||c.id===srcId)return;if((c.fx.duckBy!=null?c.fx.duckBy:S.duckSrc)!==srcId)return;
     const g=c.chain.dk.gain,at=Math.max(t,ctx.currentTime);
     g.cancelScheduledValues(at);g.setTargetAtTime(1-a*.95,at,.004);g.setTargetAtTime(1,at+.03,Math.max(.03,S.duckRel/3));
   });
@@ -929,7 +934,7 @@ function fireHit(ch,t,note,l,v,sd,x){
     const tt=Math.max(ctx.currentTime,t+tj+k*sd*l/r);
     trigger(ch,tt,note,l/r,vv,sd,false,x&&x.gl!=null&&note!=null&&x.gl!==note?{r:Math.pow(2,(x.gl-note)/12),dur:Math.min(.16,sd*.85)}:null);
     midiSend(ch,tt,note,l/r*sd,vv);
-    if(S.duckSrc===ch.id)duckAt(tt);
+    duckAt(ch.id,tt);
   }
 }
 function playStepAt(pid,step,tk,t,tm){
@@ -1030,7 +1035,7 @@ function onStep(q){
   if(S.mode==='song')markClip(q.ci,patById(q.pat));
   lyrNow(q);
 }
-let micArm=false,micRec=null,lite=false,fc=0,outG=null;
+var micArm=false,micRec=null;let lite=false,fc=0,outG=null;
 function frame(){
   if(playing&&ctx){
     while(queue.length&&queue[0].t<=ctx.currentTime){onStep(queue.shift());}
@@ -1551,16 +1556,18 @@ function drawEdit(){
   $('#edTitle').textContent='Sample · '+ch.name;if(ch.srcBpm)$('#edBpm').value=ch.srcBpm;$('#edWarp').textContent=ch.warp?'Remove stretch':'Fit to project tempo';$('#edRev').checked=ch.rev;$('#edKeys').checked=!!ch.keyPitch;$('#edRoot').value=String(ch.root||60);$('#edRoot').disabled=!ch.keyPitch;
 }
 function sliceChannel(ch,n){sliceBounds(ch,[...Array(n+1)].map((_,k)=>k/n));}
-function sliceBounds(ch,bd){
-  const T=total(),{s,e}=ch.trim,n=bd.length-1,used=new Set();
+function sliceBounds(ch,bd,opt){
+  const T=total(),{s,e}=ch.trim,n=bd.length-1,used=new Set(),made=[];
   for(let k=0;k<n;k++){
     const c=addChannel({kind:'sample',name:ch.name+' '+(k+1),buf:ch.buf,peaks:ch.peaks,raw:ch.raw,audioKey:ch.audioKey});
     c.trim={s:s+(e-s)*bd[k],e:s+(e-s)*bd[k+1]};c.rev=ch.rev;c.pitch=ch.pitch;c.vol=ch.vol;c.pan=ch.pan;c.fx=Object.assign({},ch.fx);c.warp=ch.warp?Object.assign({},ch.warp):null;
-    rebuildPlay(c);applyFx(c,true);
+    rebuildPlay(c);applyFx(c,true);made.push(c);
     let st=Math.round(bd[k]*T);while(used.has(st)&&st<T-1)st++;used.add(st);c.steps[Math.min(T-1,st)]=100;
   }
-  S.channels=S.channels.filter(c=>c!==ch);dropChain(ch);edCh=null;applyMix();render();
-  toast('Sliced into '+n+' channels. Move the steps to rearrange the loop.');
+  S.channels=S.channels.filter(c=>c!==ch);dropChain(ch);edCh=null;applyMix();
+  if(opt&&opt.pads){S.pads=Array(16).fill(null).map((_,i)=>made[i]?made[i].id:null);render();renderPads();setView('pads');
+    toast('Chopped into '+Math.min(16,n)+' pads. Tap them to play the pieces'+(n>16?' (only the first 16 fit)':'')+'. The original loop also plays from the step grid.');return made;}
+  render();toast('Sliced into '+n+' channels. Move the steps to rearrange the loop.');return made;
 }
 (()=>{
   const cv=$('#edWave');let dr=null;
@@ -1577,6 +1584,12 @@ function sliceBounds(ch,bd){
   $('#edPlay').onclick=()=>{const ch=byId(edCh);if(ch)preview(ch,ch.note);};
   $('#edReset').onclick=()=>{const ch=byId(edCh);if(!ch)return;ch.trim={s:0,e:1};ch.rev=false;rebuildPlay(ch);drawWave(ch);drawEdit();};
   $('#edSlice').onclick=()=>{const ch=byId(edCh);if(ch)sliceChannel(ch,+$('#edSlices').value);};
+  window.chopToPads=ch=>{
+    if(!ch||!ch.buf)return;let h=findHits(ch.buf,ch.trim.s,ch.trim.e,16)||[];
+    if(h.length<3)h=[...Array(15)].map((_,k)=>(k+1)/16);
+    h=h.slice(0,15);return sliceBounds(ch,[0,...h,1],{pads:true});
+  };
+  $('#edChop').onclick=()=>{const ch=byId(edCh);if(ch)chopToPads(ch);};
   $('#edHits').onclick=()=>{const ch=byId(edCh);if(!ch||!ch.buf)return;const h=findHits(ch.buf,ch.trim.s,ch.trim.e,+$('#edSlices').value);if(!h.length){toast('No clear hits found. Try equal slices instead.');return;}sliceBounds(ch,[0,...h,1]);};
   $('#edDetect').onclick=()=>{const ch=byId(edCh);if(!ch||!ch.buf)return;const b=detectBpm(ch.buf,ch.trim.s,ch.trim.e);if(!b){toast('The sample is too short to find a tempo.');return;}ch.srcBpm=b;$('#edBpm').value=b;toast('Detected about '+b+' BPM. Correct it in the box if it is half or double.');};
   $('#edBpm').addEventListener('change',e=>{const ch=byId(edCh);if(ch)ch.srcBpm=+e.target.value||0;});
@@ -1717,7 +1730,11 @@ const STYLES={
  boombap:{n:'Boom bap',bpm:90,sw:.25,kick:['X.....x...X..g..','kickHard'],snare:['....X.......X...'],hat:['x.x.x.x.x.x.x.xg']},
  lofi:{n:'Lo-fi',bpm:78,sw:.3,kick:['X.......x.x.....'],snare:['....x.......x..g'],hat:['x.g.x.g.x.g.x.g.'],perc:['.g.g.g.g.g.g.g.g']},
  dnb:{n:'Drum and bass',bpm:172,sw:0,kick:['X.........X.....'],snare:['....X.......X...'],hat:['xgxgxgxgxgxgxgxg'],open:['......x.......x.']},
- reggaeton:{n:'Reggaeton',bpm:95,sw:0,kick:['X...X...X...X...'],snare:['...x..x....x..x.'],hat:['x.x.x.x.x.x.x.x.']}
+ reggaeton:{n:'Reggaeton',bpm:95,sw:0,kick:['X...X...X...X...'],snare:['...x..x....x..x.'],hat:['x.x.x.x.x.x.x.x.']},
+ drill:{n:'Drill',bpm:142,sw:0,kick:['X.....x...X.....','kick808'],snare:['........X.......','snare808'],hat:['x.xgxgxxx.xgxgxg'],open:['...............x'],rat:{hat:{5:2,13:3}}},
+ ukg:{n:'UK garage',bpm:130,sw:.35,kick:['X.........X.....'],snare:['....X.......X...'],hat:['x.xgx.xgx.xgx.xg'],rim:['..g...g...g...g.']},
+ synthwave:{n:'Synthwave',bpm:100,sw:0,kick:['X...X...X...X...'],snare:['....x.......x...'],clap:['....x.......x...'],hat:['x.x.x.x.x.x.x.x.'],open:['..............x.']},
+ afrobeats:{n:'Afrobeats',bpm:105,sw:.1,kick:['X.....x...X.....'],snare:['....x..x....x...'],hat:['x.xgx.xgx.xgx.xg'],perc:['..g..g..g..g..g.'],rim:['...x..x.....x...']}
 };
 function roleChannel(role,pref){
   const [list,def]=ROLES[role];
@@ -1926,7 +1943,7 @@ const isPoly=ch=>ch.kind==='inst'||(ch.kind==='sample'&&ch.keyPitch);
 const noteFor=(ch,n)=>isPoly(ch)?n:ch.note;
 function liveVoice(ch,t,n,vel,len,sd,hold){
   if(ch===pianoCh)ch.pitch=ch.kind==='drum'?Math.max(-12,Math.min(12,(n-60)/2)):0;
-  else if(ch.id===S.duckSrc)duckAt(t);
+  else duckAt(ch.id,t);
   return trigger(ch,t,noteFor(ch,n),len,vel,sd,hold);
 }
 function arpSeq(){const a=[];arpNotes.forEach(v=>v.notes.forEach(n=>a.push({n,vel:v.vel})));return a.sort((x,y)=>x.n-y.n);}
@@ -2024,7 +2041,7 @@ $('#learnBtn').onclick=e=>{
 $('#midiBtn').onclick=async()=>{
   if(!navigator.requestMIDIAccess){toast('This browser does not support MIDI. Try Chrome or Edge.');return;}
   try{midiAccess=await navigator.requestMIDIAccess();}
-  catch(e){toast(inFrame?'MIDI is blocked in this embedded view. Open beat-synth.html from your computer in Chrome or Edge.':'MIDI access was not allowed.');return;}
+  catch(e){toast(inFrame?'MIDI is blocked in this embedded view. Open thebeatsynth.com in its own tab in Chrome or Edge.':'MIDI access was not allowed.');return;}
   const bind=()=>{let n=0;midiAccess.inputs.forEach(inp=>{inp.onmidimessage=onMidi;n++;});$('#midiBtn').textContent=n?'MIDI: '+n+' input'+(n>1?'s':''):'MIDI: no devices';
     const outs=[...midiAccess.outputs.values()],sel=$('#midiOutSel'),cur=sel.value;sel.hidden=!outs.length;
     sel.innerHTML='<option value="">MIDI out: off</option>'+outs.map(o=>'<option value="'+esc(o.id)+'">'+esc(o.name)+'</option>').join('');
@@ -2208,6 +2225,10 @@ function stripHTML(c){
     +'<div class="fwrap"><div class="fader" data-act="mvol" tabindex="0" role="slider" aria-label="Volume" aria-valuemin="0" aria-valuemax="1" aria-valuenow="'+c.vol.toFixed(2)+'"><i class="ftrack"></i><b class="fthumb" style="bottom:'+faderPos(c.vol)+'"></b></div><div class="vmeter"><i></i></div></div>'
     +'<output class="vdb">'+fmtDb(c.vol)+'</output>'
     +'<div class="sbtns"><button class="tg m" data-act="mmute" aria-pressed="'+c.mute+'" title="Mute">M</button><button class="tg s" data-act="msolo" aria-pressed="'+c.solo+'" title="Solo">S</button></div>'
+    +'<label class="span"><span class="lbl">Delay</span><input type="range" data-act="msend" data-k="del" min="0" max="1" step="0.01" value="'+(c.fx.del||0)+'" aria-label="Delay send for '+esc(c.name)+'"></label>'
+    +'<label class="span"><span class="lbl">Reverb</span><input type="range" data-act="msend" data-k="rev" min="0" max="1" step="0.01" value="'+(c.fx.rev||0)+'" aria-label="Reverb send for '+esc(c.name)+'"></label>'
+    +'<label class="span"><span class="lbl">Duck</span><input type="range" data-act="msend" data-k="duck" min="0" max="1" step="0.01" value="'+(c.fx.duck||0)+'" aria-label="Sidechain amount for '+esc(c.name)+'"></label>'
+    +'<select class="sdsel" data-act="mduck" aria-label="Sidechain source for '+esc(c.name)+'"><option value="">by: default</option>'+S.channels.filter(x=>x!==c).map(x=>'<option value="'+x.id+'"'+(c.fx.duckBy===x.id?' selected':'')+'>by: '+esc(x.name)+'</option>').join('')+'</select>'
     +'<button class="fxbtn2" data-act="mfx" data-has="'+hasFx(c)+'">FX</button></div>';
 }
 function renderMixer(){
@@ -2262,6 +2283,13 @@ $('#viewRack').onclick=()=>setView('rack');$('#viewMixer').onclick=()=>setView('
   });
   mx.addEventListener('input',e=>{const gi=e.target.closest('[data-g]');if(!gi)return;const [k,pn]=gi.dataset.g.split(':');S.groups[+k][pn]=gi.type==='checkbox'?gi.checked:parseFloat(gi.value);applyGroup(+k+1);});
   mx.addEventListener('toggle',e=>{if(e.target.id==='grpBox')S.grpOpen=e.target.open;},true);
+  mx.addEventListener('input',e=>{
+    const r=e.target.closest('[data-act="msend"]');if(!r)return;const ch=chOf(r);if(!ch)return;
+    ch.fx[r.dataset.k]=+r.value;
+    if(r.dataset.k==='duck'&&ch.fx.duck>0&&ch.fx.duckBy==null&&S.duckSrc==null){const k=S.channels.find(c=>c!==ch&&/kick/.test(c.sound||''))||S.channels.find(c=>c!==ch&&c.kind==='drum');if(k){S.duckSrc=k.id;toast('Ducking follows '+k.name+'. Pick another source under the slider.');}}
+    applyFx(ch);
+  });
+  mx.addEventListener('change',e=>{const r=e.target.closest('[data-act="mduck"]');if(!r)return;const ch=chOf(r);if(ch){ch.fx.duckBy=r.value?+r.value:null;applyFx(ch);}});
   mx.addEventListener('input',e=>{const r=e.target.closest('[data-act="mpan"]');if(!r)return;const ch=chOf(r);if(ch){ch.pan=+r.value;applyMix();autoRec(ch,'pan',ch.pan);}});
   mx.addEventListener('click',e=>{
     const b=e.target.closest('[data-act]');if(!b)return;const ch=chOf(b);if(!ch)return;const a=b.dataset.act;
@@ -2352,14 +2380,14 @@ function snapshot(withAudio){
       }
       let audio;if(withAudio&&c.raw&&!(c.audioKey&&seen[c.audioKey])){if(c.audioKey)seen[c.audioKey]=1;audio=b64(c.raw);}
       return {kind:c.kind,sound:c.sound,name:c.name,color:c.color,vol:c.vol,pan:c.pan,mute:c.mute,solo:c.solo,pitch:c.pitch,note:c.note,len:c.len,pats,
-        fx:c.fx,syn:c.syn,kp:c.keyPitch,rt:c.root,trim:c.trim,rev:c.rev,wp:c.warp||undefined,sb:c.srcBpm||undefined,audioKey:c.audioKey,audio};
+        fx:c.fx.duckBy!=null?Object.assign({},c.fx,{duckBy:S.channels.findIndex(x=>x.id===c.fx.duckBy)}):c.fx,syn:c.syn,kp:c.keyPitch,rt:c.root,trim:c.trim,rev:c.rev,wp:c.warp||undefined,sb:c.srcBpm||undefined,audioKey:c.audioKey,audio};
     })};
 }
 let saveT;
 function markDirty(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(snapshot(false)));}catch(e){}},400);}
 ['pointerup','change','input'].forEach(ev=>document.addEventListener(ev,markDirty,true));
 async function loadProject(p){
-  if(!p||!Array.isArray(p.channels))throw new Error('This file is not a Beat Synthesizer project.');
+  if(!p||!Array.isArray(p.channels))throw new Error('This file is not a thebeatsynth project.');
   stop();rollCh=fxCh=edCh=synCh=null;chReg.clear();S.sel=null;
   S.channels.forEach(dropChain);S.channels=[];S.nextId=1;
   const mk=(q,i)=>({id:i,name:String(q.name||'Pattern '+i).slice(0,24),color:q.color||COLORS[(i-1)%COLORS.length],
@@ -2409,6 +2437,7 @@ async function loadProject(p){
     }
     rebuildPlay(ch);applyFx(ch,true);
   }
+  S.channels.forEach(c=>{if(c.fx.duckBy!=null)c.fx.duckBy=(S.channels[+c.fx.duckBy]||{}).id??null;});
   S.duckSrc=(S.channels[+p.duckSrc]||{}).id??null;S.duckRel=[.12,.22,.4].includes(+p.duckRel)?+p.duckRel:.22;
   S.pads=Array(16).fill(null).map((_,i)=>(Array.isArray(p.pads)&&S.channels[p.pads[i]])?S.channels[p.pads[i]].id:null);
   S.activeId=(S.channels.find(c=>c.kind==='inst')||S.channels[0]||{}).id||null;
@@ -2417,7 +2446,7 @@ async function loadProject(p){
 }
 const inFrame=(()=>{try{return window.self!==window.top;}catch(e){return true;}})();
 function saveBlob(blob,name){
-  if(inFrame){toast('Saving files is blocked in this embedded view. Open beat-synth.html from your computer to save or export.');return false;}
+  if(inFrame){toast('Saving files is blocked in this embedded view. Open thebeatsynth.com in its own tab to save or export.');return false;}
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();
   setTimeout(()=>URL.revokeObjectURL(a.href),4000);return true;
 }
@@ -2471,6 +2500,8 @@ $('#padGrid').addEventListener('drop',async e=>{
   const made=await importFiles([...e.dataTransfer.files].slice(0,1));
   if(made[0]){S.pads[+el.dataset.i]=made[0].id;renderPads();toast('Loaded "'+made[0].name+'" onto pad '+(+el.dataset.i+1)+'.');}
 });
+$('#padChopBtn').onclick=()=>$('#padChop').click();
+$('#padChop').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const made=await importFiles([f]);if(made[0])chopToPads(made[0]);};
 $('#padFolderBtn').onclick=()=>$('#padFolder').click();
 $('#padFolder').onchange=async e=>{
   const files=[...e.target.files].filter(f=>/^audio\//.test(f.type)||/\.(wav|mp3|ogg|m4a|flac|aac|opus)$/i.test(f.name)).sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true}));e.target.value='';
@@ -2598,39 +2629,99 @@ $('#tlSong').onclick=()=>{$(S.mode==='song'?'#modePat':'#modeSong').click();rend
   $('#auMod').addEventListener('pointerdown',e=>{if(e.target===$('#auMod'))$('#auClose').click();});
 })();
 
-/* ---------- mic loop record ---------- */
-async function startMic(q){
-  micArm=false;const bars=+$('#micBars').value,tm=q.tm,dur=bars*tm.pb*tm.stepDur,pid=q.pat;
-  const chunks=[];let rec;
-  try{rec=new MediaRecorder(micStream);}catch(e){micCancel();toast('This browser cannot record from the microphone.');return;}
-  micRec=rec;$('#micBtn').textContent='● Recording…';
-  rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};
-  rec.onstop=async()=>{
-    micRec=null;if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null;}
-    $('#micBtn').setAttribute('aria-pressed',false);$('#micBtn').textContent='● Mic loop';
-    try{
-      const ab=await new Blob(chunks).arrayBuffer(),buf=await decode(ab.slice(0));
-      const wav=await encodeWav(buf).arrayBuffer(),key=uid();idbPut(key,wav);
-      const n=S.channels.filter(c=>/^Mic loop/.test(c.name)).length+1;
-      const ch=addChannel({kind:'sample',name:'Mic loop '+n,buf,peaks:peaksOf(buf),raw:wav,audioKey:key});
-      pd(ch,pid).steps[0]=100;render();toast('Recorded '+bars+' bar'+(bars>1?'s':'')+' as "'+ch.name+'", placed on step 1. Move it with the step grid.');markDirty();
-    }catch(err){toast('Could not use that recording.');}
-  };
-  rec.start();setTimeout(()=>{if(rec.state==='recording')rec.stop();},dur*1000);
+/* ---------- looper: record mic or resample the mix, then overdub ---------- */
+let micStream=null,LP=null,LPU=null;
+const loopLatSec=()=>{const v=$('#loopLat').value;return v===''?((ctx.baseLatency||0)+(ctx.outputLatency||0)):Math.max(0,+v)/1000;};
+function mixBufs(a,b){
+  const n=Math.max(a.length,b.length),o=ctx.createBuffer(2,n,a.sampleRate);let pk=0;
+  for(let c=0;c<2;c++){const x=a.getChannelData(Math.min(c,a.numberOfChannels-1)),y=b.getChannelData(Math.min(c,b.numberOfChannels-1)),d=o.getChannelData(c);
+    for(let i=0;i<n;i++){const v=x[i%x.length]+y[i%y.length];d[i]=v;const av=Math.abs(v);if(av>pk)pk=av;}}
+  if(pk>.98){const g=.98/pk;for(let c=0;c<2;c++){const d=o.getChannelData(c);for(let i=0;i<n;i++)d[i]*=g;}}
+  return o;
 }
-let micStream=null;
-function micCancel(){
-  micArm=false;if(micRec&&micRec.state==='recording'){micRec.ondataavailable=null;micRec.onstop=()=>{};micRec.stop();micRec=null;}
+async function setChBuf(ch,buf){
+  const wav=await encodeWav(buf).arrayBuffer(),key=uid();idbPut(key,wav);
+  ch.buf=buf;ch.peaks=peaksOf(buf);ch.raw=wav;ch.audioKey=key;ch.trim={s:0,e:1};rebuildPlay(ch);
+}
+let tapReady=null;
+async function makeTap(){
+  const z=ctx.createGain();z.gain.value=0;z.connect(ctx.destination);
+  try{
+    if(!ctx.audioWorklet)throw 0;
+    if(!tapReady||tapReady.c!==ctx){
+      const code="class T extends AudioWorkletProcessor{constructor(){super();this.l=[];this.r=[];this.n=0;this.f=0;}process(i){const x=i[0];if(x&&x.length){if(!this.n)this.f=currentFrame;this.l.push(x[0].slice());this.r.push((x[1]||x[0]).slice());this.n+=x[0].length;if(this.n>=4096)this.q();}return true;}q(){const L=new Float32Array(this.n),R=new Float32Array(this.n);let o=0;for(let k=0;k<this.l.length;k++){L.set(this.l[k],o);R.set(this.r[k],o);o+=this.l[k].length;}this.port.postMessage({f:this.f,l:L,r:R},[L.buffer,R.buffer]);this.l=[];this.r=[];this.n=0;}}registerProcessor('lp-tap',T);";
+      const url=URL.createObjectURL(new Blob([code],{type:'text/javascript'}));
+      tapReady={c:ctx,p:ctx.audioWorklet.addModule(url)};
+    }
+    await tapReady.p;
+    const node=new AudioWorkletNode(ctx,'lp-tap',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[1]}),t={node,z,bs:4096,onBlock:null};
+    node.port.onmessage=e=>{if(t.onBlock)t.onBlock({t:e.data.f/ctx.sampleRate,l:e.data.l,r:e.data.r});};
+    node.connect(z);return t;
+  }catch(e){
+    const bs=1024,sp=ctx.createScriptProcessor(bs,2,2),t={node:sp,z,bs,onBlock:null};
+    sp.onaudioprocess=ev=>{const a=ev.inputBuffer,pt=ev.playbackTime||ctx.currentTime;if(t.onBlock)t.onBlock({t:pt-bs/ctx.sampleRate,l:a.getChannelData(0).slice(),r:a.getChannelData(Math.min(1,a.numberOfChannels-1)).slice()});};
+    sp.connect(z);return t;
+  }
+}
+const loopTarget=()=>[...S.channels].reverse().find(c=>c.kind==='sample'&&/^Loop \d+$/.test(c.name));
+function loopUI(){
+  const b=$('#micBtn'),on=!!(micArm||micRec);b.setAttribute('aria-pressed',on);
+  b.textContent=micRec?'● Recording…':micArm?'Waiting for bar 1…':'● Loop rec';$('#loopUndo').disabled=!LPU;
+}
+function startMic(q){
+  micArm=false;const bars=+$('#micBars').value,tm=q.tm,dur=bars*tm.pb*tm.stepDur;
+  micRec={T0:q.t,dur,pid:q.pat,bars};loopUI();
+  const wait=Math.max(0,q.t+LP.lat+dur-ctx.currentTime)+LP.bs/ctx.sampleRate*2+.15;
+  LP.timer=setTimeout(finishLoop,wait*1000);
+}
+function loopCleanup(){
+  if(LP){clearTimeout(LP.timer);try{LP.src.disconnect(LP.sp);}catch(e){}try{LP.sp.disconnect();LP.z.disconnect();}catch(e){}LP.sp.onaudioprocess=null;if(LP.sp.port)LP.sp.port.onmessage=null;LP=null;}
   if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null;}
-  $('#micBtn').setAttribute('aria-pressed',false);$('#micBtn').textContent='● Mic loop';
+  micArm=false;micRec=null;loopUI();
 }
+function micCancel(){loopCleanup();}
+async function finishLoop(){
+  const lp=LP,r=micRec;if(!lp||!r)return;
+  const sr=ctx.sampleRate,total=Math.round(r.dur*sr),T=r.T0+lp.lat,L=new Float32Array(total),R=new Float32Array(total);
+  lp.blocks.forEach(b=>{
+    const off=Math.round((b.t-T)*sr),a=Math.max(0,off),z=Math.min(total,off+b.l.length);if(z<=a)return;
+    L.set(b.l.subarray(a-off,z-off),a);R.set(b.r.subarray(a-off,z-off),a);
+  });
+  const buf=ctx.createBuffer(2,total,sr);buf.getChannelData(0).set(L);buf.getChannelData(1).set(R);
+  const mode=$('#loopMode').value,src=lp.source;loopCleanup();
+  try{
+    const tgt=loopTarget();
+    if(mode==='over'&&tgt&&src==='mic'){
+      LPU={kind:'over',id:tgt.id,buf:tgt.buf};await setChBuf(tgt,mixBufs(tgt.buf,buf));
+      render();toast('Layered a new take onto "'+tgt.name+'". Press Undo take to remove it.');
+    }else{
+      const n=S.channels.filter(c=>/^Loop \d+$/.test(c.name)).length+1,wav=await encodeWav(buf).arrayBuffer(),key=uid();idbPut(key,wav);
+      const ch=addChannel({kind:'sample',name:'Loop '+n,buf,peaks:peaksOf(buf),raw:wav,audioKey:key});
+      pd(ch,r.pid).steps[0]=100;LPU={kind:'new',id:ch.id};render();
+      toast('Recorded '+r.bars+' bar'+(r.bars>1?'s':'')+' as "'+ch.name+'". Record again in Overdub mode to layer more.');
+    }
+    loopUI();markDirty();
+  }catch(err){toast('Could not use that recording.');}
+}
+$('#loopUndo').onclick=async()=>{
+  const u=LPU;if(!u)return;LPU=null;const ch=byId(u.id);
+  if(ch){if(u.kind==='new'){S.channels=S.channels.filter(c=>c!==ch);dropChain(ch);applyMix();}else{await setChBuf(ch,u.buf);}}
+  render();loopUI();markDirty();toast('Last take removed.');
+};
 $('#micBtn').onclick=async()=>{
   if(micArm||micRec){micCancel();return;}
-  if(!navigator.mediaDevices||!window.MediaRecorder){toast('This browser cannot record audio.');return;}
-  try{micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});}
-  catch(e){toast(inFrame?'Microphone access is blocked in this embedded view. Open beat-synth.html from your computer.':'Microphone access was not allowed.');return;}
-  ensureCtx();micArm=true;$('#micBtn').setAttribute('aria-pressed',true);$('#micBtn').textContent='Waiting for bar 1…';
-  toast('Recording starts at the next bar 1. Use headphones so the beat does not leak in.');
+  const source=$('#loopSrc').value;ensureCtx();let node;
+  if(source==='mic'){
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('This browser cannot record audio.');return;}
+    try{micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});}
+    catch(e){toast(inFrame?'Microphone access is blocked in this embedded view. Open the site in its own tab.':'Microphone access was not allowed.');return;}
+    node=ctx.createMediaStreamSource(micStream);
+  }else node=masterNodes.out;
+  const tap=await makeTap(),blocks=[];tap.onBlock=m=>blocks.push(m);
+  node.connect(tap.node);
+  LP={sp:tap.node,z:tap.z,src:node,blocks,bs:tap.bs,source,lat:source==='mic'?loopLatSec():0};
+  micArm=true;loopUI();
+  toast(source==='mic'?'Recording starts at the next bar 1. Use headphones so the beat does not leak in.':'Capturing the mix from the next bar 1.');
   if(!playing)start();
 };
 
@@ -2698,6 +2789,8 @@ $('#packList').addEventListener('click',async e=>{
   made.forEach(c=>{const k=S.pads.findIndex(x=>x==null);if(k>=0)S.pads[k]=c.id;});
   $('#packMod').hidden=true;render();toast('"'+pk.n+'" added: '+made.length+' sample channels.');markDirty();
 });
+
+$('#tplBtn').onclick=()=>{$('#libBtn').click();setTimeout(()=>{const t=$('#tpls');if(t)t.scrollIntoView({block:'center'});},60);};
 
 /* ---------- mutate, bake arp, notes lane, history ---------- */
 const nearScale=m=>{for(let d=0;d<=6;d++){if(inScale(m-d))return m-d;if(inScale(m+d))return m+d;}return m;};
@@ -2838,10 +2931,10 @@ async function readZip(ab){
   return out;
 }
 $('#zipBtn').onclick=()=>{
-  if(inFrame){toast('Saving files is blocked in this embedded view. Open beat-synth.html from your computer to save or export.');return;}
+  if(inFrame){toast('Saving files is blocked in this embedded view. Open thebeatsynth.com in its own tab to save or export.');return;}
   const enc=new TextEncoder(),files=[{name:'project.json',data:enc.encode(JSON.stringify(snapshot(false)))}],seen={};
   S.channels.forEach(c=>{if(c.raw&&c.audioKey&&!seen[c.audioKey]){seen[c.audioKey]=1;files.push({name:'audio/'+c.audioKey+'.bin',data:new Uint8Array(c.raw)});}});
-  files.push({name:'README.txt',data:enc.encode('Beat Synthesizer project.\nOpen this ZIP with Project > Open. project.json is the beat; audio/ holds imported samples as the original files.\n')});
+  files.push({name:'README.txt',data:enc.encode('thebeatsynth project.\nOpen this ZIP with Project > Open. project.json is the beat; audio/ holds imported samples as the original files.\n')});
   if(saveBlob(zipFiles(files),'my-beat.zip'))toast('Saved my-beat.zip with '+(files.length-2)+' audio file'+(files.length-2===1?'':'s')+'.');
 };
 $('#projFile').onchange=async e=>{
@@ -2859,7 +2952,7 @@ $('#projFile').onchange=async e=>{
 
 /* ---------- video export ---------- */
 $('#vidBtn').onclick=async()=>{
-  if(inFrame||exporting){if(inFrame)toast('Saving files is blocked in this embedded view. Open beat-synth.html from your computer to save or export.');return;}
+  if(inFrame||exporting){if(inFrame)toast('Saving files is blocked in this embedded view. Open thebeatsynth.com in its own tab to save or export.');return;}
   if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream){toast('This browser cannot record video.');return;}
   const b=$('#vidBtn');exporting=true;b.disabled=true;b.textContent='Rendering…';stop();let ac=null;
   try{
@@ -2871,7 +2964,7 @@ $('#vidBtn').onclick=async()=>{
     const ms=new MediaStream([...cv.captureStream(30).getVideoTracks(),...dst.stream.getAudioTracks()]);
     const mime=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'].find(m=>MediaRecorder.isTypeSupported(m));
     const rec=new MediaRecorder(ms,{mimeType:mime,videoBitsPerSecond:4e6}),chunks=[];rec.ondataavailable=ev=>{if(ev.data.size)chunks.push(ev.data);};
-    const done=new Promise(r=>{rec.onstop=r;}),fq=new Uint8Array(an.frequencyBinCount),pt=curPat(),title=S.mode==='song'?'Beat Synthesizer':pt.name,sub=pt.bpm+' BPM · '+pt.num+'/'+pt.den;
+    const done=new Promise(r=>{rec.onstop=r;}),fq=new Uint8Array(an.frequencyBinCount),pt=curPat(),title=S.mode==='song'?'thebeatsynth':pt.name,sub=pt.bpm+' BPM · '+pt.num+'/'+pt.den;
     const acc=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#ff9a3c';let t0=0,raf=0;
     const draw=()=>{
       an.getByteFrequencyData(fq);const el=ac.currentTime-t0,W=1280,H=720;
@@ -3015,7 +3108,7 @@ $('#libList').addEventListener('click',async e=>{
     delArm=null;libPut(lib.filter(x=>x.id!==id));renderLib();
   }
 });
-const nt=(ch,list)=>list.forEach(([i,m,l,v])=>ch.notes.push({i,m,l:l||1,v:v||100}));
+const nt=(ch,list)=>list.forEach(([i,m,l,v,sl])=>{const o={i,m,l:l||1,v:v||100};if(sl)o.sl=true;ch.notes.push(o);});
 const chd=(ch,list)=>list.forEach(([i,ms,l,v])=>ms.forEach(m=>ch.notes.push({i,m,l:l||1,v:v||88})));
 function tplReset(){
   stop();rollCh=fxCh=edCh=synCh=null;S.channels.forEach(dropChain);S.channels=[];resetPatterns();
@@ -3040,6 +3133,22 @@ const TEMPLATES=[
  {n:'Lo-fi chill',d:'78 BPM · soft keys, swing',c:COLORS[4],f:()=>{S.bars=2;genBeat('lofi');
    nt(addChannel({sound:'bass',vol:.7}),[[0,38,4],[8,38,2],[12,41,2],[16,36,4],[24,36,2],[28,43,2]]);
    chd(addChannel({sound:'epiano',vol:.6}),[[0,[62,65,69,72],7],[8,[62,65,69,72],3],[16,[60,64,67,71],7],[24,[60,64,67,71],3]]);}},
+ {n:'Reggaeton',d:'95 BPM · dembow, 808',c:COLORS[6],f:()=>{S.bars=2;genBeat('reggaeton');
+   nt(addChannel({sound:'bass808',vol:.85}),[[0,36,3],[3,36,1],[6,38,2],[8,36,3],[11,36,1],[14,41,2],[16,36,3],[19,36,1],[22,38,2],[24,34,3],[27,34,1],[30,31,2]]);
+   chd(addChannel({sound:'pluck',vol:.55}),[[0,[57,60,64],2],[3,[57,60,64],1],[6,[57,60,64],2],[16,[53,57,60],2],[19,[53,57,60],1],[22,[55,59,62],2]]);}},
+ {n:'Drill',d:'142 BPM · sliding 808',c:COLORS[0],f:()=>{S.bars=2;genBeat('drill');
+   nt(addChannel({sound:'bass808',vol:.85}),[[0,36,4],[6,36,2],[8,39,2,100,1],[10,34,3,100,1],[16,36,4],[22,41,2],[24,39,2,100,1],[26,34,4,100,1]]);
+   nt(addChannel({sound:'bell',vol:.45}),[[0,75,3],[8,72,3],[16,70,3],[24,67,3],[28,70,2]]);}},
+ {n:'UK garage',d:'130 BPM · shuffle, organ stabs',c:COLORS[2],f:()=>{S.bars=2;genBeat('ukg');
+   nt(addChannel({sound:'bass',vol:.8}),[[0,38,2],[3,38,1],[6,41,2],[10,38,2],[16,36,2],[19,36,1],[22,39,2],[26,34,3]]);
+   chd(addChannel({sound:'organ',vol:.45}),[[2,[62,65,69,72],1],[5,[62,65,69,72],1],[10,[62,65,69,72],1],[18,[60,64,67,71],1],[21,[60,64,67,71],1],[26,[60,64,67,71],1]]);}},
+ {n:'Synthwave',d:'100 BPM · arps, big pad',c:COLORS[5],f:()=>{S.bars=2;genBeat('synthwave');
+   const bs=addChannel({sound:'bass',vol:.75});[33,29,36,31].forEach((r,k)=>[0,2,4,6].forEach(j=>bs.notes.push({i:k*8+j,m:r,l:2,v:100})));
+   nt(addChannel({sound:'lead',vol:.45}),[[0,69,3],[4,72,3],[8,76,4],[16,74,3],[20,72,3],[24,67,4]]);
+   const p=addChannel({sound:'pad',vol:.45});chd(p,[[0,[57,60,64],8,70],[8,[53,57,60],8,70],[16,[48,52,55],8,70],[24,[55,59,62],8,70]]);duckKick(p);}},
+ {n:'Afrobeats',d:'105 BPM · plucks, bounce',c:COLORS[3],f:()=>{S.bars=2;genBeat('afrobeats');
+   nt(addChannel({sound:'bass',vol:.8}),[[0,36,2],[3,36,1],[6,38,2],[10,36,2],[16,36,2],[19,36,1],[22,41,2],[26,38,3]]);
+   chd(addChannel({sound:'pluck',vol:.55}),[[0,[60,64,67],1],[3,[60,64,67],1],[6,[62,65,69],1],[10,[60,64,67],1],[16,[57,60,64],1],[19,[57,60,64],1],[22,[53,57,60],1],[26,[55,59,62],1]]);}},
  {n:'Drum and bass',d:'172 BPM · reese bass',c:COLORS[7],f:()=>{S.bars=2;genBeat('dnb');
    const b=addChannel({sound:'custom',name:'Reese',vol:.7});b.syn=Object.assign({},SYN_DEF,PRESETS['Reese bass']);
    nt(b,[[0,38,6],[8,38,2],[12,41,3],[16,38,6],[24,36,3],[28,34,3]]);
@@ -3177,7 +3286,7 @@ async function encodeMp3(buf){
   return new Blob(parts,{type:'audio/mpeg'});
 }
 $('#expBtn').onclick=async()=>{
-  if(inFrame||exporting){if(inFrame)toast('Saving files is blocked in this embedded view. Open beat-synth.html from your computer to save or export.');return;}
+  if(inFrame||exporting){if(inFrame)toast('Saving files is blocked in this embedded view. Open thebeatsynth.com in its own tab to save or export.');return;}
   const b=$('#expBtn');exporting=true;b.disabled=true;b.textContent='Rendering…';stop();
   try{
     const v=$('#expRep').value;let plan,name;
@@ -3216,7 +3325,7 @@ function planFromUI(){
 }
 const fname=n=>String(n).replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-').toLowerCase()||'channel';
 $('#stemBtn').onclick=async()=>{
-  if(inFrame||exporting){if(inFrame)toast('Saving files is blocked in this embedded view. Open beat-synth.html from your computer to save or export.');return;}
+  if(inFrame||exporting){if(inFrame)toast('Saving files is blocked in this embedded view. Open thebeatsynth.com in its own tab to save or export.');return;}
   const b=$('#stemBtn');exporting=true;b.disabled=true;stop();
   try{
     if(!S.channels.length)throw new Error('Add a channel first.');
@@ -3273,7 +3382,7 @@ function buildMidi(plan){
   return new Uint8Array(hd.concat(...tracks));
 }
 $('#midiOutBtn').onclick=()=>{
-  if(inFrame){toast('Saving files is blocked in this embedded view. Open beat-synth.html from your computer to save or export.');return;}
+  if(inFrame){toast('Saving files is blocked in this embedded view. Open thebeatsynth.com in its own tab to save or export.');return;}
   try{if(!S.channels.length)throw new Error('Add a channel first.');
     if(saveBlob(new Blob([buildMidi(planFromUI())],{type:'audio/midi'}),'beat.mid'))toast('Exported beat.mid');}
   catch(err){toast('Export failed: '+(err.message||err));}
