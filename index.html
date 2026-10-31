@@ -153,6 +153,7 @@ body.embed #embedBar{display:flex!important;align-items:center;gap:14px;position
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:80;display:grid;place-items:center;padding:16px}
 .modal-box{background:var(--panel);border:1px solid var(--line);border-radius:8px;width:min(700px,100%);max-height:92vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.5)}
 .lib-body{padding:14px;display:flex;flex-direction:column;gap:18px}
+.pmenu{position:fixed;z-index:96;background:var(--panel2);border:1px solid var(--accent);border-radius:8px;padding:4px;display:flex;flex-direction:column;min-width:140px;box-shadow:0 12px 34px rgba(0,0,0,.55)}.pmenu button{background:transparent;border:0;color:var(--fg);text-align:left;padding:7px 10px;border-radius:5px;font:inherit}.pmenu button:hover:not(:disabled),.pmenu button:focus{background:var(--pad);outline:0}.pmenu button:disabled{opacity:.4}
 .gt{font:700 10px var(--f-ui);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);padding:0 8px 0 2px;margin-right:2px;border-right:1px solid var(--line);align-self:stretch;display:flex;align-items:center;white-space:nowrap}
 .agrp{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
 .btn.guide{border-color:var(--accent);color:var(--accent);position:relative;font-weight:700}
@@ -392,7 +393,7 @@ body.lite *{transition:none!important;animation:none!important}
 
   <div class="patbar">
     <span class="lbl">Pattern</span>
-    <div class="pats" id="pats" role="group" aria-label="Patterns" title="Tempo, time signature and bars belong to the selected pattern. Double-click a name to rename."></div>
+    <div class="pats" id="pats" role="group" aria-label="Patterns" title="Tempo, time signature and bars belong to the selected pattern. Double-click or right-click a name to rename."></div>
     <button class="btn sm" id="patNew" title="New empty pattern with the same tempo and time signature">+ New</button>
     <button class="btn sm mtool" id="patDup">Duplicate</button>
     <button class="btn sm mtool" id="patDel">Delete</button>
@@ -1817,13 +1818,29 @@ function syncMode(){
 }
 (()=>{
   $('#pats').addEventListener('click',e=>{const b=e.target.closest('.pchip');if(b&&!e.target.closest('input'))selectPattern(+b.dataset.id);});
-  $('#pats').addEventListener('dblclick',e=>{
-    const b=e.target.closest('.pchip');if(!b)return;const p=patById(+b.dataset.id);if(!p)return;
+  function renamePat(id){
+    const b=$('#pats').querySelector('.pchip[data-id="'+id+'"]'),p=patById(id);if(!b||!p)return;
     b.innerHTML='<input value="'+esc(p.name)+'" maxlength="24" aria-label="Pattern name">';const inp=b.querySelector('input');inp.focus();inp.select();
-    const done=ok=>{if(ok&&inp.value.trim())p.name=inp.value.trim().slice(0,24);renderPats();renderSong();};
+    let fin=false;const done=ok=>{if(fin)return;fin=true;if(ok&&inp.value.trim())p.name=inp.value.trim().slice(0,24);renderPats();renderSong();};
     inp.addEventListener('keydown',ev=>{if(ev.key==='Enter')done(true);else if(ev.key==='Escape')done(false);ev.stopPropagation();});
     inp.addEventListener('blur',()=>done(true),{once:true});
+  }
+  $('#pats').addEventListener('dblclick',e=>{const b=e.target.closest('.pchip');if(b&&!e.target.closest('input'))renamePat(+b.dataset.id);});
+  let pmenu=null;const closePm=()=>{if(pmenu){pmenu.remove();pmenu=null;}};
+  $('#pats').addEventListener('contextmenu',e=>{
+    const b=e.target.closest('.pchip');if(!b)return;e.preventDefault();closePm();
+    const id=+b.dataset.id;selectPattern(id);
+    const m=document.createElement('div');m.className='pmenu';m.setAttribute('role','menu');
+    m.innerHTML='<button role="menuitem" data-k="r">Rename</button><button role="menuitem" data-k="d">Duplicate</button><button role="menuitem" data-k="x"'+(S.patterns.length<2?' disabled':'')+'>Delete</button>';
+    document.body.appendChild(m);pmenu=m;
+    const r=m.getBoundingClientRect();m.style.left=Math.max(4,Math.min(e.clientX,innerWidth-r.width-4))+'px';m.style.top=Math.max(4,Math.min(e.clientY,innerHeight-r.height-4))+'px';
+    m.onclick=ev=>{const k=ev.target.closest('button');if(!k||k.disabled)return;closePm();
+      if(k.dataset.k==='r')renamePat(id);else if(k.dataset.k==='d')$('#patDup').click();else $('#patDel').click();};
+    m.querySelector('button').focus();
+    m.onkeydown=ev=>{if(ev.key==='Escape'){closePm();ev.stopPropagation();}else if(ev.key==='ArrowDown'||ev.key==='ArrowUp'){ev.preventDefault();const bs=[...m.querySelectorAll('button:not(:disabled)')],i=bs.indexOf(document.activeElement);bs[(i+(ev.key==='ArrowDown'?1:-1)+bs.length)%bs.length].focus();}};
   });
+  document.addEventListener('pointerdown',e=>{if(pmenu&&!e.target.closest('.pmenu'))closePm();},true);
+  window.addEventListener('blur',closePm);
   $('#patNew').onclick=()=>newPattern(false);
   $('#patDup').onclick=()=>newPattern(true);
   $('#patDel').onclick=()=>{
@@ -1915,7 +1932,16 @@ const STYLES={
  drill:{n:'Drill',bpm:142,sw:0,kick:['X.....x...X.....','kick808'],snare:['........X.......','snare808'],hat:['x.xgxgxxx.xgxgxg'],open:['...............x'],rat:{hat:{5:2,13:3}}},
  ukg:{n:'UK garage',bpm:130,sw:.35,kick:['X.........X.....'],snare:['....X.......X...'],hat:['x.xgx.xgx.xgx.xg'],rim:['..g...g...g...g.']},
  synthwave:{n:'Synthwave',bpm:100,sw:0,kick:['X...X...X...X...'],snare:['....x.......x...'],clap:['....x.......x...'],hat:['x.x.x.x.x.x.x.x.'],open:['..............x.']},
- afrobeats:{n:'Afrobeats',bpm:105,sw:.1,kick:['X.....x...X.....'],snare:['....x..x....x...'],hat:['x.xgx.xgx.xgx.xg'],perc:['..g..g..g..g..g.'],rim:['...x..x.....x...']}
+ afrobeats:{n:'Afrobeats',bpm:105,sw:.1,kick:['X.....x...X.....'],snare:['....x..x....x...'],hat:['x.xgx.xgx.xgx.xg'],perc:['..g..g..g..g..g.'],rim:['...x..x.....x...']}, dubstep:{n:'Dubstep',bpm:140,sw:0,kick:['X.........x.....'],snare:['........X.......'],hat:['x.x.x.x.x.x.x.x.'],open:['..............x.']},
+ phonk:{n:'Phonk',bpm:130,sw:0,kick:['X..x..X...x.X...','kick808'],clap:['........X.......'],hat:['xgxgxxgxxgxgxxgx'],rat:{hat:{13:3}}},
+ rnb:{n:'R&B',bpm:68,sw:.2,kick:['X.....x...x.....'],snare:['........X.......'],hat:['x.x.x.x.x.x.x.xg'],rim:['..g...g...g...g.']},
+ pop:{n:'Pop',bpm:118,sw:0,kick:['X...X...X...X...'],snare:['....X.......X...'],clap:['....x.......x...'],hat:['..x...x...x...x.'],open:['x.x.x.x.x.x.x.x.']},
+ disco:{n:'Disco',bpm:120,sw:0,kick:['X...X...X...X...'],clap:['....X.......X...'],hat:['xgxgxgxgxgxgxgxg'],open:['..x...x...x...x.']},
+ funk:{n:'Funk',bpm:100,sw:.15,kick:['X..g..x...x.g...'],snare:['....X..g.g..X..g'],hat:['xgxgxgxgxgxgxgxg']},
+ jersey:{n:'Jersey club',bpm:140,sw:0,kick:['X..x..X.X.X..x..'],clap:['....X.......X...'],hat:['x.x.x.x.x.x.x.x.'],perc:['..g...g...g...g.']},
+ amapiano:{n:'Amapiano',bpm:112,sw:.05,kick:['X...X...X...X...'],clap:['....x.......x...'],hat:['x.xgx.xgx.xgx.xg'],perc:['x..x..x.x..x..x.']},
+ trance:{n:'Trance',bpm:138,sw:0,kick:['X...X...X...X...'],clap:['....X.......X...'],hat:['x.x.x.x.x.x.x.x.'],open:['..x...x...x...x.']},
+ reggae:{n:'Reggae',bpm:75,sw:.1,kick:['........X.......'],rim:['....x.......x...'],hat:['x.x.x.x.x.x.x.x.']}
 };
 function roleChannel(role,pref){
   const [list,def]=ROLES[role];
@@ -1943,6 +1969,7 @@ function genBeat(key){
   S.channels.forEach(c=>applyFx(c,true));
   render();toast(st.n+' beat generated at '+st.bpm+' BPM.');
 }
+(()=>{const g=$('#genStyle');Object.keys(STYLES).forEach(k=>{if(!g.querySelector('option[value="'+k+'"]')){const o=document.createElement('option');o.value=k;o.textContent=STYLES[k].n;g.appendChild(o);}});})();
 $('#genBtn').onclick=()=>genBeat($('#genStyle').value);
 
 /* ---------- undo / redo ---------- */
@@ -3272,7 +3299,7 @@ const GUIDE=(()=>{
     steps:['Tap a pad. Tap higher on it for a harder hit. Keys 1 2 3 4, Q W E R, A S D F, Z X C V play the 16 pads.','Drop an audio file onto a pad to load it, or use Chop audio to cut a loop at its hits across the pads.','Import folder turns a folder of one-shots into channels.','Open an imported sample in the sample editor to trim it, slice it, detect its tempo and key, and fit it to your project.'],
     acts:[{l:'Open Pads',run:()=>{closeGuide();view('viewPads');coach('#pads','Tap a pad, or use the keyboard.');}}]},
    {id:'song',t:'Patterns and songs',sub:'Turn a loop into a track',intro:'A pattern is one loop. A song is patterns lined up in order.',
-    steps:['+ New adds a pattern, Duplicate copies one. Double-click a name to rename it. Tempo, time signature and bars belong to the selected pattern.','Arrange opens the song bar: add patterns, move them, set how many times each repeats.','Timeline view shows the song as blocks you can drag.','Switch Plays from Pattern to Song to play the arranged song. Compose, then Build song, makes an intro, drop and outro for you.'],
+    steps:['+ New adds a pattern, Duplicate copies one. Double-click or right-click a name to rename it. Tempo, time signature and bars belong to the selected pattern.','Arrange opens the song bar: add patterns, move them, set how many times each repeats.','Timeline view shows the song as blocks you can drag.','Switch Plays from Pattern to Song to play the arranged song. Compose, then Build song, makes an intro, drop and outro for you.'],
     acts:[{l:'Show the pattern bar',run:()=>{closeGuide();coach('#pats','Patterns live here. Arrange opens the song bar.');}},{l:'Open Timeline',run:()=>{closeGuide();view('viewTl');coach('#timeline','Drag clips to arrange your song.');}}]},
    {id:'live',t:'Play and record live',sub:'Keys, MIDI, recording, looper',intro:'The Play tools handle everything you perform.',
     steps:['Keys plays the active channel from your computer keyboard. Z and X move the octave. Piano shows an on-screen keyboard.','Connect MIDI links a keyboard or controller. MIDI learn links a knob to any slider: click the slider, then move the knob.','Record writes what you play into the active channel while the pattern runs. Use Metronome and Count-in for timing.','Loop rec records the mic or the whole mix for 1 to 8 bars, exactly in time. Reference lets you A/B against a finished track.'],
@@ -3705,7 +3732,45 @@ const TEMPLATES=[
  {n:'Drum and bass',d:'172 BPM · reese bass',c:COLORS[7],f:()=>{S.bars=2;genBeat('dnb');
    const b=addChannel({sound:'custom',name:'Reese',vol:.7});b.syn=Object.assign({},SYN_DEF,PRESETS['Reese bass']);
    nt(b,[[0,38,6],[8,38,2],[12,41,3],[16,38,6],[24,36,3],[28,34,3]]);
-   chd(addChannel({sound:'strings',vol:.4}),[[0,[57,60,64],15,80],[16,[53,57,60],15,80]]);}}
+   chd(addChannel({sound:'strings',vol:.4}),[[0,[57,60,64],15,80],[16,[53,57,60],15,80]]);}},
+ {n:'Dubstep',d:'140 BPM · half-time, reese wobble',c:COLORS[7],f:()=>{S.bars=2;genBeat('dubstep');
+   const b=addChannel({sound:'custom',name:'Reese',vol:.75});b.syn=Object.assign({},SYN_DEF,PRESETS['Reese bass']);
+   nt(b,[[0,38,8],[8,38,4],[12,41,3],[16,41,8],[24,36,6]]);
+   nt(addChannel({sound:'lead',vol:.4}),[[4,74,1],[6,77,1],[12,81,2],[20,74,1],[22,77,1],[28,79,2]]);}},
+ {n:'Phonk',d:'130 BPM · cowbell, gritty 808',c:COLORS[0],f:()=>{S.bars=2;genBeat('phonk');
+   const cb=addChannel({sound:'cowbell',vol:.55});[0,3,6,10,16,19,22,26].forEach(i=>{if(i<cb.steps.length)cb.steps[i]=100;});
+   nt(addChannel({sound:'bass808',vol:.85}),[[0,36,4],[6,36,2],[8,39,3],[16,34,4],[22,36,2],[24,31,4]]);
+   nt(addChannel({sound:'bell',vol:.4}),[[0,75,2],[3,72,1],[8,70,3],[16,67,2],[19,70,1],[24,72,4]]);}},
+ {n:'R&B slow jam',d:'68 BPM · lush 7th chords',c:COLORS[6],f:()=>{S.bars=2;genBeat('rnb');
+   nt(addChannel({sound:'bass808',vol:.75}),[[0,33,6],[8,29,6],[16,26,6],[24,28,6]]);
+   chd(addChannel({sound:'epiano',vol:.55}),[[0,[57,60,64,67],7],[8,[53,57,60,64],7],[16,[50,53,57,60],7],[24,[52,56,59,62],7]]);
+   chd(addChannel({sound:'pad',vol:.3}),[[0,[69,72,76],15,70],[16,[62,65,69],15,70]]);}},
+ {n:'Pop anthem',d:'118 BPM · I-V-vi-IV',c:COLORS[3],f:()=>{S.bars=2;genBeat('pop');
+   nt(addChannel({sound:'bass',vol:.75}),[[0,36,6],[8,31,6],[16,33,6],[24,29,6]]);
+   chd(addChannel({sound:'piano',vol:.6}),[[0,[60,64,67],7],[8,[55,59,62],7],[16,[57,60,64],7],[24,[53,57,60],7]]);
+   nt(addChannel({sound:'lead',vol:.4}),[[0,76,2],[4,79,2],[8,74,3],[16,76,2],[20,72,2],[24,69,4]]);}},
+ {n:'Disco',d:'120 BPM · octave bass, brass stabs',c:COLORS[1],f:()=>{S.bars=2;genBeat('disco');
+   const bs=addChannel({sound:'bass',vol:.8});[33,38,31,36].forEach((r,k)=>[0,2,4,6].forEach(j=>{bs.notes.push({i:k*8+j,m:j%4?r+12:r,l:1,v:100});}));
+   chd(addChannel({sound:'brass',vol:.5}),[[2,[57,60,64],1],[6,[57,60,64],1],[10,[62,65,69],1],[14,[62,65,69],1],[18,[55,59,62],1],[22,[55,59,62],1],[26,[60,64,67],1],[30,[60,64,67],1]]);
+   chd(addChannel({sound:'strings',vol:.35}),[[0,[69,72,76],15,70],[16,[67,71,74],15,70]]);}},
+ {n:'Funk',d:'100 BPM · slap bass, organ',c:COLORS[2],f:()=>{S.bars=2;genBeat('funk');
+   nt(addChannel({sound:'bass',vol:.85}),[[0,40,1],[3,40,1],[6,43,1],[8,45,2],[11,40,1],[14,38,1],[16,40,1],[19,40,1],[22,43,1],[24,47,2],[27,45,1],[30,43,1]]);
+   chd(addChannel({sound:'organ',vol:.45}),[[0,[52,56,59,62],1],[3,[52,56,59,62],1],[6,[52,56,59,62],1],[10,[52,56,59,62],1],[16,[57,61,64,67],1],[19,[57,61,64,67],1],[22,[57,61,64,67],1],[26,[57,61,64,67],1]]);}},
+ {n:'Jersey club',d:'140 BPM · bounce kicks, bells',c:COLORS[5],f:()=>{S.bars=2;genBeat('jersey');
+   nt(addChannel({sound:'bass808',vol:.8}),[[0,36,2],[3,36,2],[6,36,2],[8,39,3],[16,36,2],[19,36,2],[22,34,2],[24,31,3]]);
+   nt(addChannel({sound:'bell',vol:.45}),[[0,84,1],[3,79,1],[6,75,1],[8,79,1],[16,82,1],[19,79,1],[22,75,1],[24,72,2]]);
+   chd(addChannel({sound:'supersaw',vol:.3}),[[0,[60,63,67],14,70],[16,[58,62,65],14,70]]);}},
+ {n:'Amapiano',d:'112 BPM · log drum bass, keys',c:COLORS[4],f:()=>{S.bars=2;genBeat('amapiano');
+   nt(addChannel({sound:'marimba',vol:.8}),[[0,45,2],[3,45,1],[6,48,2],[8,43,2],[11,43,1],[14,45,2],[16,41,2],[19,41,1],[22,43,2],[24,40,2],[27,40,1],[30,43,2]]);
+   chd(addChannel({sound:'epiano',vol:.5}),[[0,[57,60,64,67],3],[6,[57,60,64,67],2],[8,[53,57,60,64],3],[16,[50,53,57,60],3],[22,[50,53,57,60],2],[24,[52,55,59,62],3]]);
+   chd(addChannel({sound:'pluck',vol:.35}),[[4,[69,72,76],1],[12,[65,69,72],1],[20,[62,65,69],1],[28,[64,67,71],1]]);}},
+ {n:'Trance',d:'138 BPM · offbeat bass, supersaw',c:COLORS[7],f:()=>{S.bars=2;genBeat('trance');
+   const bs=addChannel({sound:'bass',vol:.75});[33,29,36,31].forEach((r,k)=>[2,6].forEach(j=>bs.notes.push({i:k*8+j,m:r,l:2,v:100})));
+   chd(addChannel({sound:'supersaw',vol:.45}),[[0,[57,60,64],8,80],[8,[53,57,60],8,80],[16,[48,52,55],8,80],[24,[55,59,62],8,80]]);
+   const ld=addChannel({sound:'lead',vol:.35});[81,84,88,84,81,84,88,91].forEach((m,k)=>ld.notes.push({i:k*2,m,l:1,v:90}));[77,81,84,81,76,79,83,79].forEach((m,k)=>ld.notes.push({i:16+k*2,m,l:1,v:90}));}},
+ {n:'Reggae one-drop',d:'75 BPM · skank organ, deep bass',c:COLORS[6],f:()=>{S.bars=2;genBeat('reggae');
+   nt(addChannel({sound:'bass',vol:.85}),[[0,40,4],[8,43,3],[12,40,2],[16,38,4],[24,40,3],[28,43,2]]);
+   chd(addChannel({sound:'organ',vol:.45}),[[2,[52,55,59],1],[6,[52,55,59],1],[10,[52,55,59],1],[14,[52,55,59],1],[18,[50,53,57],1],[22,[50,53,57],1],[26,[52,55,59],1],[30,[52,55,59],1]]);}}
 ];
 $('#tpls').innerHTML=TEMPLATES.map((t,i)=>'<button class="tpl" data-i="'+i+'" style="--c:'+t.c+'"><b>'+t.n+'</b><span>'+t.d+'</span></button>').join('');
 $('#tpls').addEventListener('click',e=>{
