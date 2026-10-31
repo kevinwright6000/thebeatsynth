@@ -154,6 +154,7 @@ body.embed #embedBar{display:flex!important;align-items:center;gap:14px;position
 .modal-box{background:var(--panel);border:1px solid var(--line);border-radius:8px;width:min(700px,100%);max-height:92vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.5)}
 .lib-body{padding:14px;display:flex;flex-direction:column;gap:18px}
 .pmenu{position:fixed;z-index:96;background:var(--panel2);border:1px solid var(--accent);border-radius:8px;padding:4px;display:flex;flex-direction:column;min-width:140px;box-shadow:0 12px 34px rgba(0,0,0,.55)}.pmenu button{background:transparent;border:0;color:var(--fg);text-align:left;padding:7px 10px;border-radius:5px;font:inherit}.pmenu button:hover:not(:disabled),.pmenu button:focus{background:var(--pad);outline:0}.pmenu button:disabled{opacity:.4}
+#coffee{position:fixed;left:50%;transform:translateX(-50%);bottom:64px;z-index:94;display:flex;gap:10px;align-items:center;background:var(--panel2);border:1px solid var(--accent);border-radius:999px;padding:7px 8px 7px 16px;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.5)}#coffee[hidden]{display:none}#coffee a,.coffee-link{color:var(--accent);font-weight:700;text-decoration:none}#coffee a:hover,.coffee-link:hover{text-decoration:underline}#coffee button{background:transparent;border:0;color:var(--dim);font-size:18px;cursor:pointer;padding:0 8px}.guide-nav .coffee-link{margin-top:auto;padding:10px 8px;border-top:1px solid var(--line);display:block}.lib-foot{padding:10px 0 0;border-top:1px solid var(--line);font-size:13px;color:var(--dim)}
 .gt{font:700 10px var(--f-ui);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);padding:0 8px 0 2px;margin-right:2px;border-right:1px solid var(--line);align-self:stretch;display:flex;align-items:center;white-space:nowrap}
 .agrp{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
 .btn.guide{border-color:var(--accent);color:var(--accent);position:relative;font-weight:700}
@@ -604,6 +605,7 @@ body.lite *{transition:none!important;animation:none!important}
       <div class="lib-sec"><span class="lbl">Saved in this browser</span>
         <div class="lib-save"><input id="libName" maxlength="40" placeholder="Name this beat" aria-label="Project name"><button class="btn sm primary" id="libSave">Save current</button></div>
         <div class="lib-list" id="libList"></div></div>
+      <div class="lib-foot">Free to use, no sign-up. If it helps you make music, <a class="coffee-link" href="https://buymeacoffee.com/kevin.wright" target="_blank" rel="noopener">☕ buy me a coffee</a>.</div>
       <div class="lib-sec" id="galSec"><span class="lbl">Public gallery</span>
         <div class="lib-save"><input id="galTitle" maxlength="40" placeholder="Name your beat to publish it" aria-label="Title for the gallery"><input id="galTags" maxlength="60" placeholder="Tags: lofi, chill" aria-label="Tags, separated by commas"><button class="btn sm primary" id="galPub">Publish</button></div>
         <div class="lib-save"><input id="galQ" type="search" placeholder="Search the gallery by name or tag" aria-label="Search the gallery"></div>
@@ -678,6 +680,7 @@ body.lite *{transition:none!important;animation:none!important}
 <div id="drop">Drop audio files to import</div>
 <div id="embedBar" role="region" aria-label="Beat player"><button id="emPlay" aria-pressed="false" aria-label="Play">▶</button><div class="em-info"><b id="emTitle">thebeatsynth beat</b><span id="emMeta"></span><div class="em-prog"><i id="emBar"></i></div></div><a id="emOpen" target="_blank" rel="noopener">Open in thebeatsynth</a></div>
 <div id="toast" role="status"></div>
+<div id="coffee" hidden><span>Enjoying thebeatsynth?</span> <a href="https://buymeacoffee.com/kevin.wright" target="_blank" rel="noopener">☕ Buy me a coffee</a><button id="coffeeX" aria-label="Dismiss">×</button></div>
 
 <script>
 (()=>{
@@ -2072,7 +2075,7 @@ const SCALES={minp:[0,3,5,7,10],majp:[0,2,4,7,9],min:[0,2,3,5,7,8,10],maj:[0,2,4
 const pcOf=m=>((m-S.key)%12+12)%12;
 const inScale=m=>SCALES[S.scale].includes(pcOf(m));
 function snapNote(m){if(!S.lock||inScale(m))return m;for(let d=1;d<=6;d++){if(inScale(m-d))return m-d;if(inScale(m+d))return m+d;}return m;}
-window.__bs={parseProg,degTones,chordEvents,bassNotes,writeBass,writeProgression,get SOUNDS(){return SOUNDS},yinPitch,pitchTrack,framesToNotes,notesToSteps,detectKey,chordTones,chordLabel,importMidi,parseMidi,readZip,clipAuto,detectBpm,findHits,stretchBuf,measureLufs,normalizeLufs,renderOne,get PACKS(){return PACKS},get S(){return S},inScale,snapNote,midi:(a)=>onMidi({data:a}),padHit,renderPlan,foldLoop,planList,encodeMp3,PRESETS:()=>PRESETS,setView,get playing(){return playing}};
+window.__bs={coffeeNudge,parseProg,degTones,chordEvents,bassNotes,writeBass,writeProgression,get SOUNDS(){return SOUNDS},yinPitch,pitchTrack,framesToNotes,notesToSteps,detectKey,chordTones,chordLabel,importMidi,parseMidi,readZip,clipAuto,detectBpm,findHits,stretchBuf,measureLufs,normalizeLufs,renderOne,get PACKS(){return PACKS},get S(){return S},inScale,snapNote,midi:(a)=>onMidi({data:a}),padHit,renderPlan,foldLoop,planList,encodeMp3,PRESETS:()=>PRESETS,setView,get playing(){return playing}};
 function scaleChanged(){if(!$('#kbd').hidden)buildKbd();if(rollCh)drawRoll();}
 $('#keyRoot').onchange=e=>{S.key=+e.target.value;scaleChanged();markDirty();};
 $('#keyScale').onchange=e=>{S.scale=e.target.value;scaleChanged();markDirty();};
@@ -3314,6 +3317,11 @@ const GUIDE=(()=>{
   ];
   return T;
 })();
+const COFFEE='https://buymeacoffee.com/kevin.wright';
+let coffeeShown=false;
+function coffeeNudge(){if(coffeeShown||EMBED)return;let d=null;try{d=localStorage.getItem('beatsynth.coffee');}catch(e){}if(d&&Date.now()-(+d)<6048e5)return;coffeeShown=true;setTimeout(()=>{const c=$('#coffee');c.hidden=false;setTimeout(()=>{c.hidden=true;},12000);},1200);}
+$('#coffeeX').onclick=()=>{$('#coffee').hidden=true;try{localStorage.setItem('beatsynth.coffee',Date.now());}catch(e){}};
+$('#coffee a').addEventListener('click',()=>{try{localStorage.setItem('beatsynth.coffee',Date.now());}catch(e){}$('#coffee').hidden=true;});
 let coachEl=null,coachSpot=null;
 function clearCoach(){if(coachEl){coachEl.remove();coachEl=null;}if(coachSpot){coachSpot.classList.remove('spot');coachSpot=null;}}
 function coach(sel,text){
@@ -3329,7 +3337,7 @@ window.addEventListener('keydown',e=>{if(e.key==='Escape'&&coachEl){clearCoach()
 let gTopic=null;
 function drawGuide(id){
   const t=GUIDE.find(x=>x.id===id)||GUIDE[0],i=GUIDE.indexOf(t);gTopic=t.id;try{localStorage.setItem('beatsynth.guide',t.id);}catch(e){}
-  $('#guideNav').innerHTML=GUIDE.map((g,k)=>'<button role="tab" data-g="'+g.id+'" aria-selected="'+(g.id===t.id)+'" id="gn_'+g.id+'"><span class="gn">'+(k+1)+'</span><span><b>'+esc(g.t)+'</b><small>'+esc(g.sub)+'</small></span></button>').join('');
+  $('#guideNav').innerHTML=GUIDE.map((g,k)=>'<button role="tab" data-g="'+g.id+'" aria-selected="'+(g.id===t.id)+'" id="gn_'+g.id+'"><span class="gn">'+(k+1)+'</span><span><b>'+esc(g.t)+'</b><small>'+esc(g.sub)+'</small></span></button>').join('')+'<a class="coffee-link" href="'+COFFEE+'" target="_blank" rel="noopener">☕ Buy me a coffee</a>';
   const body=t.keys?SHORTCUTS.map(([g,rows])=>'<h4>'+esc(g)+'</h4><div class="gkeys">'+rows.map(r=>'<kbd>'+esc(r[0])+'</kbd><span>'+esc(r[1])+'</span>').join('')+'</div>').join(''):'<ol>'+t.steps.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol>';
   const prev=GUIDE[i-1],next=GUIDE[i+1];
   $('#guidePane').setAttribute('aria-labelledby','gn_'+t.id);
@@ -3939,7 +3947,7 @@ $('#expBtn').onclick=async()=>{
     if(fmt==='loop'){buf=foldLoop(buf,planList(plan).T);blob=encodeWav(buf);name=name.replace('.wav','-loop.wav');}
     else if(fmt==='mp3'){b.textContent='Encoding…';blob=await encodeMp3(buf);name=name.replace('.wav','.mp3');}
     else blob=encodeWav(buf);
-    if(saveBlob(blob,name))toast('Exported '+name+lufsMsg);}
+    if(saveBlob(blob,name)){toast('Exported '+name+lufsMsg);coffeeNudge();}}
   catch(err){toast('Export failed: '+(err.message||err));}
   finally{exporting=false;b.disabled=false;b.textContent='Render';}
 };
