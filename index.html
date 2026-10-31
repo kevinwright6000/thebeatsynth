@@ -551,6 +551,7 @@ body.lite *{transition:none!important;animation:none!important}
     <div class="egrp" data-tab="compose" data-also="play" role="group" aria-label="Key and scale"><span class="gt">Key and scale</span>
       <select id="keyRoot" class="btn sm" aria-label="Key"><option value="0">C</option><option value="1">C#</option><option value="2">D</option><option value="3">D#</option><option value="4">E</option><option value="5">F</option><option value="6">F#</option><option value="7">G</option><option value="8">G#</option><option value="9">A</option><option value="10">A#</option><option value="11">B</option></select>
       <select id="keyScale" class="btn sm" aria-label="Scale"><option value="minp">Minor pentatonic</option><option value="majp">Major pentatonic</option><option value="min">Natural minor</option><option value="maj">Major</option><option value="dor">Dorian</option><option value="mix">Mixolydian</option><option value="phr">Phrygian</option><option value="har">Harmonic minor</option><option value="blues">Blues</option><option value="chr">Chromatic (no scale)</option></select>
+      <button class="btn sm toggle" id="kScaleBtn" aria-pressed="true" title="The keys A to ; play only notes in your key and scale, so every key sounds right. Turn off for a normal chromatic piano layout.">Keys follow scale</button>
       <button class="btn sm toggle" id="lockBtn" aria-pressed="false" title="Snap the notes you play on the keyboard, the on-screen piano, pads or MIDI, and notes you draw, to the scale">Scale lock</button>
     </div>
     <div class="egrp" data-tab="compose" role="group" aria-label="Pattern generator"><span class="gt">Drums</span>
@@ -705,7 +706,7 @@ body.lite *{transition:none!important;animation:none!important}
       <button class="btn" id="tplBtn" title="Start from a ready-made beat in a style">Templates</button>
       <button class="btn adv" id="midiInBtn" title="Open a .mid file as a new pattern">Import MIDI…</button><input type="file" id="midiFile" accept=".mid,.midi,audio/midi" hidden></div>
     <input type="file" id="file" accept="audio/*,.wav,.mp3,.ogg,.m4a,.flac,.aac" multiple hidden>
-    <span class="hint adv">Click or drag across steps to draw a beat; drag a lit step up or down to set its velocity. Shift-click selects a range to copy and paste. Play the active channel with the keys A to ; (Z and X change octave). Drop audio files anywhere to import them. Your beat autosaves in this browser.</span>
+    <span class="hint adv">Click or drag across steps to draw a beat; drag a lit step up or down to set its velocity. Shift-click selects a range to copy and paste. Play the active channel with the keys A to ;. They follow your key and scale (Z and X change octave). Drop audio files anywhere to import them. Your beat autosaves in this browser.</span>
   </div>
 </div>
 <div class="pop" id="stepPop" hidden role="dialog" aria-label="Step settings">
@@ -2512,6 +2513,7 @@ window.__bs={coffeeNudge,get audTakes(){return audTakes},get audStartFn(){return
 function scaleChanged(){if(!$('#kbd').hidden)buildKbd();if(rollCh)drawRoll();}
 $('#keyRoot').onchange=e=>{S.key=+e.target.value;scaleChanged();markDirty();};
 $('#keyScale').onchange=e=>{S.scale=e.target.value;scaleChanged();markDirty();};
+$('#kScaleBtn').onclick=e=>{kScale=!kScale;e.currentTarget.setAttribute('aria-pressed',kScale);try{localStorage.setItem('beatsynth.kscale',kScale?'1':'0');}catch(err){}scaleChanged();toast(kScale?'Keys A to ; now follow your key and scale.':'Keys A to ; are a normal piano layout.');};
 $('#lockBtn').onclick=e=>{S.lock=!S.lock;e.currentTarget.setAttribute('aria-pressed',S.lock);scaleChanged();markDirty();};
 function syncKey(){$('#keyRoot').value=String(S.key);$('#keyScale').value=S.scale;$('#lockBtn').setAttribute('aria-pressed',S.lock);}
 function doRandom(){
@@ -2584,6 +2586,13 @@ $('#countIn').onchange=e=>{S.countIn=+e.target.value;};
 $('#recBtn').onclick=e=>{S.rec=!S.rec;e.currentTarget.setAttribute('aria-pressed',S.rec);setPlayUI();if(S.rec&&!playing)toast('Record is armed. Press play'+(S.countIn?' to start after the count-in':'')+', then play notes.');};
 $('#keysBtn').onclick=e=>{S.keys=!S.keys;e.currentTarget.setAttribute('aria-pressed',S.keys);};
 $('#octDn').onclick=()=>setOct(kbOct-1);$('#octUp').onclick=()=>setOct(kbOct+1);
+const HOMEKEYS='asdfghjkl;';let kScale=true;try{kScale=localStorage.getItem('beatsynth.kscale')!=='0';}catch(e){}
+const kScaleOn=()=>kScale&&S.scale!=='chr';
+$('#kScaleBtn').setAttribute('aria-pressed',kScale);
+function keyNote(k){
+  if(kScaleOn()){const i=HOMEKEYS.indexOf(k);if(i<0)return null;const sc=SCALES[S.scale],n=sc.length,m=12*(kbOct+1)+S.key+Math.floor(i/n)*12+sc[i%n];return m<=127?m:null;}
+  return k in KEYMAP?12*(kbOct+1)+KEYMAP[k]:null;
+}
 const KEYMAP={a:0,w:1,s:2,e:3,d:4,f:5,t:6,g:7,y:8,h:9,u:10,j:11,k:12,o:13,l:14,p:15,';':16};
 const held={};
 function recordHit(ch,m,vel){
@@ -2679,7 +2688,7 @@ window.addEventListener('keydown',e=>{
   if(!(k in KEYMAP))return;
   e.preventDefault();
   const ch=activeCh();if(!ch)return;
-  const dn=12*(kbOct+1)+KEYMAP[k];liveOn('k'+k,dn,100,dn);
+  const dn=keyNote(k);if(dn==null)return;liveOn('k'+k,dn,100,dn);
 });
 window.addEventListener('keyup',e=>{liveOff('k'+e.key.toLowerCase());});
 var midiOut=null;let midiAccess=null;
@@ -2996,10 +3005,11 @@ function drawSpec(){
 /* ---------- on-screen piano ---------- */
 const REVKEY={};Object.entries(KEYMAP).forEach(([k,o])=>REVKEY[o]=k==='\;'?';':k.toUpperCase());
 function buildKbd(){
-  const base=12*kbOct,W=34,BW=22;let wh='',bl='',wi=0;
+  const base=12*kbOct,W=34,BW=22;let wh='',bl='',wi=0;const hm={};
+  (kScaleOn()?HOMEKEYS.split(''):Object.keys(KEYMAP)).forEach(k=>{const n=keyNote(k);if(n!=null)hm[n]=k==='\;'||k===';'?';':k.toUpperCase();});
   for(let s=0;s<=36;s++){
-    const m=base+s,pc=m%12,hint=REVKEY[s-12]!==undefined?'<small>'+REVKEY[s-12]+'</small>':'';
-    const oos=S.lock&&!inScale(m)?' oos':'';
+    const m=base+s,pc=m%12,hint=hm[m]!==undefined?'<small>'+hm[m]+'</small>':'';
+    const oos=(S.lock||kScaleOn())&&!inScale(m)?' oos':'';
     if([1,3,6,8,10].includes(pc))bl+='<button class="bk'+oos+'" data-m="'+m+'" style="left:'+(wi*W-BW/2)+'px" aria-label="'+noteName(m)+'">'+hint+'</button>';
     else{wh+='<button class="wk'+oos+'" data-m="'+m+'" aria-label="'+noteName(m)+'">'+hint+(pc===0?'<span>'+noteName(m)+'</span>':'')+'</button>';wi++;}
   }
