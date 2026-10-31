@@ -419,7 +419,9 @@ body.lite *{transition:none!important;animation:none!important}
 .lenbox .lbl{font-size:10px}
 .lenbox input{width:8ch;background:var(--field);border:1px solid var(--line);border-radius:3px;font:700 12px var(--f-mono);padding:2px 4px}
 .editbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.tabrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;width:100%}
+.tabrow{display:contents}
+#kbInfo{order:1;flex:1 1 160px;min-width:0}
+.editbar .egrp.more-strip,.editbar .egrp.adv2{order:2}
 .editbar .egrp[data-tab]{display:none}
 .editbar[data-tab="edit"] .egrp[data-tab="edit"],.editbar[data-tab="compose"] .egrp[data-tab="compose"],.editbar[data-tab="play"] .egrp[data-tab="play"]{display:flex}
 .editbar[data-tab="play"] .egrp[data-also="play"]{display:flex}
