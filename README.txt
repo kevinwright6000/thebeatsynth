@@ -31,3 +31,11 @@ Without step 1, "Short link" and the gallery show a friendly "not set up" messag
 ---- Tests ----
 GitHub Actions runs tests/ on every push (.github/workflows/test.yml).
 Locally: cd tests && npm install && npx playwright install chromium && npm test
+
+---- Real instruments ----
+The "Real instruments" button loads single instruments on demand from the midi-js-soundfonts project (FluidR3_GM, Creative Commons BY 3.0)
+at https://gleitz.github.io/midi-js-soundfonts/. Keep the credit shown in that window. The service worker caches them after the first load.
+
+Sound sets: the Real instruments window uses FluidR3_GM (CC BY 3.0) from midi-js-soundfonts.
+Salamander Grand Piano V3 by Alexander Holm (CC BY 3.0) is self-hosted in sounds/salamander/ (30 mp3 files, about 2 MB). Keep LICENSE.txt with them.
+If sounds/salamander/ is missing the app falls back to jsDelivr.

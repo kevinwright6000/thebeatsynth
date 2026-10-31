@@ -24,7 +24,7 @@ exports.readBody = async req => {
   for await (const c of req) { n += c.length; if (n > 600 * 1024) throw new Error('too large'); chunks.push(c); }
   return JSON.parse(Buffer.concat(chunks).toString('utf8'));
 };
-// Accept only something that looks like a Beat Synthesizer project, and strip embedded audio.
+// Accept only something that looks like a thebeatsynth project, and strip embedded audio.
 exports.clean = p => {
   if (!p || typeof p !== 'object' || !Array.isArray(p.channels) || p.channels.length > 40) throw new Error('bad project');
   p.channels.forEach(c => { delete c.audio; });

@@ -534,6 +534,7 @@ body.lite *{transition:none!important;animation:none!important}
     <button class="btn primary" id="add">+ Add channel</button>
     <button class="btn" id="importBtn">Import audio…</button>
     <button class="btn" id="tplBtn" title="Start from a ready-made beat in a style">Templates</button>
+    <button class="btn" id="gmBtn" title="Real recorded piano, strings, brass, guitars and more">Real instruments</button>
     <button class="btn" id="sbBtn" title="Search and audition every built-in sound, then add it or drag it onto a pad">Browse sounds</button>
     <button class="btn" id="midiInBtn" title="Open a .mid file as a new pattern">Import MIDI…</button><input type="file" id="midiFile" accept=".mid,.midi,audio/midi" hidden>
     <button class="btn" id="packBtn" title="Ready-made one-shot sets, made inside the app">Sound packs…</button>
@@ -567,6 +568,9 @@ body.lite *{transition:none!important;animation:none!important}
   </div>
 </div>
 <aside class="sb" id="sbPanel" hidden aria-label="Sound browser"><div class="sb-h"><input id="sbQ" type="search" placeholder="Search sounds and packs" aria-label="Search sounds"><button class="btn sm" id="sbClose" aria-label="Close sound browser">Close</button></div><div class="sb-l" id="sbList"></div></aside>
+<div class="modal" id="gmMod" hidden role="dialog" aria-modal="true" aria-labelledby="gmT">
+  <div class="modal-box"><div class="roll-bar"><strong id="gmT">Real instruments</strong><input id="gmQ" type="search" placeholder="Search instruments" aria-label="Search instruments"><span class="grow"></span><button class="btn sm" id="gmClose">Close</button></div>
+  <div class="lib-body"><div class="sb-l" id="gmList" style="max-height:60vh"></div><p class="hint" id="gmCred" style="margin:8px 0 0"></p></div></div></div>
 <div class="modal" id="packMod" hidden role="dialog" aria-modal="true" aria-labelledby="packT">
   <div class="modal-box"><div class="roll-bar"><strong id="packT">Sound packs</strong><span class="hint">Each pack adds sample channels you can use in the rack, on pads or across the keyboard.</span><span class="grow"></span><button class="btn sm" id="packClose">Close</button></div>
   <div class="lib-body"><div class="tpls" id="packList"></div></div></div>
@@ -894,8 +898,16 @@ SOUNDS.custom={label:'Custom Synth',kind:'inst',root:60,len:2,gain:.8,fn:(t,d,x)
     targets.forEach(([prm,sc])=>{const sg=ctx.createGain();sg.gain.value=am*sc;mg.connect(sg);sg.connect(prm);});
   });
 }};
+SOUNDS.gm={label:'Real instrument',kind:'inst',root:60,len:1.5,gain:.9,fn:(t,d,x)=>{
+  const bank=x.ch&&x.ch.gm&&GM.get(x.ch.gm);
+  if(!bank||!bank.b)return SOUNDS.piano.fn(t,d,x);
+  const m=Math.round(x.m);let k=bank.keys[0];for(const q of bank.keys)if(Math.abs(q-m)<Math.abs(k-m))k=q;
+  const s=ctx.createBufferSource();s.buffer=bank.b.get(k);s.playbackRate.value=Math.pow(2,(m-k)/12)*x.k;
+  const {g,end}=gate(d,t,.95,.004,Math.max(x.d,.08),.3);s.connect(g);s.start(t);s.stop(end+.05);if(HOLD)HOLD.oscs.push(s);
+}};
 const GROUPS=[['Drums',['kick','snare','clap','hatC','hatO','shaker','tom','rim','cowbell','crash']],
   ['Drums: 808 and percussion',['kick808','kickHard','snare808','snap','hat808','hat808o','ride','conga','clave','wood']],
+  ['Real instruments',['gm']],
   ['Instruments',['piano','epiano','organ','marimba','bell','strings','pad','brass','bass','bass808','acid','lead','supersaw','chip','pluck','custom']]];
 
 function playSample(ch,t,dst,note){
@@ -1233,6 +1245,7 @@ rack.addEventListener('change',e=>{
       });
     } else if(def.kind==='inst'){ch.note=def.root;}
     if(b.value==='custom'&&!ch.syn)ch.syn=Object.assign({},SYN_DEF);
+    if(b.value==='gm'&&!ch.gm){ch.gm='acoustic_grand_piano';gmEnsure(ch);}
     render();preview(ch,ch.note);
   }
 });
@@ -2159,7 +2172,7 @@ function midiSend(ch,t,note,dur,vel){
 function midiPanic(){if(!midiOut)return;for(let c=0;c<16;c++)try{midiOut.send([0xB0|c,123,0]);}catch(e){}}
 $('#midiOutSel').onchange=e=>{
   midiOut=e.target.value&&midiAccess?midiAccess.outputs.get(e.target.value)||null:null;
-  if(midiOut){S.channels.filter(c=>c.kind==='inst').forEach(c=>{try{midiOut.send([0xC0|midiChan(c),GM_PROG[c.sound]||0]);}catch(err){}});toast('Sending notes to '+midiOut.name+'. Drums go to channel 10.');}
+  if(midiOut){S.channels.filter(c=>c.kind==='inst').forEach(c=>{try{midiOut.send([0xC0|midiChan(c),progOf(c)]);}catch(err){}});toast('Sending notes to '+midiOut.name+'. Drums go to channel 10.');}
   else toast('MIDI output off.');
 };
 
@@ -2380,7 +2393,7 @@ function snapshot(withAudio){
       }
       let audio;if(withAudio&&c.raw&&!(c.audioKey&&seen[c.audioKey])){if(c.audioKey)seen[c.audioKey]=1;audio=b64(c.raw);}
       return {kind:c.kind,sound:c.sound,name:c.name,color:c.color,vol:c.vol,pan:c.pan,mute:c.mute,solo:c.solo,pitch:c.pitch,note:c.note,len:c.len,pats,
-        fx:c.fx.duckBy!=null?Object.assign({},c.fx,{duckBy:S.channels.findIndex(x=>x.id===c.fx.duckBy)}):c.fx,syn:c.syn,kp:c.keyPitch,rt:c.root,trim:c.trim,rev:c.rev,wp:c.warp||undefined,sb:c.srcBpm||undefined,audioKey:c.audioKey,audio};
+        gm:c.gm||undefined,fx:c.fx.duckBy!=null?Object.assign({},c.fx,{duckBy:S.channels.findIndex(x=>x.id===c.fx.duckBy)}):c.fx,syn:c.syn,kp:c.keyPitch,rt:c.root,trim:c.trim,rev:c.rev,wp:c.warp||undefined,sb:c.srcBpm||undefined,audioKey:c.audioKey,audio};
     })};
 }
 let saveT;
@@ -2424,6 +2437,7 @@ async function loadProject(p){
     }
     if(pc.kind!=='sample'&&!SOUNDS[pc.sound])continue;
     const ch=addChannel({kind:pc.kind,sound:pc.sound,name:pc.name,buf:ent&&ent.buf,raw:ent&&ent.raw,audioKey:key});
+    if(pc.sound==='gm'&&typeof pc.gm==='string'&&/^([A-Za-z0-9_]+\/)?[a-z0-9_]+$/.test(pc.gm)){ch.gm=pc.gm;gmEnsure(ch);}
     Object.assign(ch,{color:pc.color||ch.color,vol:pc.vol??.8,pan:pc.pan||0,mute:!!pc.mute,solo:!!pc.solo,pitch:pc.pitch||0,note:pc.note||ch.note,
       fx:Object.assign(defaultFx(),pc.fx||{}),syn:pc.sound==='custom'?Object.assign({},SYN_DEF,pc.syn||{}):null,keyPitch:!!pc.kp,root:Math.min(108,Math.max(12,Math.round(+pc.rt)||60)),trim:pc.trim&&pc.trim.e>pc.trim.s?{s:pc.trim.s,e:pc.trim.e}:{s:0,e:1},rev:!!pc.rev,
       len:Math.min(64,Math.max(0,Math.round(+pc.len)||0)),warp:pc.wp&&pc.wp.src>0&&pc.wp.tgt>0?{src:+pc.wp.src,tgt:+pc.wp.tgt}:null,srcBpm:+pc.sb||0});
@@ -2791,6 +2805,82 @@ $('#packList').addEventListener('click',async e=>{
 });
 
 $('#tplBtn').onclick=()=>{$('#libBtn').click();setTimeout(()=>{const t=$('#tpls');if(t)t.scrollIntoView({block:'center'});},60);};
+
+/* ---------- real instruments (FluidR3_GM, CC BY 3.0, via midi-js-soundfonts) ---------- */
+const GM_SETS={FluidR3_GM:{label:'FluidR3_GM',lic:'Creative Commons BY 3.0',note:'smallest, fastest'}};
+const GM_BASE='https://gleitz.github.io/midi-js-soundfonts/';
+const gmParse=id=>{const i=id.indexOf('/');return i<0?{set:'FluidR3_GM',name:id}:{set:id.slice(0,i),name:id.slice(i+1)};};
+const SAL_NOTES=['A0'].concat([1,2,3,4,5,6,7].flatMap(o=>['C','Ds','Fs','A'].map(n=>n+o)),['C8']);
+const SAL_MIDI=n=>{const m=/^([A-G])(s?)(\d)$/.exec(n);return 12*(+m[3]+1)+NOTEPC[m[1]]+(m[2]?1:0);};
+const SAL_URLS=['sounds/salamander/','https://cdn.jsdelivr.net/gh/Tonejs/audio@master/salamander/'];
+const GM=new Map(),GMP=new Map();
+const GM_NAMES=['acoustic_grand_piano','bright_acoustic_piano','electric_grand_piano','honkytonk_piano','electric_piano_1','electric_piano_2','harpsichord','clavinet','celesta','glockenspiel','music_box','vibraphone','marimba','xylophone','tubular_bells','dulcimer','drawbar_organ','percussive_organ','rock_organ','church_organ','reed_organ','accordion','harmonica','tango_accordion','acoustic_guitar_nylon','acoustic_guitar_steel','electric_guitar_jazz','electric_guitar_clean','electric_guitar_muted','overdriven_guitar','distortion_guitar','guitar_harmonics','acoustic_bass','electric_bass_finger','electric_bass_pick','fretless_bass','slap_bass_1','slap_bass_2','synth_bass_1','synth_bass_2','violin','viola','cello','contrabass','tremolo_strings','pizzicato_strings','orchestral_harp','timpani','string_ensemble_1','string_ensemble_2','synth_strings_1','synth_strings_2','choir_aahs','voice_oohs','synth_choir','orchestra_hit','trumpet','trombone','tuba','muted_trumpet','french_horn','brass_section','synth_brass_1','synth_brass_2','soprano_sax','alto_sax','tenor_sax','baritone_sax','oboe','english_horn','bassoon','clarinet','piccolo','flute','recorder','pan_flute','blown_bottle','shakuhachi','whistle','ocarina','lead_1_square','lead_2_sawtooth','lead_3_calliope','lead_4_chiff','lead_5_charang','lead_6_voice','lead_7_fifths','lead_8_bass__lead','pad_1_new_age','pad_2_warm','pad_3_polysynth','pad_4_choir','pad_5_bowed','pad_6_metallic','pad_7_halo','pad_8_sweep','sitar','banjo','shamisen','koto','kalimba','bagpipe','fiddle','shanai','tinkle_bell','agogo','steel_drums','woodblock','taiko_drum','melodic_tom','synth_drum'];
+const gmLabel=id=>id==='salamander'?'Salamander Grand Piano':gmParse(id).name.replace(/__/g,' ').replace(/_/g,' ').replace(/^\w/,c=>c.toUpperCase());
+const NOTEPC={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+function gmLoad(name){
+  if(GMP.has(name))return GMP.get(name);
+  const p=(async()=>{
+    if(name==='salamander'){
+      const dec=(ctx||new OfflineAudioContext(1,1,44100)),b=new Map();let base=null;
+      for(const u of SAL_URLS){try{const r=await fetch(u+'A0.mp3');if(r.ok){base=u;break;}}catch(e){}}
+      if(!base)throw new Error('no source');
+      await Promise.all(SAL_NOTES.map(async n=>{try{const r=await fetch(base+n+'.mp3');if(!r.ok)return;b.set(SAL_MIDI(n),await dec.decodeAudioData(await r.arrayBuffer()));}catch(e){}}));
+      if(!b.size)throw new Error('undecodable');
+      const bank={b,keys:[...b.keys()].sort((x,y)=>x-y)};GM.set(name,bank);return bank;
+    }
+    const gp=gmParse(name);
+    const r=await fetch(GM_BASE+gp.set+'/'+gp.name+'-mp3.js');if(!r.ok)throw new Error('HTTP '+r.status);
+    const txt=await r.text(),re=/"([A-G][b#]?-?\d)"\s*:\s*"(data:audio\/[^"]+)"/g,ents=[];let m;
+    while((m=re.exec(txt)))ents.push(m);
+    if(!ents.length)throw new Error('empty');
+    const dec=(ctx||new OfflineAudioContext(1,1,44100)),b=new Map();
+    await Promise.all(ents.map(async e=>{
+      const nm=/^([A-G])([b#]?)(-?\d)$/.exec(e[1]),midi=12*(+nm[3]+1)+NOTEPC[nm[1]]+(nm[2]==='b'?-1:nm[2]==='#'?1:0);
+      const bin=atob(e[2].slice(e[2].indexOf(',')+1)),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+      try{b.set(midi,await dec.decodeAudioData(u.buffer));}catch(err){}
+    }));
+    if(!b.size)throw new Error('undecodable');
+    const bank={b,keys:[...b.keys()].sort((x,y)=>x-y)};GM.set(name,bank);return bank;
+  })();
+  GMP.set(name,p);p.catch(()=>GMP.delete(name));return p;
+}
+async function gmEnsure(ch){
+  if(!ch||!ch.gm||GM.has(ch.gm))return;
+  try{toast('Loading '+gmLabel(ch.gm)+'…');await gmLoad(ch.gm);toast(gmLabel(ch.gm)+' is ready.');}
+  catch(e){toast('Could not load '+gmLabel(ch.gm)+'. Check your connection. A synth piano plays until it loads.');}
+}
+const gmEnsureAll=()=>Promise.all(S.channels.filter(c=>c.gm).map(c=>gmLoad(c.gm).catch(()=>{})));
+(()=>{
+  const mod=$('#gmMod'),list=$('#gmList'),q=$('#gmQ');let names=GM_NAMES.slice(),loaded=false,cur='FluidR3_GM';const cred=$('#gmCred'),idOf=n=>n;
+  async function open(){
+    mod.hidden=false;q.focus();
+    if(!loaded){loaded=true;try{const r=await fetch(GM_BASE+'FluidR3_GM/names.json');if(r.ok){const a=await r.json();if(Array.isArray(a)&&a.length){const have=new Set(a),ord=GM_NAMES.filter(n=>have.has(n));a.forEach(n=>{if(!ord.includes(n)&&/^[a-z0-9_]+$/.test(n))ord.push(n);});names=ord;}}}catch(e){}}
+    draw();
+  }
+  function draw(){
+    const s=q.value.trim().toLowerCase();
+    cred.innerHTML='Recorded instruments load from the internet the first time you pick one, then stay cached. <b>'+GM_SETS[cur].label+'</b> soundfont: '+GM_SETS[cur].lic+', via midi-js-soundfonts. Salamander Grand Piano by Alexander Holm: Creative Commons BY 3.0.';
+    list.innerHTML=['salamander'].concat(names).filter(n=>!s||gmLabel(n).toLowerCase().includes(s)).map(n=>'<div class="sb-it" data-n="'+n+'"><button class="btn sm" data-a="pv" aria-label="Preview '+esc(gmLabel(n))+'">▶</button><span class="nm">'+esc(gmLabel(n))+'</span><button class="btn sm" data-a="add">+ Channel</button><button class="btn sm" data-a="pad">→ Pad</button></div>').join('')||'<div class="sb-g">Nothing matches.</div>';
+  }
+  $('#gmBtn').onclick=open;$('#gmClose').onclick=()=>{mod.hidden=true;};q.addEventListener('input',draw);
+  q.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Escape')mod.hidden=true;});
+  mod.addEventListener('pointerdown',e=>{if(e.target===mod)mod.hidden=true;});
+  list.addEventListener('click',async e=>{
+    const b=e.target.closest('button[data-a]');if(!b)return;const n=idOf(b.closest('.sb-it').dataset.n),a=b.dataset.a;ensureCtx();
+    b.disabled=true;
+    try{
+      if(a==='pv'){await gmLoad(n);const tmp={kind:'inst',sound:'gm',gm:n,pitch:0,note:60,syn:null,chain:{in:master},fx:{}};
+        [60,64,67].forEach((m,k)=>trigger(tmp,ctx.currentTime+.02+k*.12,m,1.2,100));}
+      else{
+        let k=-1;if(a==='pad'){k=S.pads.findIndex(x=>x==null||!byId(x));if(k<0){toast('All pads are taken. Clear one first.');return;}}
+        toast('Loading '+gmLabel(n)+'…');await gmLoad(n);
+        const ch=addChannel({sound:'gm',name:gmLabel(n).slice(0,24)});ch.gm=n;if(k>=0)S.pads[k]=ch.id;
+        render();if(k>=0)renderPads();markDirty();toast(gmLabel(n)+(k>=0?' is on pad '+(k+1)+'.':' added.'));
+      }
+    }catch(err){toast('Could not load that instrument. Check your connection.');}
+    finally{b.disabled=false;}
+  });
+})();
 
 /* ---------- mutate, bake arp, notes lane, history ---------- */
 const nearScale=m=>{for(let d=0;d<=6;d++){if(inScale(m-d))return m-d;if(inScale(m+d))return m+d;}return m;};
@@ -3211,6 +3301,7 @@ function planList(plan){
   return {list,T};
 }
 async function renderPlan(plan,only){
+  await gmEnsureAll();
   const sr=44100,{list,T}=planList(plan);
   const len=T+Math.max(2,S.verbSize+1.5);
   const off=new OfflineAudioContext(2,Math.ceil(sr*len),sr);
@@ -3340,6 +3431,7 @@ $('#stemBtn').onclick=async()=>{
   finally{exporting=false;b.disabled=false;b.textContent='Stems';}
 };
 const GM_DRUM={kick:36,kick808:36,kickHard:36,snare:38,snare808:38,clap:39,snap:39,hatC:42,hat808:42,hatO:46,hat808o:46,shaker:70,tom:45,rim:37,cowbell:56,crash:49,ride:51,conga:63,clave:75,wood:76};
+const progOf=c=>c.sound==='gm'&&c.gm&&GM_NAMES.indexOf(gmParse(c.gm).name)>=0?GM_NAMES.indexOf(gmParse(c.gm).name):(GM_PROG[c.sound]||0);
 const GM_PROG={piano:0,epiano:4,organ:19,marimba:12,bell:14,strings:48,pad:89,brass:61,bass:38,bass808:38,acid:87,lead:80,supersaw:81,chip:80,pluck:24,custom:80};
 function vlq(n){const b=[n&127];while(n>>=7)b.unshift((n&127)|128);return b;}
 function buildMidi(plan){
@@ -3375,7 +3467,7 @@ function buildMidi(plan){
   S.channels.forEach((ch,ci)=>{
     const drum=ch.kind!=='inst';let c=9;if(!drum){c=inst++%15;if(c>=9)c++;}
     const events=evs[ci].map(e=>Object.assign(e,{c}));
-    if(!drum)events.push({t:0,o:0,b:[0xC0|c,GM_PROG[ch.sound]||0]});
+    if(!drum)events.push({t:0,o:0,b:[0xC0|c,progOf(ch)]});
     tracks.push(trk(events,ch.name));
   });
   const hd=[0x4D,0x54,0x68,0x64,0,0,0,6,0,1,tracks.length>>8,tracks.length&255,PPQ>>8,PPQ&255];

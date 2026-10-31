@@ -7,5 +7,5 @@ module.exports = async (req, res) => {
     const body = await kv.readBody(req), s = kv.clean(body), id = kv.newId();
     await kv.cmd('SET', 'share:' + id, s, 'EX', 60 * 60 * 24 * 365);
     kv.send(res, 200, { id });
-  } catch (e) { kv.send(res, 400, { error: 'Not a Beat Synthesizer project' }); }
+  } catch (e) { kv.send(res, 400, { error: 'Not a thebeatsynth project' }); }
 };
