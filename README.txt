@@ -48,3 +48,28 @@ Sample editor: Detect key and "Use for project" (sets project tempo and key). Im
 Embed: Share > Embed code gives an iframe. It uses ?embed=1 and shows a small player. Embeds never touch the viewer's saved beat.
 Gallery: tags, search, and a Listen button (needs the Upstash/KV setup described above). api/gallery.js was updated, so upload it too.
 Piano roll > "Progression and bass": write a chord progression in your key (presets or your own numbers/numerals, chord change rate, rhythm, 7ths), and a bass line (six styles) that follows the chords on any channel. Chords are written as root notes with the chord picker on, so the roll shows chord names.
+
+---- Layout: Simple and All tools ----
+New visitors start in Simple view (only the essentials). The Simple | All tools switch (top left) shows everything. The choice is kept in localStorage
+('beatsynth.layout'); visitors who already finished the welcome keep the full layout. File and Export are dropdown menus. In All tools, a dashed
+"More tools" bar opens Rhythm, Variation, Transitions, Mutate and Automation. On phones, Swing, Master and Level sit in a "Mix" menu.
+
+---- Features added since the notes above ----
+Tap tempo; piano-roll copy/paste and ghost notes; Perform mute scenes; audio take recording (WAV/MP3); tempo changes inside a song (per-clip BPM and ramp);
+master automation lanes; "Make me a beat" (mood starters); a redone welcome with a Guide button to replay it.
+Pads: a note tuner under the grid (instruments pick their note; imported audio uses "Sample is" plus the target note; synth drums tune in semitones).
+Mixer: with 10 or more channels the strips split into two compact rows so the spectrum and master panels keep their size.
+Sounds: 15 new synths and effects (Sub, Reese, Wobble and FM bass; Chord Stab, PWM Lead, Choir, Flute, Kalimba, Vibraphone, Glass Pad; Laser Zap, Arcade Blip,
+Downlifter, Reverse Cymbal) plus two wavetable pads (Evolving Pad, Drift Pad). Wobble, Reese, FM Bass, Choir and the pads have a macro slider on their rack row.
+Channel FX panel > Arpeggiator: Up, Down, Up and down or Random, speed, 1 to 3 octaves, note length. Works with the chord picker.
+Key and scale is available in both the Compose and Play tools. "Keys follow scale" (on by default): the keys A to ; play only notes in the key and scale.
+Guide: new topics for Simple/All tools and for synths, macros and the arpeggiator; Key and scale, Pads, Play live and Save and export were updated.
+
+---- Tests ----
+tests/smoke.test.js now has 44 tests (node:test + Playwright). Run: cd tests && npm install && npx playwright install chromium && npm test
+
+Added in this round
+- Remix this (vary or swap drums, same key), 8 new moods (16 total), Surprise me.
+- Vocal chain for mic loops (clean, rap, sing, big space) via the select next to Loop rec; also in Effects presets.
+- Share previews: Short link now also uploads a 600x315 preview card. api/page.js (rewritten from /?s=ID) injects Open Graph tags; api/og.js serves the image. Needs the Upstash KV env vars already used by Short links.
+- Speed check: 24 channels redraw in ~20 ms; offline export time scales roughly linearly with channels (no cliffs).
