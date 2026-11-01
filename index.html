@@ -65,7 +65,6 @@ button{cursor:pointer}
   .mixdd .dd-panel .ctl .lbl{min-width:56px}.mixdd .dd-panel .w120{width:100%;flex:1}
   .mixdd .dd-panel .meter{flex:1;width:auto}
 }
-#tipsBtn{margin-left:auto}
 @media (min-width:701px){.patbar{gap:6px}.patbar .seg button{padding:6px 10px}.patbar .lbl{margin-left:2px}}
 #keyScale{max-width:none!important}
 .adder .btn{padding:5px 10px;font-size:14px}
@@ -395,6 +394,14 @@ body.lite *{transition:none!important;animation:none!important}
 .patbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
 .seg[hidden],#helpBtn[hidden]{display:none!important}
 .patbar select.btn{min-width:0}
+.patbar{position:relative}
+#viewDd .dd-panel{right:auto;left:0;min-width:230px}
+.vrow{display:flex;gap:6px}.vrow .vname{flex:1;text-align:left}.vrow .vplus{width:34px;padding-inline:0;text-align:center;font-weight:700}
+.vrow[hidden]{display:none}
+.vrow.cur .vname{border-color:var(--accent);color:var(--accent)}
+.vrow .vplus[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.app.split .rack-scroll{flex:1 1 0;min-height:240px}
+.app.split .mixer{flex:1 1 0;min-height:300px}
 .patbar{width:fit-content;max-width:100%}
 @media (max-width:700px){.patbar>.gt{display:none}}
 .pats{display:flex;gap:4px;flex-wrap:wrap}
@@ -603,7 +610,7 @@ body.lite *{transition:none!important;animation:none!important}
     <button class="btn sm" id="undoBtn" disabled title="Undo (Ctrl+Z)">Undo</button> <button class="btn sm" id="redoBtn" disabled title="Redo (Ctrl+Shift+Z)">Redo</button>
     <button class="btn sm adv" id="patDup">Duplicate</button>
     <button class="btn sm adv" id="patDel">Delete</button>
-    <span class="gt">View</span><select id="viewSel" class="btn sm" aria-label="View" title="Switch between the Rack, Mixer, Pads and more"><option value="viewRack">Rack</option><option value="viewMixer">Mixer</option><option value="viewPads">Pads</option><option value="viewTl" class="adv" data-adv="1">Timeline</option><option value="viewPerf" class="adv" data-adv="1">Perform</option></select><div class="seg" id="viewSeg" role="group" aria-label="View buttons" hidden><button id="viewRack" aria-pressed="true">Rack</button><button id="viewMixer" aria-pressed="false">Mixer</button><button id="viewPads" aria-pressed="false">Pads</button><button id="viewTl" class="adv" aria-pressed="false">Timeline</button><button id="viewPerf" class="adv" aria-pressed="false" title="Launch patterns live like clips, and record the take as your song">Perform</button></div>
+    <span class="gt">View</span><div class="dd" id="viewDd"><button class="btn sm dd-btn" id="viewBtn" aria-haspopup="true" aria-expanded="false" title="Choose what fills the bottom of the page. Press + beside a second view to show two at once.">Rack ▾</button><div class="dd-panel" role="group" aria-label="View"><span class="lbl">Click a view, or press + to show two together</span><div class="vrow" data-v="viewRack"><button class="btn sm vname" type="button">Rack</button><button class="btn sm vplus" type="button" aria-pressed="false" aria-label="Show Rack together with the other view" title="Show Rack alongside another view (up to two)">+</button></div><div class="vrow" data-v="viewMixer"><button class="btn sm vname" type="button">Mixer</button><button class="btn sm vplus" type="button" aria-pressed="false" aria-label="Show Mixer together with the other view" title="Show Mixer alongside another view (up to two)">+</button></div><div class="vrow" data-v="viewPads"><button class="btn sm vname" type="button">Pads</button><button class="btn sm vplus" type="button" aria-pressed="false" aria-label="Show Pads together with the other view" title="Show Pads alongside another view (up to two)">+</button></div><div class="vrow adv" data-v="viewTl"><button class="btn sm vname" type="button">Timeline</button><button class="btn sm vplus" type="button" aria-pressed="false" aria-label="Show Timeline together with the other view" title="Show Timeline alongside another view (up to two)">+</button></div><div class="vrow adv" data-v="viewPerf"><button class="btn sm vname" type="button">Perform</button><button class="btn sm vplus" type="button" aria-pressed="false" aria-label="Show Perform together with the other view" title="Show Perform alongside another view (up to two)">+</button></div></div></div><div class="seg" id="viewSeg" role="group" aria-label="View buttons" hidden><button id="viewRack" aria-pressed="true">Rack</button><button id="viewMixer" aria-pressed="false">Mixer</button><button id="viewPads" aria-pressed="false">Pads</button><button id="viewTl" class="adv" aria-pressed="false">Timeline</button><button id="viewPerf" class="adv" aria-pressed="false" title="Launch patterns live like clips, and record the take as your song">Perform</button></div>
     <span class="gt adv">Plays</span><div class="seg adv" role="group" aria-label="Play mode"><button id="modePat" aria-pressed="true" title="Loop the selected pattern">Pattern</button><button id="modeSong" aria-pressed="false" title="Play the arranged song">Song</button></div>
     <button class="btn sm toggle adv" id="songToggle" aria-pressed="false">Arrange ▾</button>
   </div>
@@ -739,7 +746,7 @@ body.lite *{transition:none!important;animation:none!important}
       <button class="btn" id="tplBtn" title="Start from a ready-made beat in a style">Templates</button>
       <button class="btn adv" id="midiInBtn" title="Open a .mid file as a new pattern">Import MIDI…</button><input type="file" id="midiFile" accept=".mid,.midi,audio/midi" hidden></div>
     <input type="file" id="file" accept="audio/*,.wav,.mp3,.ogg,.m4a,.flac,.aac" multiple hidden>
-    <span class="hint" id="tipLine">Click or drag across the squares to draw a beat. Your beat saves itself.</span><button class="btn sm guide" id="tipsBtn" title="Open the Guide: drawing, notes, keys, drag and drop"><b>?</b>Tips</button>
+    <span class="hint" id="tipLine">Click or drag across the squares to draw a beat. Your beat saves itself.</span>
   </div>
 </div>
 <div class="pop" id="stepPop" hidden role="dialog" aria-label="Step settings">
@@ -882,6 +889,7 @@ const $=s=>document.querySelector(s);
 const NN=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 const noteName=m=>NN[m%12]+(Math.floor(m/12)-1);
 const hz=m=>440*Math.pow(2,(m-69)/12);
+const VIEWS=[['rack','#viewRack','#scroll','Rack','viewRack'],['mixer','#viewMixer','#mixer','Mixer','viewMixer'],['pads','#viewPads','#pads','Pads','viewPads'],['timeline','#viewTl','#timeline','Timeline','viewTl'],['perf','#viewPerf','#perf','Perform','viewPerf']];
 const COLORS=['#ff9a3c','#9be15d','#6fa0ff','#ff6fa8','#4fd6c8','#c58bff','#ffd23f','#ff6b5a'];
 const MAX=256;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -1441,7 +1449,7 @@ function stop(){
   if(masterNodes&&ctx){const n=ctx.currentTime;masterNodes.cg.gain.cancelScheduledValues(n);masterNodes.cg.gain.setValueAtTime(1,n);masterNodes.cf.frequency.cancelScheduledValues(n);masterNodes.cf.frequency.setValueAtTime(ctx.sampleRate/2,n);masterNodes.cf.type='allpass';}
 }
 function setPlayUI(){
-  if(S.view==='perf')setTimeout(renderPerf,0);
+  if(vOn('perf'))setTimeout(renderPerf,0);
   $('#play').setAttribute('aria-pressed',playing);$('#pos').classList.toggle('rec',S.rec&&playing);
   $('#playIcon').innerHTML=playing?'<path d="M4 3h4v14H4zM12 3h4v14h-4z"/>':'<path d="M5 3l12 7-12 7z"/>';
 }
@@ -1452,7 +1460,7 @@ function setPos(i,tm){
 }
 let nowI=-1,nowTick=0,nowEls=[];
 function setNow(i,tk){
-  if(S.view==='perf')perfProg(i);
+  if(vOn('perf'))perfProg(i);
   nowEls.forEach(e=>e.classList.remove('now'));nowEls=[];nowI=i;if(tk!==undefined)nowTick=tk;
   const hd=$('#rollHead'),rc=rollCh&&byId(rollCh);
   if(hd){const j=rc&&rc.len?nowTick%rc.len:i;hd.style.display=(i>=0&&rollCh)?'block':'none';hd.style.left=(KW+j*CW)+'px';}
@@ -1481,7 +1489,7 @@ function frame(){
   if(analyser&&!skip){analyser.getByteTimeDomainData(mbuf);let pk=0;for(let i=0;i<mbuf.length;i++){const v=Math.abs(mbuf[i]-128)/128;if(v>pk)pk=v;}
     lvl=Math.max(pk,lvl*.9);meterEl.style.transform='scaleX('+Math.min(1,lvl*1.2)+')';mixPeak=Math.max(mixPeak,pk);if(pk>=.985)mixClip=true;}
   if(fxCh&&!skip){const gm=document.getElementById('grM'),c0=byId(fxCh);if(gm&&c0&&c0.chain&&c0.chain.cp){const r=-(+c0.chain.cp.reduction||0);gm.style.transform='scaleX('+Math.min(1,r/24)+')';document.getElementById('grO').textContent='-'+r.toFixed(1)+' dB';}}
-  if(S.view==='mixer'&&!skip){
+  if(vOn('mixer')&&!skip){
     S.channels.forEach(c=>{
       const el=mixMeters[c.id];if(!el)return;let pk=0;
       if(c.chain&&c.chain.an){c.chain.an.getByteTimeDomainData(abuf);for(let i=0;i<abuf.length;i++){const v=Math.abs(abuf[i]-128)/128;if(v>pk)pk=v;}}
@@ -1492,7 +1500,7 @@ function frame(){
       document.getElementById('mPk').textContent=fmtDb(mixPeak);const l=document.getElementById('mClip');l.dataset.on=mixClip?'1':'0';l.textContent=mixClip?'CLIP':'ok';}}
     drawSpec();
   }
-  if(S.view==='timeline')tlFrame();
+  if(vOn('timeline'))tlFrame();
   requestAnimationFrame(frame);
 }
 
@@ -1560,7 +1568,7 @@ function render(){
     ru+='<div class="rc'+stepCls(i).replace(' alt','')+(bs?' bar':'')+'" data-i="'+i+'"'+(bs?' title="Click to select this bar on the active channel. Shift-click another bar to select a range. Then Copy or Paste."':'')+'>'+(bs?(Math.floor(i/pb)+1):beat?(Math.floor((i%pb)/spb())+1):'')+'</div>';}
   ru+='</div></div>';
   rack.innerHTML=ru+(S.channels.length?S.channels.map(rowHTML).join(''):'<div class="empty">No channels yet. Pick a sound below and add one, or import an audio file.</div>');
-  S.channels.forEach(drawWave);renderPats();renderSong();if(S.view==='perf')renderPerf();applySel();if(S.view==='mixer')renderMixer();if(S.view==='pads')renderPads();renderLyr();
+  S.channels.forEach(drawWave);renderPats();renderSong();if(vOn('perf'))renderPerf();applySel();if(vOn('mixer'))renderMixer();if(vOn('pads'))renderPads();renderLyr();
   nowEls=[];if(playing&&nowI>=0)setNow(nowI);
   syncRoll();
 }
@@ -2264,7 +2272,7 @@ function renderSong(){
     :'<span class="hint">The song is empty. Build a pattern, then add it here. Add patterns in the order you want them to play.</span>';
   $('#clipReps').textContent=sel?'×'+sel.reps:'—';
   ['clipL','clipR','clipMinus','clipPlus','clipDel'].forEach(id=>$('#'+id).disabled=!sel);
-  lastClip=-2;if(S.view==='timeline')renderTimeline();
+  lastClip=-2;if(vOn('timeline'))renderTimeline();
 }
 function markClip(ci,pat){
   if(ci===lastClip)return;lastClip=ci;
@@ -2587,13 +2595,12 @@ $('#stepOptBtn').onclick=e=>{S.stepOpt=!S.stepOpt;e.currentTarget.setAttribute('
 let layMode='simple',moreOn=false;
 function setMore(o){moreOn=!!o;$('.app').classList.toggle('more',moreOn);const b=$('#moreBtn');b.setAttribute('aria-pressed',moreOn);b.setAttribute('aria-expanded',moreOn);b.querySelector('b').textContent=moreOn?'Fewer tools ▴':'More tools ▾';try{localStorage.setItem('beatsynth.more',moreOn?'1':'0');}catch(e){}}
 function syncSels(){
-  const vb=document.querySelector('#viewSeg [aria-pressed="true"]'),tb=document.querySelector('#toolSeg [aria-pressed="true"]'),vs=$('#viewSel'),ts=$('#toolSel');
-  if(vb)vs.value=vb.id;if(tb)ts.value=tb.dataset.t;
-  [...vs.options].forEach(o=>{o.hidden=!!o.dataset.adv&&$('.app').classList.contains('simple');});
+  const tb=document.querySelector('#toolSeg [aria-pressed="true"]'),ts=$('#toolSel'),vs=S.views||['rack'],simple=$('.app').classList.contains('simple');
+  if(tb)ts.value=tb.dataset.t;
+  $('#viewBtn').textContent=vs.map(k=>VIEWS.find(x=>x[0]===k)[3]).join(' + ')+' ▾';
+  document.querySelectorAll('#viewDd .vrow').forEach(r=>{const k=VIEWS.find(x=>x[4]===r.dataset.v)[0],on=vs.includes(k);r.classList.toggle('cur',on);r.querySelector('.vplus').setAttribute('aria-pressed',on&&vs.length>1);r.hidden=r.classList.contains('adv')&&simple;});
 }
-$('#viewSel').onchange=e=>$('#'+e.target.value).click();
 $('#toolSel').onchange=e=>{const v=e.target.value;if(v==='help'){syncSels();openHelp();e.target.blur();return;}const b=document.querySelector('#toolSeg [data-t="'+v+'"]');if(b)b.click();};
-new MutationObserver(syncSels).observe($('.patbar'),{attributes:true,subtree:true,attributeFilter:['aria-pressed']});
 new MutationObserver(syncSels).observe($('#toolSeg'),{attributes:true,subtree:true,attributeFilter:['aria-pressed']});
 function setLayout(m,quiet){
   layMode=m==='full'?'full':'simple';const A=$('.app');A.classList.toggle('simple',layMode==='simple');
@@ -2612,11 +2619,10 @@ function revealEl(el){
   if(!el)return;const d=el.closest('.dd');if(d)openDd(d);
   if(!el.getClientRects().length){if(layMode==='simple')setLayout('full',true);if(el.closest('.adv2')&&!moreOn)setMore(true);}
 }
-$('#tipsBtn').onclick=()=>openGuide('steps');
 $('#layS').onclick=()=>setLayout('simple');$('#layF').onclick=()=>setLayout('full');
 $('#moreBtn').onclick=()=>setMore(!moreOn);
 document.querySelectorAll('.dd-btn').forEach(b=>b.onclick=e=>{e.stopPropagation();const d=b.parentElement;d.classList.contains('open')?closeDd():openDd(d);});
-document.querySelectorAll('.dd-panel').forEach(p=>p.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.id==='newBtn'&&b.textContent==='Sure?')return;setTimeout(closeDd,0);}));
+document.querySelectorAll('.dd-panel').forEach(p=>p.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.id==='newBtn'&&b.textContent==='Sure?')return;if(b.classList.contains('vplus'))return;setTimeout(closeDd,0);}));
 document.addEventListener('click',e=>{if(!e.target.closest('.dd'))closeDd();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.querySelector('.dd.open')){const d=document.querySelector('.dd.open .dd-btn');closeDd();if(d)d.focus();}});
 try{
@@ -2994,11 +3000,28 @@ function setFader(f,v){
   f.closest('.strip').querySelector('.vdb').textContent=fmtDb(v);
 }
 function updMasterFader(){const f=$('#mixer .strip.master .fader');if(f)setFader(f,S.master);}
-function setView(v){
-  S.view=v;[['rack','#viewRack'],['mixer','#viewMixer'],['pads','#viewPads'],['timeline','#viewTl'],['perf','#viewPerf']].forEach(([k,id])=>$(id).setAttribute('aria-pressed',v===k));
-  $('#scroll').hidden=v!=='rack';$('#mixer').hidden=v!=='mixer';$('#pads').hidden=v!=='pads';$('#timeline').hidden=v!=='timeline';$('#perf').hidden=v!=='perf';
-  if(v==='mixer')renderMixer();if(v==='pads'){autoPads();renderPads();}if(v==='timeline')renderTimeline();if(v==='perf')renderPerf();
+function vOn(k){return(S.views||['rack']).includes(k);}
+function setView(v,v2){
+  const vs=v2&&v2!==v?[v,v2]:[v];S.views=vs;S.view=vs[0];
+  VIEWS.forEach(([k,b,p])=>{$(b).setAttribute('aria-pressed',vs.includes(k));$(p).hidden=!vs.includes(k);});
+  $('.app').classList.toggle('split',vs.length>1);
+  if(vOn('mixer'))renderMixer();if(vOn('pads')){autoPads();renderPads();}if(vOn('timeline'))renderTimeline();if(vOn('perf'))renderPerf();
+  syncSels();
 }
+(()=>{
+  const dd=$('#viewDd');
+  const idOf=k=>VIEWS.find(x=>x[0]===k);
+  dd.addEventListener('click',e=>{
+    const row=e.target.closest('.vrow');if(!row)return;e.stopPropagation();
+    const k=VIEWS.find(x=>x[4]===row.dataset.v)[0],cur=S.views||['rack'];
+    if(e.target.closest('.vname')){setView(k);closeDd();return;}
+    if(e.target.closest('.vplus')){
+      if(cur.includes(k)){if(cur.length>1)setView(cur.find(x=>x!==k));}
+      else if(cur.length===1)setView(cur[0],k);
+      else setView(cur[1],k);
+    }
+  });
+})();
 $('#viewRack').onclick=()=>setView('rack');$('#viewMixer').onclick=()=>setView('mixer');$('#viewPads').onclick=()=>setView('pads');$('#viewTl').onclick=()=>setView('timeline');$('#viewPerf').onclick=()=>setView('perf');
 (()=>{
   const mx=$('#mixer');let dr=null;
@@ -3316,7 +3339,7 @@ $('#padFolder').onchange=async e=>{
 };
 $('#padReset').onclick=()=>{S.pads=Array(16).fill(null);autoPads();renderPads();markDirty();};
 window.addEventListener('keydown',e=>{
-  if(S.view!=='pads'||e.ctrlKey||e.metaKey||e.altKey||e.repeat)return;
+  if(!vOn('pads')||e.ctrlKey||e.metaKey||e.altKey||e.repeat)return;
   const tg=e.target,tag=tg.tagName;if(tag==='SELECT'||tag==='TEXTAREA'||(tag==='INPUT'&&!['range','checkbox','button'].includes(tg.type)))return;
   const i=PADKEYS.indexOf(e.key.toLowerCase());if(i<0)return;
   e.preventDefault();e.stopImmediatePropagation();padHit(i,110);
@@ -3467,7 +3490,7 @@ function tlFrame(){
     else pts=[[0,hi],[.8,lo],[.8001,hi],[1,hi]];
     histMark();S.lanes[k]=pts.map(q=>[q[0],q[1]]);lastP=null;window.drawLanes();markDirty();scheduleCommit();
   };
-  window.addEventListener('resize',()=>{if(S.view==='timeline')window.drawLanes();});
+  window.addEventListener('resize',()=>{if(vOn('timeline'))window.drawLanes();});
 })();
 $('#tlAdd').onclick=()=>$('#clipAdd').click();
 $('#tlDel').onclick=()=>{if(S.selClip<0){toast('Select a clip first.');return;}$('#clipDel').click();};
@@ -4203,12 +4226,12 @@ function takePush(id){if(takeArmed&&playing)takeLog.push(id);}
 function finishTake(){
   if(!takeArmed)return;takeArmed=false;$('#perfRec').setAttribute('aria-pressed','false');
   const log=takeLog;takeLog=[];
-  if(!log.length){if(S.view==='perf')toast('Nothing recorded. Let at least one loop finish before you stop.');return;}
+  if(!log.length){if(vOn('perf'))toast('Nothing recorded. Let at least one loop finish before you stop.');return;}
   histMark();const clips=[];log.forEach(id=>{const l=clips[clips.length-1];if(l&&l.pat===id&&l.reps<16)l.reps++;else clips.push({pat:id,reps:1});});
-  S.song=clips;S.selClip=0;renderSong();if(S.view==='timeline')renderTimeline();markDirty();scheduleCommit();
+  S.song=clips;S.selClip=0;renderSong();if(vOn('timeline'))renderTimeline();markDirty();scheduleCommit();
   toastUndo('Take saved as your song: '+clips.length+' clip'+(clips.length>1?'s':'')+'. Switch Plays to Song, or open Timeline.');
 }
-function perfUI(){if(S.view==='perf')renderPerf();}
+function perfUI(){if(vOn('perf'))renderPerf();}
 /* ---------- audio takes ---------- */
 let audArmed=false,aud=null,audTakes=[],audN=0,audTimer=null,audStopTok=0;
 const REC_SRC="class R extends AudioWorkletProcessor{constructor(){super();this.on=false;this.n=0;this.l=new Float32Array(2048);this.r=new Float32Array(2048);this.port.onmessage=e=>{this.on=!!e.data;if(!this.on){this.flush();this.port.postMessage('done');}};}flush(){if(this.n){this.port.postMessage([this.l.slice(0,this.n),this.r.slice(0,this.n)]);this.n=0;}}process(inp){const c=inp[0];if(this.on&&c&&c[0]){const a=c[0],b=c[1]||c[0];for(let i=0;i<a.length;i++){this.l[this.n]=a[i];this.r[this.n]=b[i];if(++this.n===2048)this.flush();}}return true;}}registerProcessor('bs-rec',R);";
@@ -4298,7 +4321,7 @@ const sameSet=(a,b)=>a.size===b.size&&[...a].every(x=>b.has(x));
 function syncMuteUI(){
   rack.querySelectorAll('.row').forEach(r=>{const c=byId(r.dataset.id),b=r.querySelector('[data-act="mute"]');if(c&&b)b.setAttribute('aria-pressed',c.mute);});
   document.querySelectorAll('#mixer .strip:not(.master)').forEach(st=>{const c=byId(st.dataset.id),b=st.querySelector('[data-act="mmute"]');if(c&&b)b.setAttribute('aria-pressed',c.mute);});
-  if(S.view==='perf')renderPerfMix();
+  if(vOn('perf'))renderPerfMix();
 }
 function renderPerfMix(){
   const a=$('#perfScenes'),c=$('#perfChs');if(!a||!c)return;
@@ -4338,7 +4361,7 @@ function queueScene(id){
   });
   $('#perfChs').addEventListener('click',e=>{const b=e.target.closest('[data-cid]');if(!b)return;const c=byId(b.dataset.cid);if(!c)return;c.mute=!c.mute;applyMix();syncMuteUI();markDirty();});
   window.addEventListener('keydown',e=>{
-    if(S.view!=='perf'||!e.shiftKey||e.ctrlKey||e.metaKey||e.altKey||!/^Digit[1-9]$/.test(e.code))return;
+    if(!vOn('perf')||!e.shiftKey||e.ctrlKey||e.metaKey||e.altKey||!/^Digit[1-9]$/.test(e.code))return;
     const t=e.target.tagName;if(['INPUT','SELECT','TEXTAREA'].includes(t))return;
     const sc=allScenes()[+e.code.slice(5)-1];if(sc){e.preventDefault();e.stopPropagation();queueScene(sc.id);}
   },true);
@@ -4352,7 +4375,7 @@ function doLaunch(keep){
 function launchPattern(id){
   if(!patById(id))return;
   if(S.mode==='song'){S.mode='pattern';syncMode();if(playing){stop();}}
-  if(!playing){launchQ=null;selectPattern(id);start();if(S.view==='perf')renderPerf();return;}
+  if(!playing){launchQ=null;selectPattern(id);start();if(vOn('perf'))renderPerf();return;}
   if(id===S.curPat&&launchQ==null){toast('That pattern is already playing.');return;}
   launchQ=id===S.curPat?null:id;renderPerf();
 }
@@ -4377,7 +4400,7 @@ function perfProg(i){const el=$('#perfGrid').querySelector('.clipt[data-s=playin
   $('#perfRec').onclick=e=>{takeArmed=!takeArmed;takeLog=[];e.currentTarget.setAttribute('aria-pressed',takeArmed);toast(takeArmed?(playing?'Recording the take from the next loop.':'Armed. Tap a pattern to start and record.'):'Take recording off.');};
   $('#perfStop').onclick=()=>{if(!playing)return;launchQ=-1;toast('Stopping at the end of this loop.');};
   window.addEventListener('keydown',e=>{
-    if(S.view!=='perf'||e.ctrlKey||e.metaKey||e.altKey||!/^[1-9]$/.test(e.key))return;
+    if(!vOn('perf')||e.ctrlKey||e.metaKey||e.altKey||!/^[1-9]$/.test(e.key))return;
     const t=e.target.tagName;if(['INPUT','SELECT','TEXTAREA'].includes(t))return;
     const p=S.patterns[+e.key-1];if(p){e.preventDefault();e.stopPropagation();launchPattern(p.id);}
   },true);
@@ -4423,7 +4446,7 @@ function setPolish(on){
   if(on===S.polish)return;histMark();
   if(on){S.polishPrev={mEq:S.mEq.slice(),mComp:Object.assign({},S.mComp),limThr:S.limThr,limCeil:S.limCeil};S.mEq=POLISH.mEq.slice();S.mComp=Object.assign({},POLISH.mComp);S.limThr=POLISH.limThr;S.limCeil=POLISH.limCeil;}
   else if(S.polishPrev){const q=S.polishPrev;S.mEq=q.mEq.slice();S.mComp=Object.assign({},q.mComp);S.limThr=q.limThr;S.limCeil=q.limCeil;S.polishPrev=null;}
-  S.polish=on;applyMaster();syncPolish();if(S.view==='mixer')renderMixer();markDirty();
+  S.polish=on;applyMaster();syncPolish();if(vOn('mixer'))renderMixer();markDirty();
   toast(on?'Polish on: gentle EQ, smoother dynamics. Press it again to hear your original.':'Polish off. This is your original master.');
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-polish]');if(b)setPolish(!S.polish);});
@@ -4790,7 +4813,7 @@ window.addEventListener('keydown',e=>{
   const k=e.key;
   if(k==='?'){e.preventDefault();openHelp();}
   else if(k==='Home'){e.preventDefault();stop();}
-  else if(S.view!=='pads'&&(k==='r'||k==='R')){S.rec=!S.rec;$('#recBtn').setAttribute('aria-pressed',S.rec);setPlayUI();}
+  else if(!vOn('pads')&&(k==='r'||k==='R')){S.rec=!S.rec;$('#recBtn').setAttribute('aria-pressed',S.rec);setPlayUI();}
   else if(k==='m'||k==='M'){S.metro=!S.metro;$('#metroBtn').setAttribute('aria-pressed',S.metro);}
 });
 function quickSave(){
@@ -5376,7 +5399,7 @@ $('#midiOutBtn').onclick=()=>{
   const openTools=()=>{};
   const ROWS=[['Play and tempo','Play starts and stops the music (Space does the same). Next to it you set the tempo, or press Tap in time with a song.','#play','Play and stop. Space does the same.'],
     ['The Channel Rack','Each row is one sound. Click the squares to place hits, and drag a lit square up or down to change how hard it hits.','.rack-scroll','This is the Channel Rack. Click squares to draw a beat.'],
-    ['Views','Switch between the Rack, a Mixer and drum Pads. The song Timeline and Perform for live sets appear in All tools.','#viewSel','View: Rack, Mixer and Pads.'],
+    ['Views','Switch between the Rack, a Mixer and drum Pads. The song Timeline and Perform for live sets appear in All tools.','#viewBtn','View: Rack, Mixer and Pads. Press + beside a second view to show two at once.'],
     ['Simple or All tools','You start with just the essentials. Press All tools when you want more: the Timeline, Perform, chord and melody writers, recording, time signatures and more. Your choice is remembered.','.seg.lay','Simple shows the essentials. All tools shows everything.'],
     ['Get sounds and starters','Make me a beat, Templates, Import audio and Real instruments are along the bottom of the page.','#mmbBtn','Make me a beat writes a whole starter for you. Templates and imports are beside it.',openTools],
     ['Save and export','Export renders your beat to WAV or MP3. The File menu has New, Open, Save and the Library, where your beats are remembered.','#expDd .dd-btn','Export renders your beat to WAV or MP3. File saves and opens projects.'],
