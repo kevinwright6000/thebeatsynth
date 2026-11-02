@@ -360,7 +360,7 @@ body.embed #embedBar{display:flex!important;align-items:center;gap:14px;position
 .alrow .lbl input[type=number]{width:62px;background:var(--field);border:1px solid var(--line);border-radius:3px;font:700 12px var(--f-mono);padding:2px 4px;color:inherit}
 .alrow .lbl input[type=range]{width:90px;vertical-align:middle}
 .alrow .steps{flex:none;padding:6px 10px 8px 4px;flex-direction:column;align-items:flex-start;gap:5px}
-.alrow .alt{display:flex;gap:5px;align-items:center;flex-wrap:wrap;position:sticky;left:calc(var(--head) + 8px);z-index:2}.alrow .alt .hint{font-size:11px}
+.alrow .alt{display:flex;gap:5px;align-items:center;flex-wrap:wrap;position:sticky;left:calc(var(--head) + 8px);z-index:2}.alrow .alt .hint{font-size:11px}.alrow .alz{display:inline-flex;gap:4px;align-items:center}.alrow .alzv{min-width:110px}
 .rack.als .row{opacity:.5}
 .alrow canvas{cursor:crosshair;touch-action:none;outline-offset:2px}.alrow canvas{display:block;height:56px;background:rgba(255,255,255,.03);border-radius:4px}
 @media (max-width:520px){.alrow{flex-direction:column;align-items:flex-start}.alrow .head{width:min(100vw - 34px,420px)}}
@@ -3006,7 +3006,7 @@ function newPattern(copyData){
 }
 function resetPatterns(){
   S.scenes=[];S.lanes={};sceneQ=null;
-  S.patterns=[{id:1,name:'Pattern 1',color:COLORS[0],num:4,den:4,bars:1,bpm:120}];S.curPat=1;S.nextPat=2;S.song=[];S.selClip=-1;S.mode='pattern';S.asrc=[];S.alane=[];S.aref=0;S.alrip=false;S.als=false;S.ahear=true;S.alm=false;S.alv=1;alSel=-1;alCur=null;if(typeof renderAudioLane==='function')renderAudioLane();syncMode();syncTransport();
+  S.patterns=[{id:1,name:'Pattern 1',color:COLORS[0],num:4,den:4,bars:1,bpm:120}];S.curPat=1;S.nextPat=2;S.song=[];S.selClip=-1;S.mode='pattern';S.asrc=[];S.alane=[];S.aref=0;S.alrip=false;S.als=false;S.alsnap=true;S.ahear=true;S.alm=false;S.alv=1;alSel=-1;alCur=null;if(typeof renderAudioLane==='function')renderAudioLane();syncMode();syncTransport();
 }
 function syncMode(){
   {const b=$('#modeBtn');if(b){b.textContent=S.mode==='song'?'SONG':'PAT';b.dataset.m=S.mode==='song'?'song':'pat';}}
@@ -3288,7 +3288,7 @@ const pcOf=m=>((m-S.key)%12+12)%12;
 const inScale=m=>SCALES[S.scale].includes(pcOf(m));
 function snapNote(m){if(!S.lock||inScale(m))return m;for(let d=1;d<=6;d++){if(inScale(m-d))return m-d;if(inScale(m+d))return m+d;}return m;}
 $('#etBtn').onclick=e=>{const on=!$('.app').classList.contains('et-open');$('.app').classList.toggle('et-open',on);e.currentTarget.setAttribute('aria-pressed',on);};
-window.__bs={get alN(){return alNodes.length},alRemoveAll,alEdSlice,alEdDelete,alEdCopy,alEdPaste,alEdMove,setAlSel(a,b,c){alSelR=a==null?null:{a,b};alCursor=c==null?null:c;alOverlay();},alSplit,alDup,alDel,alSnap,loadProject,warpMarkers,wkPoints,freezeChannel,unfreezeChannel,audioToNotes,audioToDrums,macroApply,macroRender,grooveFromLoop,grooveDef,openLaunchSet,followAction,captureMidi,get capBuf(){return capBuf},takeSave,takeSwap,takeDel,secGroups,secLabel,secMove,secDuplicate,normalizeLufs,measureLufs,loadKit,onMidi,recUndoTake,get recLog(){return recLog},get mset(){return mset},set msetV(v){mset=cleanSet(v);},mmApplyTpl,get midiMap(){return midiMap},get btnMap(){return btnMap},flToggle,coffeeNudge,get held(){return held},get snapshot(){return snapshot},get cleanMi(){return cleanMi},setMidiOut:o=>{midiOut=o;},setClk:m=>{clkMode=m;},addChannel,render,renderMixer,get shareCard(){return shareCard},get audTakes(){return audTakes},get audStartFn(){return audStart},get audStopNow(){return audStopNow},get planList(){return planList},get renderPlan(){return renderPlan},get clipDur(){return clipDur},get planFromUI(){return planFromUI},get encodeWav(){return encodeWav},parseProg,degTones,chordEvents,bassNotes,writeBass,writeProgression,get SOUNDS(){return SOUNDS},yinPitch,pitchTrack,framesToNotes,notesToSteps,detectKey,chordTones,chordLabel,importMidi,parseMidi,readZip,clipAuto,detectBpm,findHits,stretchBuf,measureLufs,normalizeLufs,renderOne,get PACKS(){return PACKS},get S(){return S},inScale,snapNote,midi:(a,ts)=>onMidi({data:a,timeStamp:ts}),padHit,renderPlan,foldLoop,planList,encodeMp3,PRESETS:()=>PRESETS,setView,get playing(){return playing}};
+window.__bs={get alN(){return alNodes.length},alZoomTo,alView,get alZoom(){return alZoom},alRemoveAll,alEdSlice,alEdDelete,alEdCopy,alEdPaste,alEdMove,setAlSel(a,b,c){alSelR=a==null?null:{a,b};alCursor=c==null?null:c;alOverlay();},alSplit,alDup,alDel,alSnap,loadProject,warpMarkers,wkPoints,freezeChannel,unfreezeChannel,audioToNotes,audioToDrums,macroApply,macroRender,grooveFromLoop,grooveDef,openLaunchSet,followAction,captureMidi,get capBuf(){return capBuf},takeSave,takeSwap,takeDel,secGroups,secLabel,secMove,secDuplicate,normalizeLufs,measureLufs,loadKit,onMidi,recUndoTake,get recLog(){return recLog},get mset(){return mset},set msetV(v){mset=cleanSet(v);},mmApplyTpl,get midiMap(){return midiMap},get btnMap(){return btnMap},flToggle,coffeeNudge,get held(){return held},get snapshot(){return snapshot},get cleanMi(){return cleanMi},setMidiOut:o=>{midiOut=o;},setClk:m=>{clkMode=m;},addChannel,render,renderMixer,get shareCard(){return shareCard},get audTakes(){return audTakes},get audStartFn(){return audStart},get audStopNow(){return audStopNow},get planList(){return planList},get renderPlan(){return renderPlan},get clipDur(){return clipDur},get planFromUI(){return planFromUI},get encodeWav(){return encodeWav},parseProg,degTones,chordEvents,bassNotes,writeBass,writeProgression,get SOUNDS(){return SOUNDS},yinPitch,pitchTrack,framesToNotes,notesToSteps,detectKey,chordTones,chordLabel,importMidi,parseMidi,readZip,clipAuto,detectBpm,findHits,stretchBuf,measureLufs,normalizeLufs,renderOne,get PACKS(){return PACKS},get S(){return S},inScale,snapNote,midi:(a,ts)=>onMidi({data:a,timeStamp:ts}),padHit,renderPlan,foldLoop,planList,encodeMp3,PRESETS:()=>PRESETS,setView,get playing(){return playing}};
 function scaleChanged(){if(!$('#kbd').hidden)buildKbd();if(rollCh)drawRoll();if(typeof drawChordStrip==='function'&&document.querySelector('#chStrip'))drawChordStrip();}
 $('#keyRoot').onchange=e=>{S.key=+e.target.value;scaleChanged();markDirty();};
 $('#keyScale').onchange=e=>{S.scale=e.target.value;scaleChanged();markDirty();};
@@ -4603,7 +4603,7 @@ function alRowHTML(){
     return '<div class="alrow"><div class="head"><div class="alh"><b>Song audio</b><span class="tgs"><button class="tg s" data-al="solo" aria-pressed="'+!!S.als+'" title="Solo the song: hear only the song audio, and silence the channels. Press again to bring them back.">S</button><button class="tg" data-al="remove" title="Remove the song audio from this project. Undo brings it back." aria-label="Remove song audio">✕</button><button class="tg m" data-al="mute" aria-pressed="'+!!S.alm+'" title="Mute the song audio">M</button><button class="tg s" data-al="hear" aria-pressed="'+(S.ahear!==false)+'" title="Play the song along with this pattern while it loops. Turn off to hear only the beat.">♪</button></span></div>'
       +'<div class="alh"><label class="lbl">From bar <input type="number" data-al="bar" min="1" step="0.25" value="'+bar+'" aria-label="Which bar of the song this pattern lines up with"></label><button class="btn sm" data-al="prev" title="Go back one bar of the song" aria-label="Back one bar">◀</button><button class="btn sm" data-al="next" title="Go forward one bar of the song" aria-label="Forward one bar">▶</button></div>'
       +'<div class="alh"><button class="btn sm" data-al="match" title="Jump to where this pattern sits in your arrangement">Match arrangement</button><label class="lbl">Vol <input type="range" data-al="vol" min="0" max="1.5" step="0.01" value="'+(S.alv==null?1:S.alv)+'" aria-label="Song audio volume"></label></div></div>'
-      +'<div class="steps"><div class="alt" role="toolbar" aria-label="Edit the song audio"><button class="btn sm" data-al="slice" title="Cut the song in two at the marker (S)">Slice</button><button class="btn sm" data-al="del" title="Remove the selected part (Delete)">Delete</button><button class="btn sm" data-al="cut" title="Cut the selected part to the clipboard (Ctrl+X)">Cut</button><button class="btn sm" data-al="copy" title="Copy the selected part (Ctrl+C)">Copy</button><button class="btn sm" data-al="paste" title="Paste at the marker (Ctrl+V)">Paste</button><label class="lbl" title="Ripple: Delete and Paste move the later song audio, so there is no gap and nothing is covered"><input type="checkbox" data-al="rip"'+(S.alrip?' checked':'')+'> Ripple</label><span class="hint">Click to place the marker. Drag across the waveform to select, then drag the selection to move it.</span></div><canvas tabindex="0" aria-label="Song waveform lined up with the steps. Click to place a marker, drag to select. S slices, Delete removes, Ctrl+C, X and V copy, cut and paste."></canvas></div></div>';
+      +'<div class="steps"><div class="alt" role="toolbar" aria-label="Edit the song audio"><button class="btn sm" data-al="slice" title="Cut the song in two at the marker (S)">Slice</button><button class="btn sm" data-al="del" title="Remove the selected part (Delete)">Delete</button><button class="btn sm" data-al="cut" title="Cut the selected part to the clipboard (Ctrl+X)">Cut</button><button class="btn sm" data-al="copy" title="Copy the selected part (Ctrl+C)">Copy</button><button class="btn sm" data-al="paste" title="Paste at the marker (Ctrl+V)">Paste</button><span class="alz" role="group" aria-label="Zoom the song waveform"><button class="btn sm" data-al="zout" title="Zoom out (-)" aria-label="Zoom out">−</button><button class="btn sm" data-al="zin" title="Zoom in on the marker (+). Ctrl and mouse wheel also zooms." aria-label="Zoom in">+</button><button class="btn sm" data-al="zfit" title="Show the whole pattern again">Fit</button><span class="alzv hint"></span></span><label class="lbl" title="Snap: markers and selections land exactly on the grid. Turn off for free placement."><input type="checkbox" data-al="snap"'+(S.alsnap===false?'':' checked')+'> Snap</label><label class="lbl" title="Ripple: Delete and Paste move the later song audio, so there is no gap and nothing is covered"><input type="checkbox" data-al="rip"'+(S.alrip?' checked':'')+'> Ripple</label><span class="hint">Click to place the marker. Drag across the waveform to select, then drag the selection to move it.</span></div><canvas tabindex="0" aria-label="Song waveform lined up with the steps. Click to place a marker, drag to select. S slices, Delete removes, Ctrl+C, X and V copy, cut and paste."></canvas></div></div>';
   }catch(e){return '';}
 }
 function alAmp(b0,b1){
@@ -4624,7 +4624,7 @@ function alRowDraw(){
     const w=ru?ru.offsetWidth:600;st.style.width=w+'px';const cw=Math.max(40,w-14);cv.style.width=cw+'px';cv.width=Math.min(cw,4000);cv.height=56;
     alBase=document.createElement('canvas');alBase.width=cv.width;alBase.height=56;
     const g=alBase.getContext('2d');
-    const pat=curPat(),tm=tmOf(pat),lenB=tm.total*tm.stepDur*abpm()/60,ob=S.aref||0;
+    const V=alView(),lenB=V.lenB,ob=V.ob;
     let ink=false;g.fillStyle=S.alm?'rgba(160,170,180,.35)':'rgba(190,210,230,.85)';
     for(let x=0;x<cv.width;x++){
       const a=ob+x/cv.width*lenB,b=ob+(x+1)/cv.width*lenB,v=alAmp(a,b),h=v?Math.max(2,Math.min(1,v)*50):0;
@@ -4633,6 +4633,11 @@ function alRowDraw(){
     if(!ink){g.fillStyle='rgba(200,210,220,.7)';g.font='12px sans-serif';g.fillText(S.alm?'Song muted':'No song audio in this part. Use From bar, the arrows, or Match arrangement.',10,32);}
     g.fillStyle='rgba(255,255,255,.35)';
     for(const cl of S.alane){for(const bt of [cl.a,cl.a+cl.l]){if(bt>ob&&bt<ob+lenB)g.fillRect(Math.round((bt-ob)/lenB*cv.width),0,1,56);}}
+    if(alZoom>1){ // grid lines: one per step cell, stronger on whole beats
+      const gs=V.stepB,k0=Math.ceil((ob-V.wob)/gs-1e-6);
+      for(let k=k0;V.wob+k*gs<ob+lenB;k++){const t=V.wob+k*gs,x=Math.round((t-ob)/lenB*cv.width),beat=Math.abs(t-Math.round(t))<1e-6;g.fillStyle=beat?'rgba(255,255,255,.28)':'rgba(255,255,255,.10)';g.fillRect(x,0,1,56);}
+    }
+    const zv=row.querySelector('.alzv');if(zv)zv.textContent='×'+alZoom+' · beat '+(ob+1).toFixed(2)+' to '+(ob+lenB+1).toFixed(2);
     alOverlay();
   }catch(e){}
 }
@@ -4662,10 +4667,23 @@ function alRowDraw(){
 
 /* ---------- live editing in the rack row ---------- */
 let alBase=null,alSelR=null,alCursor=null,alClipbd=null,alGhost=0;
+let alZoom=1,alVs=null;
 const alWinInfo=()=>{const tm=tmOf(curPat()),lenB=tm.total*tm.stepDur*abpm()/60;return {ob:S.aref||0,lenB,stepB:lenB/tm.total};};
+function alView(){
+  const w=alWinInfo(),len=w.lenB/alZoom,vs=Math.max(w.ob,Math.min(alVs==null?w.ob:alVs,w.ob+w.lenB-len));
+  return {ob:vs,lenB:len,stepB:w.stepB/alZoom,wob:w.ob,wlen:w.lenB};
+}
+function alZoomTo(z,anchor){
+  z=Math.max(1,Math.min(32,z));const v=alView(),w=alWinInfo();
+  if(anchor==null)anchor=alCursor!=null?alCursor:(alSelR?alSelR.a:v.ob+v.lenB/2);
+  anchor=Math.max(v.ob,Math.min(anchor,v.ob+v.lenB));const nl=w.lenB/z,frac=(anchor-v.ob)/v.lenB;
+  alZoom=z;alVs=anchor-frac*nl;alRowDraw();
+}
+function alPanBy(db){const v=alView();alVs=v.ob+db;alRowDraw();}
+function alKeepVisible(b){const v=alView();if(b<v.ob)alVs=b-v.lenB*.1;else if(b>v.ob+v.lenB)alVs=b-v.lenB*.9;}
 function alOverlay(){
   const row=rack.querySelector('.alrow');if(!row||!alBase)return;
-  const cv=row.querySelector('canvas'),g=cv.getContext('2d'),{ob,lenB}=alWinInfo(),W=cv.width,X=b=>(b-ob)/lenB*W;
+  const cv=row.querySelector('canvas'),g=cv.getContext('2d'),{ob,lenB}=alView(),W=cv.width,X=b=>(b-ob)/lenB*W;
   g.clearRect(0,0,W,56);g.drawImage(alBase,0,0);
   const acc=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#ff9a3c';
   if(alSelR){
@@ -4675,7 +4693,7 @@ function alOverlay(){
   if(alCursor!=null&&alCursor>=ob&&alCursor<=ob+lenB){g.fillStyle=acc;g.fillRect(Math.round(X(alCursor))-1,0,2,56);g.beginPath();g.moveTo(X(alCursor)-5,0);g.lineTo(X(alCursor)+5,0);g.lineTo(X(alCursor),7);g.fill();}
   const has=!!alSelR&&alSelR.b-alSelR.a>.001,cur=alCursor!=null||has;
   const dis=(k,v)=>{const b=row.querySelector('[data-al="'+k+'"]');if(b)b.disabled=!v;};
-  dis('slice',alCursor!=null||has);dis('del',has);dis('cut',has);dis('copy',has);dis('paste',!!alClipbd&&cur);
+  dis('zin',alZoom<32);dis('zout',alZoom>1);dis('zfit',alZoom>1);dis('slice',alCursor!=null||has);dis('del',has);dis('cut',has);dis('copy',has);dis('paste',!!alClipbd&&cur);
 }
 function alCutAt(beat){
   let did=false;
@@ -4689,7 +4707,7 @@ function alPeek(a,b){
   return out;
 }
 function alRemoveAll(){
-  if(!S.alane.length)return;histMark();S.alane=[];S.aref=0;S.als=false;alSelR=null;alCursor=null;alClipbd=null;alStop();applyMix();
+  if(!S.alane.length)return;histMark();S.alane=[];S.aref=0;S.als=false;alZoom=1;alVs=null;alSelR=null;alCursor=null;alClipbd=null;alStop();applyMix();
   alAfter();toastUndo('Song audio removed.');
 }
 function alAfter(msg){alSel=-1;alCur=null;markDirty();scheduleCommit();renderAudioLane();alResync();if(msg)toast(msg);}
@@ -4724,7 +4742,7 @@ function alEdMove(d){
 }
 (()=>{
   let drag=null;
-  const beatOf=(e,cv)=>{const r=cv.getBoundingClientRect(),{ob,lenB,stepB}=alWinInfo(),raw=ob+Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*lenB;return Math.max(0,ob+Math.round((raw-ob)/stepB)*stepB);};
+  const beatOf=(e,cv)=>{const r=cv.getBoundingClientRect(),v=alView(),raw=v.ob+Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*v.lenB;if(S.alsnap===false)return Math.max(0,Math.round(raw*1000)/1000);return Math.max(0,v.wob+Math.round((raw-v.wob)/v.stepB)*v.stepB);};
   rack.addEventListener('pointerdown',e=>{
     const cv=e.target.closest&&e.target.closest('.alrow canvas');if(!cv)return;
     cv.focus({preventScroll:true});const b=beatOf(e,cv);
@@ -4753,14 +4771,27 @@ function alEdMove(d){
     else if(m&&k==='c')alEdCopy();
     else if(m&&k==='v')alEdPaste();
     else if(k==='escape'){alSelR=null;alCursor=null;alOverlay();}
+    else if(k==='+'||k==='='){alZoomTo(alZoom*2);}
+    else if(k==='-'||k==='_'){alZoomTo(alZoom/2);}
+    else if(k==='arrowleft'||k==='arrowright'){
+      const v=alView(),d=(k==='arrowleft'?-1:1)*(e.shiftKey?v.stepB*8:v.stepB);
+      alCursor=Math.max(0,(alCursor!=null?alCursor:v.ob)+d);alSelR=null;alKeepVisible(alCursor);alRowDraw();
+    }
     else return;
     e.preventDefault();e.stopPropagation();
   });
   rack.addEventListener('click',e=>{
     const b=e.target.closest&&e.target.closest('.alrow button[data-al]');if(!b)return;const k=b.dataset.al;
-    if(k==='remove')alRemoveAll();else if(k==='slice')alEdSlice();else if(k==='del')alEdDelete(false);else if(k==='cut')alEdDelete(true);else if(k==='copy')alEdCopy();else if(k==='paste')alEdPaste();
+    if(k==='zin')alZoomTo(alZoom*2);else if(k==='zout')alZoomTo(alZoom/2);else if(k==='zfit'){alZoomTo(1);alVs=null;alRowDraw();}
+    else if(k==='remove')alRemoveAll();else if(k==='slice')alEdSlice();else if(k==='del')alEdDelete(false);else if(k==='cut')alEdDelete(true);else if(k==='copy')alEdCopy();else if(k==='paste')alEdPaste();
   });
-  rack.addEventListener('change',e=>{const c=e.target.closest&&e.target.closest('input[data-al="rip"]');if(c){S.alrip=c.checked;}});
+  rack.addEventListener('change',e=>{const c=e.target.closest&&e.target.closest('input[data-al="rip"]');if(c){S.alrip=c.checked;}const q=e.target.closest&&e.target.closest('input[data-al="snap"]');if(q){S.alsnap=q.checked;markDirty();}});
+  let wT=0;
+  rack.addEventListener('wheel',e=>{
+    const cv=e.target.closest&&e.target.closest('.alrow canvas');if(!cv)return;
+    if(e.ctrlKey||e.metaKey){e.preventDefault();const now=Date.now();if(now-wT<90)return;wT=now;const r=cv.getBoundingClientRect(),v=alView(),b=v.ob+(e.clientX-r.left)/r.width*v.lenB;alZoomTo(e.deltaY<0?alZoom*2:alZoom/2,b);}
+    else if(alZoom>1&&(e.shiftKey||Math.abs(e.deltaX)>Math.abs(e.deltaY))){e.preventDefault();const v=alView();alPanBy((e.deltaX||e.deltaY)/cv.getBoundingClientRect().width*v.lenB);}
+  },{passive:false});
 })();
 async function alImportBuf(ab,name){
   ensureCtx();const buf=await decode(ab.slice(0)),key=uid();idbPut(key,ab);
@@ -4845,10 +4876,10 @@ $('#alDbl').onclick=()=>{const c=S.alane[alSel],src=c&&alSrc(c.s);if(src)alSetBp
 $('#alGain').addEventListener('input',e=>{const c=S.alane[alSel];if(!c)return;c.g=+e.target.value;$('#alGainO').textContent=c.g+' dB';markDirty();});
 $('#alGain').addEventListener('change',()=>{scheduleCommit();});
 function alSnap(withAudio){
-  return {solo:S.als?1:undefined,rip:S.alrip?1:undefined,ref:S.aref||undefined,hear:S.ahear===false?0:undefined,mute:S.alm?1:undefined,vol:S.alv!=null&&S.alv!==1?S.alv:undefined,src:S.asrc.filter(x=>S.alane.some(c=>c.s===x.id)).map(x=>({id:x.id,name:x.name,key:x.key,bpm:x.bpm,audio:withAudio&&x.raw?b64(x.raw):undefined})),clips:S.alane.map(c=>Object.assign({},c))};
+  return {snap:S.alsnap===false?0:undefined,solo:S.als?1:undefined,rip:S.alrip?1:undefined,ref:S.aref||undefined,hear:S.ahear===false?0:undefined,mute:S.alm?1:undefined,vol:S.alv!=null&&S.alv!==1?S.alv:undefined,src:S.asrc.filter(x=>S.alane.some(c=>c.s===x.id)).map(x=>({id:x.id,name:x.name,key:x.key,bpm:x.bpm,audio:withAudio&&x.raw?b64(x.raw):undefined})),clips:S.alane.map(c=>Object.assign({},c))};
 }
 async function alLoad(al,getRaw){
-  S.asrc=[];S.alane=[];alSel=-1;alCur=null;S.als=!!(al&&al.solo);S.alrip=!!(al&&al.rip);S.aref=al&&+al.ref>0?+al.ref:0;S.ahear=!(al&&al.hear===0);S.alm=!!(al&&al.mute);S.alv=al&&al.vol!=null?Math.max(0,Math.min(1.5,+al.vol)):1;
+  S.asrc=[];S.alane=[];alSel=-1;alCur=null;S.alsnap=!(al&&al.snap===0);S.als=!!(al&&al.solo);S.alrip=!!(al&&al.rip);S.aref=al&&+al.ref>0?+al.ref:0;S.ahear=!(al&&al.hear===0);S.alm=!!(al&&al.mute);S.alv=al&&al.vol!=null?Math.max(0,Math.min(1.5,+al.vol)):1;
   if(al&&Array.isArray(al.src)){
     for(const q of al.src.slice(0,16)){
       if(!q||typeof q.id!=='string')continue;
@@ -5657,7 +5688,7 @@ const GUIDE=(()=>{
     steps:['Song sections: in the Timeline, press Section to label the selected clip as Intro, Verse, Build, Chorus, Drop, Bridge, Outro or your own name. Matching neighbours join into one coloured band. Drag a band to move the whole section, or use Duplicate and Move earlier or later in the same menu.','Take lanes: a channel\'s menu has Takes. Save the current notes as a take, swap another one in, or delete it. Recording in Replace mode saves the old pass as a take, so nothing is lost. In the MIDI map, Undo last recorded take drops the last recording.','+ New adds a pattern, Duplicate copies one. Double-click or right-click a name to rename it. Tempo, time signature and bars belong to the selected pattern.','Arrange opens the song bar: add patterns, move them, set how many times each repeats.','Timeline view shows the song as blocks you can drag.','Switch Plays from Pattern to Song to play the arranged song. Compose, then Build song, makes an intro, drop and outro for you.','Tempo changes: select a clip in the Timeline and type a Tempo for it, for example 70 for a slow intro and 140 for the drop. Ramp to speeds up or slows down smoothly across the clip. Leave them empty to use the pattern tempo.','Master automation (under the Timeline) draws a lane across the whole song for Volume, a Low-pass filter, a High-pass filter, Reverb or Delay. Click to add a point, drag to shape it, right-click a point to remove it. Quick shape fills in a sweep, a dip or a build-then-drop.','Lanes and clip tempos are heard when you play as Song and in a Render of the song.'],
     acts:[{l:'Show the pattern bar',run:()=>{closeGuide();coach('#pats','Patterns live here. Arrange opens the song bar.');}},{l:'Open Timeline',run:()=>{closeGuide();view('viewTl');coach('#timeline','Drag clips to arrange your song.');}},show('#clBpm','Give the selected clip its own tempo, or ramp it to a new one.',()=>{view('viewTl');},'Show clip tempo'),show('#mlCv','Draw a master lane here: volume, filters, reverb or delay across the song.',()=>{view('viewTl');},'Show master automation')]},
    {id:'songaudio',t:'Import a song and cut it up',sub:'Mix a real track in with your beats',intro:'Bring in any song, chop it into pieces, and arrange the pieces among your own patterns.',
-    steps:['Open Timeline and press Import song. Pick an MP3, WAV, M4A or OGG. It appears as a wavy clip in the audio lane under your patterns. The audio lane lines up with the pattern blocks above it, so you can see which beat each piece lands on.','Set Audio BPM to the song\'s tempo (the app guesses it, and ÷2 or ×2 fix a half-time or double-time guess). The song is stretched to match your project tempo without changing its pitch, so it stays in time with your drums.','Click a clip to place a white marker, then press Split to cut it there. Cut as many times as you like. Drag a piece to move it, drag its edges to trim it, and Duplicate to repeat a bit, like a hook or a drum break.','Right-click a clip for fades, Mute and Delete. Level changes how loud the selected piece is.','To Sample channel turns a piece into a normal channel, so you can slice it to pads, chop it by hits, or play it from the keys.','Edit your channels against the song: once a song is imported, a Song audio row appears at the top of the Channel Rack, lined up with the steps. It shows the part of the song under the pattern you are editing. Use From bar or the arrows to pick which part, or Match arrangement to jump to where this pattern sits in your song. In Pattern mode the song loops along with your beat; the ♪ button turns that off and M mutes it.','Edit the song live in that row, even while it plays. Click the waveform to place a marker and press Slice (or S). Drag across it to select a part, then use Delete, Cut, Copy and Paste (or Ctrl+X, C and V). Drag a selection to move it. The S button on the row solos the song so you hear only the song audio; press it again to bring the channels back. Ripple makes Delete close the gap and Paste push the later audio along. Ctrl+Z undoes any edit.','Press Play as song to hear the audio together with your patterns. Export Render includes the audio lane too. It saves with your project; use ZIP to keep the song file inside the project.'],
+    steps:['Open Timeline and press Import song. Pick an MP3, WAV, M4A or OGG. It appears as a wavy clip in the audio lane under your patterns. The audio lane lines up with the pattern blocks above it, so you can see which beat each piece lands on.','Set Audio BPM to the song\'s tempo (the app guesses it, and ÷2 or ×2 fix a half-time or double-time guess). The song is stretched to match your project tempo without changing its pitch, so it stays in time with your drums.','Click a clip to place a white marker, then press Split to cut it there. Cut as many times as you like. Drag a piece to move it, drag its edges to trim it, and Duplicate to repeat a bit, like a hook or a drum break.','Right-click a clip for fades, Mute and Delete. Level changes how loud the selected piece is.','To Sample channel turns a piece into a normal channel, so you can slice it to pads, chop it by hits, or play it from the keys.','Edit your channels against the song: once a song is imported, a Song audio row appears at the top of the Channel Rack, lined up with the steps. It shows the part of the song under the pattern you are editing. Use From bar or the arrows to pick which part, or Match arrangement to jump to where this pattern sits in your song. In Pattern mode the song loops along with your beat; the ♪ button turns that off and M mutes it.','Edit the song live in that row, even while it plays. Click the waveform to place a marker and press Slice (or S). Drag across it to select a part, then use Delete, Cut, Copy and Paste (or Ctrl+X, C and V). Drag a selection to move it. The S button on the row solos the song so you hear only the song audio; press it again to bring the channels back. Ripple makes Delete close the gap and Paste push the later audio along. Ctrl+Z undoes any edit.','For accurate cuts, zoom the song row: press + (or Ctrl and the mouse wheel over the waveform) to zoom in on the marker, up to 32 times. Each zoom step makes the snap grid finer, so a cut lands exactly on a fine grid line. Drag the waveform sideways with Shift and the wheel to pan, use the left and right arrow keys to nudge the marker one grid line, and press Fit to see the whole pattern again. Snap off lets you place a marker anywhere.','Press Play as song to hear the audio together with your patterns. Export Render includes the audio lane too. It saves with your project; use ZIP to keep the song file inside the project.'],
     acts:[{l:'Open Timeline',run:()=>{closeGuide();view('viewTl');coach('#alBar','Import a song here, then split and arrange it.');}}]},
    {id:'live',t:'Play and record live',sub:'Keys, MIDI, recording, looper',intro:'The Play tools handle everything you perform.',
     steps:['Keys plays the active channel from your computer keyboard. Z and X move the octave. With Keys follow scale on, A to ; play only notes in your key and scale. Piano shows an on-screen keyboard.','Connect MIDI links a keyboard or controller. MIDI learn links a knob to any slider: click the slider, then move the knob.','Record writes what you play into the active channel while the pattern runs. Use Metronome and Count-in for timing.','Loop rec records the mic or the whole mix for 1 to 8 bars, exactly in time. Mic loops get a vocal chain (clean, rap, sing or big space) that you can change or switch off. Reference lets you A/B against a finished track.','Open Settings, MIDI map, More for recording options: quantize every step, every 2 steps or every beat, and whether each loop pass layers on top of the last or replaces it. Undo last recorded take removes one pass. MPE controllers can be switched on there too.'],
