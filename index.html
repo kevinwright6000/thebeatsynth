@@ -354,6 +354,23 @@ body.embed #embedBar{display:flex!important;align-items:center;gap:14px;position
 .pad b{font-size:12px;line-height:1.15;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .pad select{width:100%;font-size:11px;padding:2px;background:transparent;color:inherit;border:1px solid var(--line);border-radius:4px;min-height:0}
 .tl-scroll{overflow-x:auto;padding-bottom:6px}
+.row,.ruler,.alrow{display:flex}
+.alrow{border-bottom:1px solid var(--line)}.alrow .head{display:flex;flex-direction:column;align-items:stretch;gap:5px;padding:6px 8px;min-height:72px}
+.alrow .alh{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.alrow .alh b{flex:1;font-size:12px}.alrow .tgs{display:flex;gap:4px}
+.alrow .lbl input[type=number]{width:62px;background:var(--field);border:1px solid var(--line);border-radius:3px;font:700 12px var(--f-mono);padding:2px 4px;color:inherit}
+.alrow .lbl input[type=range]{width:90px;vertical-align:middle}
+.alrow .steps{flex:none;padding:6px 10px 8px 4px;flex-direction:column;align-items:flex-start;gap:5px}
+.alrow .alt{display:flex;gap:5px;align-items:center;flex-wrap:wrap;position:sticky;left:calc(var(--head) + 8px);z-index:2}.alrow .alt .hint{font-size:11px}
+.rack.als .row{opacity:.5}
+.alrow canvas{cursor:crosshair;touch-action:none;outline-offset:2px}.alrow canvas{display:block;height:56px;background:rgba(255,255,255,.03);border-radius:4px}
+@media (max-width:520px){.alrow{flex-direction:column;align-items:flex-start}.alrow .head{width:min(100vw - 34px,420px)}}
+.tl-audio{position:relative;height:96px;margin-top:6px;border-top:1px dashed var(--line,#3a4452);min-width:100%;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(var(--abeat,26px) * 4 - 1px),rgba(255,255,255,.06) calc(var(--abeat,26px) * 4 - 1px),rgba(255,255,255,.06) calc(var(--abeat,26px) * 4))}
+.alc{position:absolute;top:6px;height:84px;border:2px solid var(--c);border-radius:6px;background:color-mix(in srgb,var(--c) 22%,var(--field,#1a2029));overflow:hidden;cursor:grab;touch-action:none;user-select:none}
+.alc canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.alc span{position:absolute;left:6px;top:2px;font:700 11px var(--f-mono,monospace);color:#fff;text-shadow:0 1px 2px #000;pointer-events:none;max-width:calc(100% - 12px);overflow:hidden;white-space:nowrap}
+.alc[aria-pressed=true]{box-shadow:0 0 0 2px #fff}.alc.mt{opacity:.4}.alc.drag{opacity:.8;z-index:3}
+.alc .alh{position:absolute;top:0;bottom:0;width:12px;max-width:28%;cursor:col-resize}.alc .alh.l{left:0}.alc .alh.r{right:0}
+.alc .cur{position:absolute;top:0;bottom:0;width:2px;background:#fff;pointer-events:none}
 .tl-track{position:relative;display:flex;gap:2px;min-height:84px;padding-top:42px;min-width:100%}
 .tl-secs{position:absolute;left:0;right:0;top:20px;height:20px;pointer-events:none}
 .tlsec{position:absolute;top:0;height:18px;border-radius:4px 4px 0 0;background:color-mix(in srgb,var(--sc) 70%,#10151a);color:#10151a;font:700 11px var(--f-mono);padding:2px 8px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:grab;pointer-events:auto;touch-action:none;user-select:none}
@@ -543,6 +560,7 @@ body.lite *{transition:none!important;animation:none!important}
 .kbrow{display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--line);padding:4px 0}.kbrow .nm{flex:1}.kbrow .btn.cap{min-width:12ch;font-family:var(--f-mono)}.kbrow .btn.cap.rec{outline:2px solid var(--accent)}
 .fl{position:fixed!important;bottom:auto!important;right:auto!important;margin:0!important;resize:both;overflow:auto!important;min-width:300px;min-height:140px;max-width:98vw;max-height:96vh;box-shadow:0 16px 48px rgba(0,0,0,.6);border:1px solid var(--accent)!important;z-index:60;flex:none!important}
 .fl>.roll-bar,.fl>.fl-bar,.fl>.sb-h{cursor:move;user-select:none}
+.modal.mfl{background:transparent;pointer-events:none;display:block;padding:0}.modal.mfl .modal-box{pointer-events:auto}.modal-box.fl{width:420px;height:420px;max-width:98vw}
 .fl-bar{display:none}.mixer .mxin{display:contents}
 .mixer.fl{flex-direction:column;padding:0;gap:0}.mixer.fl>.fl-bar{display:flex;align-items:center;gap:8px;padding:4px 8px;background:var(--panel2);border-bottom:1px solid var(--line);position:sticky;top:0;left:0;z-index:3}
 .mixer.fl .mxin{display:flex;gap:6px;padding:10px;align-items:stretch;min-height:0}
@@ -603,7 +621,7 @@ body.lite *{transition:none!important;animation:none!important}
       <div class="dd" id="fileDd"><button class="btn sm dd-btn" aria-haspopup="true" aria-expanded="false" title="New, Open, Save and the Library">File ▾</button><div class="dd-panel" role="group" aria-label="File"><span class="lbl">Project</span><div class="ddrow"><button class="btn sm" id="newBtn">New</button><button class="btn sm" id="openBtn">Open</button><button class="btn sm" id="saveBtn">Save</button><button class="btn sm" id="zipBtn" title="Save the project and its imported audio as a ZIP">ZIP</button><button class="btn sm primary" id="libBtn" title="Starter templates, saved projects and share links">Library</button><button class="btn sm" id="verBtn" title="Step back to an earlier version. The app keeps snapshots while you work.">Version history…</button></div></div></div>
       <div class="dd" id="expDd"><button class="btn sm dd-btn primary" aria-haspopup="true" aria-expanded="false" title="Render your beat to WAV or MP3, or export MIDI and stems">Export ▾</button><div class="dd-panel" role="group" aria-label="Export"><span class="lbl">Export</span><div class="ddrow"><select id="expLufs" class="btn sm" aria-label="Loudness target" title="Set the exported loudness"><option value="0">Loudness: as is</option><option value="-14">-14 LUFS (streaming)</option><option value="-16">-16 LUFS (podcast)</option><option value="-9">-9 LUFS (loud)</option></select><select id="expFmt" class="btn sm" aria-label="File format"><option value="wav">WAV</option><option value="loop">WAV, loop-ready</option><option value="mp3">MP3</option></select><select id="expRep" class="btn sm" aria-label="Loops to render"><option value="1">1 loop</option><option value="2">2 loops</option><option value="4">4 loops</option><option value="song">Whole song</option></select><button class="btn sm primary" id="expBtn">Render</button><button class="btn sm" id="stemBtn" title="One WAV per channel, in a zip file">Stems</button><button class="btn sm" id="vidBtn" title="Render a visualizer video (WebM) of the export">Video</button><button class="btn sm" id="midiOutBtn" title="Standard MIDI file with a track per channel">MIDI</button></div></div></div>
       <button class="btn sm toggle adv" id="browserBtn" aria-pressed="false" title="Show or hide the browser: sounds, packs, presets and your samples">Browser</button><div class="dd adv" id="toolsDd"><button class="btn sm dd-btn" id="toolsBtn" aria-haspopup="true" aria-expanded="false" title="Edit, Compose and Play tools, and the keyboard shortcuts">Tools ▾</button><div class="dd-panel" role="group" aria-label="Tools"><span class="lbl">Tools</span><button class="btn sm trow" type="button" data-tool="edit">Edit</button><button class="btn sm trow" type="button" data-tool="compose">Compose</button><button class="btn sm trow" type="button" data-tool="play">Play</button><button class="btn sm trow" type="button" data-tool="help">Shortcuts…</button></div></div>
-      <div class="dd" id="viewDd"><button class="btn sm dd-btn" id="viewBtn" aria-haspopup="true" aria-expanded="false" title="Choose what fills the bottom of the page. Press + beside a second view to show two at once.">Rack ▾</button><div class="dd-panel" role="group" aria-label="View"><span class="lbl">Click a view, or press + to show two together</span><div class="vrow" data-v="viewRack"><button class="btn sm vname" type="button">Rack</button><button class="btn sm vplus" type="button" aria-pressed="false" aria-label="Show Rack together with the other view" title="Show Rack alongside another view (up to two)">+</button></div><div class="vrow" data-v="viewMixer"><button class="btn sm vname" type="button">Mixer</button><button class="btn sm vplus" type="button" aria-pressed="false" aria-label="Show Mixer together with the other view" title="Show Mixer alongside another view (up to two)">+</button></div><div class="vrow" data-v="viewPads"><button class="btn sm vname" type="button">Pads</button><button class="btn sm vplus" type="button" aria-pressed="false" aria-label="Show Pads together with the other view" title="Show Pads alongside another view (up to two)">+</button></div><div class="vrow adv" data-v="viewSession"><button class="btn sm vname" type="button">Session</button><button class="btn sm vplus" type="button" aria-pressed="false" aria-label="Show Session together with the other view" title="Show Session alongside another view (up to two)">+</button></div><div class="vrow adv" data-v="viewTl"><button class="btn sm vname" type="button">Timeline</button><button class="btn sm vplus" type="button" aria-pressed="false" aria-label="Show Timeline together with the other view" title="Show Timeline alongside another view (up to two)">+</button></div><div class="vrow adv" data-v="viewPerf"><button class="btn sm vname" type="button">Perform</button><button class="btn sm vplus" type="button" aria-pressed="false" aria-label="Show Perform together with the other view" title="Show Perform alongside another view (up to two)">+</button></div></div></div>
+      <div class="dd" id="viewDd"><button class="btn sm dd-btn" id="viewBtn" aria-haspopup="true" aria-expanded="false" title="Choose what fills the bottom of the page. Press + beside a second view to show two at once.">Rack ▾</button><div class="dd-panel" role="group" aria-label="View"><span class="lbl">Click a view, or press + to show two together</span><div class="vrow" data-v="viewRack"><button class="btn sm vname" type="button">Rack</button><button class="btn sm vplus" type="button" aria-pressed="false" aria-label="Show Rack together with the other view" title="Show Rack alongside another view (up to two)">+</button></div><div class="vrow" data-v="viewMixer"><button class="btn sm vname" type="button">Mixer</button><button class="btn sm vplus" type="button" aria-pressed="false" aria-label="Show Mixer together with the other view" title="Show Mixer alongside another view (up to two)">+</button></div><div class="vrow" data-v="viewPads"><button class="btn sm vname" type="button">Pads</button><button class="btn sm vplus" type="button" aria-pressed="false" aria-label="Show Pads together with the other view" title="Show Pads alongside another view (up to two)">+</button></div><div class="vrow adv" data-v="viewSession"><button class="btn sm vname" type="button">Session</button><button class="btn sm vplus" type="button" aria-pressed="false" aria-label="Show Session together with the other view" title="Show Session alongside another view (up to two)">+</button></div><div class="vrow adv" data-v="viewTl"><button class="btn sm vname" type="button">Timeline</button><button class="btn sm vplus" type="button" aria-pressed="false" aria-label="Show Timeline together with the other view" title="Show Timeline alongside another view (up to two)">+</button></div><div class="vrow adv" data-v="viewPerf"><button class="btn sm vname" type="button">Perform</button><button class="btn sm vplus" type="button" aria-pressed="false" aria-label="Show Perform together with the other view" title="Show Perform alongside another view (up to two)">+</button></div><button class="btn sm" id="macroBtn" type="button" title="Macro rack: one knob that moves several sliders at once. Link filters, drive, reverb and more, then perform it or map it to a MIDI knob. You can float it as its own window.">Macro rack…</button></div></div>
       <div class="grp tbg playg">
         <button class="btn-play" id="play" aria-pressed="false" aria-label="Play or pause (Space)" title="Play / stop (Space)">
         <svg viewBox="0 0 20 20" id="playIcon"><path d="M5 3l12 7-12 7z"/></svg>
@@ -808,7 +826,19 @@ body.lite *{transition:none!important;animation:none!important}
       <label class="fxr" style="display:inline-flex;gap:6px;align-items:center"><span class="lbl">Level</span><input type="range" id="clLvl" min="-12" max="6" step="0.5" value="0" style="width:100px" aria-label="Clip level in dB"><output id="clLvlO">0 dB</output></label>
       <label class="fxr" style="display:inline-flex;gap:6px;align-items:center" title="Play this clip at its own tempo. Leave empty to use the pattern's tempo."><span class="lbl">Tempo</span><input type="number" id="clBpm" class="btn sm" min="40" max="240" step="1" placeholder="pattern" style="width:74px" aria-label="Clip tempo in BPM"></label>
       <label class="fxr" style="display:inline-flex;gap:6px;align-items:center" title="Gradually speed up or slow down to this tempo over the length of the clip. Leave empty for a steady tempo."><span class="lbl">Ramp to</span><input type="number" id="clRamp" class="btn sm" min="40" max="240" step="1" placeholder="off" style="width:64px" aria-label="Ramp tempo to BPM"></label></div>
-    <div class="tl-scroll"><div class="tl-track" id="tlTrack"><div class="tl-head" id="tlHead" hidden></div></div></div>
+    <div class="pads-bar" id="alBar"><span class="lbl">Song audio</span>
+      <button class="btn sm primary" id="alImport" title="Bring in a whole song or any audio. It appears as a clip in the audio lane under your patterns, ready to cut up, move and play along with your beats.">Import song…</button>
+      <button class="btn sm" id="alSplit" title="Cut the selected clip in two at the marker (click the clip to place the marker, or right-click and choose Split here)">Split</button>
+      <button class="btn sm" id="alDup" title="Copy the selected clip right after itself">Duplicate</button>
+      <button class="btn sm" id="alMute" title="Mute or unmute the selected clip">Mute</button>
+      <button class="btn sm" id="alDel">Delete</button><button class="btn sm" id="alRemoveAll" title="Remove all the song audio from this project">Remove all</button>
+      <button class="btn sm" id="alCh" title="Turn the selected clip into a sample channel, so you can slice it, chop it to pads, or play it from the keys">To sample channel</button>
+      <label class="fxr" style="display:inline-flex;gap:6px;align-items:center" title="The tempo of this audio. It is stretched to match the project tempo without changing its pitch."><span class="lbl">Audio BPM</span><input type="number" id="alBpm" class="btn sm" placeholder="auto" min="40" max="240" step="0.1" style="width:76px" aria-label="Tempo of the selected audio"></label>
+      <button class="btn sm" id="alHalf" title="Halve the tempo the app thinks this audio has">÷2</button><button class="btn sm" id="alDbl" title="Double the tempo the app thinks this audio has">×2</button>
+      <label class="fxr" style="display:inline-flex;gap:6px;align-items:center"><span class="lbl">Level</span><input type="range" id="alGain" min="-24" max="6" step="0.5" value="0" style="width:90px" aria-label="Clip level in dB"><output id="alGainO">0 dB</output></label>
+      <span class="hint" id="alInfo"></span></div>
+    <div class="tl-scroll"><div class="tl-track" id="tlTrack"><div class="tl-head" id="tlHead" hidden></div></div><div class="tl-audio" id="tlAudio" aria-label="Song audio lane"></div></div>
+    <input type="file" id="alFile" accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac,.aac" hidden>
     <div class="pads-bar" id="mlBar"><span class="lbl">Master automation</span>
       <select id="mlParam" class="btn sm" aria-label="Which master control to draw"></select>
       <select id="mlShape" class="btn sm" aria-label="Quick shape for this lane"><option value="">Quick shape…</option><option value="up">Sweep in to normal</option><option value="down">Sweep away from normal</option><option value="dip">Dip in the middle</option><option value="build">Build, then drop</option></select>
@@ -881,15 +911,15 @@ body.lite *{transition:none!important;animation:none!important}
       <button class="btn primary" id="add">+ Add channel</button></div>
     <div class="agrp"><span class="gt">Get sounds</span>
       <button class="btn" id="importBtn">Import audio…</button>
+      <button class="btn" id="importSong" title="Bring in a whole song. It shows as a Song audio row at the top of the rack, lined up with your steps, and in the Timeline where you can cut it up.">Import song…</button>
       <button class="btn" id="gmBtn" title="Real recorded piano, strings, brass, guitars and more">Real instruments</button>
       <button class="btn" id="sbBtn" title="Search and audition every built-in sound, then add it or drag it onto a pad">Browse sounds</button>
       <button class="btn adv" id="packBtn" title="Ready-made one-shot sets, made inside the app">Sound packs…</button></div>
     <div class="agrp"><span class="gt">Start from</span>
-      <button class="btn" id="macroBtn" title="Macro rack: one knob that moves several sliders at once. Link filters, drive, reverb and more, then perform it or map it to a MIDI knob.">Macros ▾</button>
       <button class="btn primary" id="mmbBtn" title="Pick a mood and the app writes drums, chords, bass and a melody together in a key that fits">Make me a beat</button>
       <button class="btn" id="surpriseBtn" title="Instant random beat: picks a mood and writes drums, chords, bass and a melody, then plays it">Surprise me</button>
       <button class="btn" id="remixBtn" title="Make a variation of your beat in the same key, or swap the drum style">Remix this</button>
-      <button class="btn" id="tplBtn" title="Start from a ready-made beat in a style">Templates</button>
+      <button class="btn" id="tplBtn" title="Open the Library: ready-made beats in a style, your saved beats and the public gallery">Library</button>
       <button class="btn" id="kitBtn" title="Drum kits that react to velocity: pick a character and get the kit with a matching groove">Kits ▾</button>
       <button class="btn adv" id="midiInBtn" title="Open a .mid file as a new pattern">Import MIDI…</button><input type="file" id="midiFile" accept=".mid,.midi,audio/midi" hidden></div>
     <input type="file" id="file" accept="audio/*,.wav,.mp3,.ogg,.m4a,.flac,.aac" multiple hidden>
@@ -941,7 +971,7 @@ body.lite *{transition:none!important;animation:none!important}
   <div class="modal-box" style="width:min(560px,100%)"><div class="roll-bar"><strong id="prevT">Preview</strong><span class="grow"></span><button class="btn sm" id="prevClose">Close</button></div>
   <div class="lib-body"><iframe id="prevFrame" title="Beat preview" allow="autoplay" style="width:100%;height:96px;border:0;border-radius:8px"></iframe><span class="hint">Press play to listen. Use Open on the card to edit your own copy.</span></div></div></div>
 <div class="modal" id="macroMod" hidden role="dialog" aria-modal="true" aria-labelledby="macroT">
-  <div class="modal-box"><div class="roll-bar"><strong id="macroT">Macro rack</strong><span class="grow"></span><button class="btn sm" id="macroClose">Close</button></div>
+  <div class="modal-box" id="macroBox"><div class="roll-bar"><strong id="macroT">Macro rack</strong><span class="grow"></span><button class="btn sm" id="macroFloat" aria-pressed="false" title="Float this window: drag it by its title bar, resize it from the corner, and keep working while it stays open. Press again to dock it.">⧉ Float</button><button class="btn sm" id="macroClose">Close</button></div>
   <div class="lib-body">
     <p class="hint">Each macro is one knob that moves several sliders together. Press Link, click any slider in the app, and set how far it travels. To use a MIDI knob: turn on Learn (Settings), click the macro slider, then turn the knob.</p>
     <div id="macroList"></div>
@@ -1250,7 +1280,7 @@ function autoFx(ch,k,v,t,sd){
 function autoClear(ch){if(!ch.fxA)return;ch.fxA=null;if(ch.chain&&ctx)applyFx(ch,false);}
 function autoApply(ch,k,v,t,sd){
   const c=ch.chain;if(!c||!ctx)return;const tc=Math.max(.005,sd*.25),at=Math.max(t,ctx.currentTime);
-  if(k==='vol'){const on=renderOnly!=null?ch.id===renderOnly:(S.channels.some(x=>x.solo)?ch.solo:!ch.mute);if(on)c.g.gain.setTargetAtTime(v,at,tc);}
+  if(k==='vol'){const on=renderOnly!=null?ch.id===renderOnly:(S.als?false:S.channels.some(x=>x.solo)?ch.solo:!ch.mute);if(on)c.g.gain.setTargetAtTime(v,at,tc);}
   else if(k==='pan'){if(c.p)c.p.pan.setTargetAtTime(v,at,tc);}
   else if(k==='cut'){if(ch.fx.type!=='off')c.f.frequency.setTargetAtTime(cutHz(v),at,tc);}
   else if(AUP[k])autoFx(ch,k,v,t,sd);
@@ -1313,10 +1343,11 @@ function applyMix(){
   const solo=S.channels.some(c=>c.solo);
   S.channels.forEach(c=>{
     if(!c.chain) return;
-    const on=solo?c.solo:!c.mute;
+    const on=S.als?false:solo?c.solo:!c.mute;
     c.chain.g.gain.setTargetAtTime(on?c.vol:0,ctx.currentTime,.01);
     if(c.chain.p) c.chain.p.pan.setTargetAtTime(c.pan,ctx.currentTime,.01);
   });
+  if(typeof alSoloSync==='function')alSoloSync();
 }
 // helpers
 function env(dst,t,peak,att,dec){const g=ctx.createGain();g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(peak,t+att);g.gain.exponentialRampToValueAtTime(.0001,t+att+dec);g.connect(dst);return g;}
@@ -1815,7 +1846,8 @@ function sched(){
     if(pos.step>=tm.total)pos.step=0;
     if(Math.abs(ebpm-liveBpm)>=.5){liveBpm=ebpm;if(bus)updateDelay(bus);refreshLfo();}
     const sd=tm.stepDur,st=pos.step,t=nextT+((st%2===1&&tm.spb>=2)?S.swing*sd*.5:0);
-    if(S.mode==='song'&&st===0&&pos.rep===0){const cl=S.song[pos.ci];if(cl&&masterNodes)clipAuto(masterNodes,cl,nextT,clipDur(cl,pat),tm);if(pos.ci===0&&masterNodes)laneApply(masterNodes,bus,nextT,songTotal());}
+    if(S.mode==='song'&&st===0&&pos.rep===0){const cl=S.song[pos.ci];if(cl&&masterNodes)clipAuto(masterNodes,cl,nextT,clipDur(cl,pat),tm);if(pos.ci===0&&masterNodes)laneApply(masterNodes,bus,nextT,songTotal());if(pos.ci===0)alStart(nextT);}
+    if(S.mode!=='song'&&st===0&&S.alane&&S.alane.length&&S.ahear!==false)alStartWin(nextT,S.aref||0,tm.total*tm.stepDur*abpm()/60);
     if(sessOn&&sessQ.length&&st%tm.pb===0)sessApply();
     playStepAt(pat.id,st,tick,t,tm);clockStep(t,pat,tm);
     if(S.metro&&st%tm.spb===0)click(t,st%tm.pb===0);
@@ -1866,7 +1898,7 @@ function stop(){
   if(timer)clearInterval(timer);timer=null;playing=false;ending=false;queue=[];pre=0;lastStep=null;recKey=null;
   setNow(-1);setPlayUI();setPos(0,null);markClip(-1);liveBpm=S.bpm;if(bus)updateDelay(bus);
   if(ctx){S.channels.forEach(c=>{if(c.chain)c.chain.g.gain.cancelScheduledValues(ctx.currentTime);});applyMix();S.channels.forEach(c=>{c.fxA=null;applyFx(c,false);});}
-  laneReset();
+  laneReset();alStop();
   if(masterNodes&&ctx){const n=ctx.currentTime;masterNodes.cg.gain.cancelScheduledValues(n);masterNodes.cg.gain.setValueAtTime(1,n);masterNodes.cf.frequency.cancelScheduledValues(n);masterNodes.cf.frequency.setValueAtTime(ctx.sampleRate/2,n);masterNodes.cf.type='allpass';}
 }
 function setPlayUI(){
@@ -2001,8 +2033,8 @@ function render(){
   for(let i=0;i<n;i++){const bs=i%pb===0,beat=i%spb()===0;
     ru+='<div class="rc'+stepCls(i).replace(' alt','')+(bs?' bar':'')+'" data-i="'+i+'"'+(bs?' title="Click to select this bar on the active channel. Shift-click another bar to select a range. Then Copy or Paste."':'')+'>'+(bs?(Math.floor(i/pb)+1):beat?(Math.floor((i%pb)/spb())+1):'')+'</div>';}
   ru+='</div></div>';
-  rack.innerHTML=ru+(S.channels.length?S.channels.map(rowHTML).join(''):'<div class="empty">No channels yet. Pick a sound below and add one, or import an audio file.</div>');
-  S.channels.forEach(drawWave);renderPats();renderSong();if(vOn('perf'))renderPerf();if(vOn('session'))renderSession();applySel();if(vOn('mixer'))renderMixer();if(vOn('pads'))renderPads();renderLyr();
+  rack.innerHTML=ru+alRowHTML()+(S.channels.length?S.channels.map(rowHTML).join(''):'<div class="empty">No channels yet. Pick a sound below and add one, or import an audio file.</div>');
+  alRowDraw();S.channels.forEach(drawWave);renderPats();renderSong();if(vOn('perf'))renderPerf();if(vOn('session'))renderSession();applySel();if(vOn('mixer'))renderMixer();if(vOn('pads'))renderPads();renderLyr();
   nowEls=[];if(playing&&nowI>=0)setNow(nowI);
   syncRoll();
 }
@@ -2174,7 +2206,7 @@ async function importFiles(files){
         if(b||k)toast('Loop analysis: '+(b?'about '+Math.round(b)+' BPM':'')+(b&&k?', ':'')+(k?keyName(k):'')+'. Open its sample editor and press Use for project to match it.');markDirty();}catch(e){}},80);}}
     catch(err){toast('Could not read '+f.name+'. Try a WAV, MP3 or OGG file.');}
   }
-  if(n){render();toast(n+' audio file'+(n>1?'s':'')+' imported. Click steps to place '+(n>1?'them':'it')+'.');$('#scroll').scrollTop=$('#scroll').scrollHeight;}
+  if(n){render();if(made.some(c=>c.buf&&c.buf.duration>=25)){setTimeout(()=>toast('That is a long file, so it went in as one sample channel. To edit it against your beats, use Import song… instead.'),2600);}toast(n+' audio file'+(n>1?'s':'')+' imported. Click steps to place '+(n>1?'them':'it')+'.');$('#scroll').scrollTop=$('#scroll').scrollHeight;}
   return made;
 }
 let dragDepth=0;
@@ -2974,7 +3006,7 @@ function newPattern(copyData){
 }
 function resetPatterns(){
   S.scenes=[];S.lanes={};sceneQ=null;
-  S.patterns=[{id:1,name:'Pattern 1',color:COLORS[0],num:4,den:4,bars:1,bpm:120}];S.curPat=1;S.nextPat=2;S.song=[];S.selClip=-1;S.mode='pattern';syncMode();syncTransport();
+  S.patterns=[{id:1,name:'Pattern 1',color:COLORS[0],num:4,den:4,bars:1,bpm:120}];S.curPat=1;S.nextPat=2;S.song=[];S.selClip=-1;S.mode='pattern';S.asrc=[];S.alane=[];S.aref=0;S.alrip=false;S.als=false;S.ahear=true;S.alm=false;S.alv=1;alSel=-1;alCur=null;if(typeof renderAudioLane==='function')renderAudioLane();syncMode();syncTransport();
 }
 function syncMode(){
   {const b=$('#modeBtn');if(b){b.textContent=S.mode==='song'?'SONG':'PAT';b.dataset.m=S.mode==='song'?'song':'pat';}}
@@ -3144,7 +3176,7 @@ function chState(c){
   for(const [pid,d] of Object.entries(c.pats)){const st=[];d.steps.forEach((v,i)=>{if(v)st.push(i,v);});pats[pid]={st,notes:d.notes,x:d.x,au:d.au};}
   return {id:c.id,kind:c.kind,sound:c.sound,name:c.name,cn:c.cname,color:c.color,note:c.note,vol:c.vol,pan:c.pan,mute:c.mute,fz:c.fz,wk:c.wk,solo:c.solo,pitch:c.pitch,mc:c.macro,len:c.len,fx:c.fx,syn:c.syn,kp:c.keyPitch,mi:c.midiIn||undefined,rt:c.root,trim:c.trim,rev:c.rev,pats};
 }
-const captureState=()=>JSON.stringify({ml:S.lanes,p:S.patterns,cp:S.curPat,song:S.song,sc:S.selClip,sw:S.swing,np:S.nextPat,ch:S.channels.map(chState)});
+const captureState=()=>JSON.stringify({ml:S.lanes,p:S.patterns,cp:S.curPat,song:S.song,sc:S.selClip,sw:S.swing,np:S.nextPat,al:S.alane,ch:S.channels.map(chState)});
 function updateHistUI(){$('#undoBtn').disabled=hi<=0;$('#redoBtn').disabled=hi>=hist.length-1;}
 function summ(a,b){
   if(!a)return 'Start';let x,y;try{x=JSON.parse(a);y=JSON.parse(b);}catch(e){return 'Edit';}
@@ -3182,6 +3214,7 @@ function restoreState(raw){
     return c;
   });
   S.lanes=st.ml||{};S.patterns=st.p;S.curPat=st.p.some(p=>p.id===st.cp)?st.cp:st.p[0].id;S.song=st.song;S.selClip=st.sc;S.swing=st.sw;S.nextPat=Math.max(S.nextPat,st.np);
+  S.alane=(st.al||[]).filter(c=>alSrc(c.s)).map(c=>Object.assign({},c));if(alSel>=S.alane.length)alSel=-1;alCur=null;renderAudioLane();
   $('#swing').value=S.swing;S.sel=null;if(!byId(S.activeId))S.activeId=(S.channels[0]||{}).id||null;
   applyMix();S.channels.forEach(c=>applyFx(c,true));syncTransport();render();updateKbInfo();
 }
@@ -3255,7 +3288,7 @@ const pcOf=m=>((m-S.key)%12+12)%12;
 const inScale=m=>SCALES[S.scale].includes(pcOf(m));
 function snapNote(m){if(!S.lock||inScale(m))return m;for(let d=1;d<=6;d++){if(inScale(m-d))return m-d;if(inScale(m+d))return m+d;}return m;}
 $('#etBtn').onclick=e=>{const on=!$('.app').classList.contains('et-open');$('.app').classList.toggle('et-open',on);e.currentTarget.setAttribute('aria-pressed',on);};
-window.__bs={warpMarkers,wkPoints,freezeChannel,unfreezeChannel,audioToNotes,audioToDrums,macroApply,macroRender,grooveFromLoop,grooveDef,openLaunchSet,followAction,captureMidi,get capBuf(){return capBuf},takeSave,takeSwap,takeDel,secGroups,secLabel,secMove,secDuplicate,normalizeLufs,measureLufs,loadKit,onMidi,recUndoTake,get recLog(){return recLog},get mset(){return mset},set msetV(v){mset=cleanSet(v);},mmApplyTpl,get midiMap(){return midiMap},get btnMap(){return btnMap},flToggle,coffeeNudge,get held(){return held},get snapshot(){return snapshot},get cleanMi(){return cleanMi},setMidiOut:o=>{midiOut=o;},setClk:m=>{clkMode=m;},addChannel,render,renderMixer,get shareCard(){return shareCard},get audTakes(){return audTakes},get audStartFn(){return audStart},get audStopNow(){return audStopNow},get planList(){return planList},get renderPlan(){return renderPlan},get clipDur(){return clipDur},get planFromUI(){return planFromUI},get encodeWav(){return encodeWav},parseProg,degTones,chordEvents,bassNotes,writeBass,writeProgression,get SOUNDS(){return SOUNDS},yinPitch,pitchTrack,framesToNotes,notesToSteps,detectKey,chordTones,chordLabel,importMidi,parseMidi,readZip,clipAuto,detectBpm,findHits,stretchBuf,measureLufs,normalizeLufs,renderOne,get PACKS(){return PACKS},get S(){return S},inScale,snapNote,midi:(a,ts)=>onMidi({data:a,timeStamp:ts}),padHit,renderPlan,foldLoop,planList,encodeMp3,PRESETS:()=>PRESETS,setView,get playing(){return playing}};
+window.__bs={get alN(){return alNodes.length},alRemoveAll,alEdSlice,alEdDelete,alEdCopy,alEdPaste,alEdMove,setAlSel(a,b,c){alSelR=a==null?null:{a,b};alCursor=c==null?null:c;alOverlay();},alSplit,alDup,alDel,alSnap,loadProject,warpMarkers,wkPoints,freezeChannel,unfreezeChannel,audioToNotes,audioToDrums,macroApply,macroRender,grooveFromLoop,grooveDef,openLaunchSet,followAction,captureMidi,get capBuf(){return capBuf},takeSave,takeSwap,takeDel,secGroups,secLabel,secMove,secDuplicate,normalizeLufs,measureLufs,loadKit,onMidi,recUndoTake,get recLog(){return recLog},get mset(){return mset},set msetV(v){mset=cleanSet(v);},mmApplyTpl,get midiMap(){return midiMap},get btnMap(){return btnMap},flToggle,coffeeNudge,get held(){return held},get snapshot(){return snapshot},get cleanMi(){return cleanMi},setMidiOut:o=>{midiOut=o;},setClk:m=>{clkMode=m;},addChannel,render,renderMixer,get shareCard(){return shareCard},get audTakes(){return audTakes},get audStartFn(){return audStart},get audStopNow(){return audStopNow},get planList(){return planList},get renderPlan(){return renderPlan},get clipDur(){return clipDur},get planFromUI(){return planFromUI},get encodeWav(){return encodeWav},parseProg,degTones,chordEvents,bassNotes,writeBass,writeProgression,get SOUNDS(){return SOUNDS},yinPitch,pitchTrack,framesToNotes,notesToSteps,detectKey,chordTones,chordLabel,importMidi,parseMidi,readZip,clipAuto,detectBpm,findHits,stretchBuf,measureLufs,normalizeLufs,renderOne,get PACKS(){return PACKS},get S(){return S},inScale,snapNote,midi:(a,ts)=>onMidi({data:a,timeStamp:ts}),padHit,renderPlan,foldLoop,planList,encodeMp3,PRESETS:()=>PRESETS,setView,get playing(){return playing}};
 function scaleChanged(){if(!$('#kbd').hidden)buildKbd();if(rollCh)drawRoll();if(typeof drawChordStrip==='function'&&document.querySelector('#chStrip'))drawChordStrip();}
 $('#keyRoot').onchange=e=>{S.key=+e.target.value;scaleChanged();markDirty();};
 $('#keyScale').onchange=e=>{S.scale=e.target.value;scaleChanged();markDirty();};
@@ -4228,6 +4261,7 @@ async function idbGet(k){try{const d=await idb();return await new Promise(res=>{
 function snapshot(withAudio){
   const seen={};
   return {v:3,metro:S.metro,countIn:S.countIn,swing:S.swing,groove:S.groove||null,macros:S.macros,human:S.human,key:S.key,scale:S.scale,lock:S.lock,groups:S.groups,pads:S.pads.map(id=>S.channels.findIndex(c=>c.id===id)),mEq:S.mEq,mComp:S.mComp,pol:S.polish?1:undefined,polPrev:S.polish?S.polishPrev:undefined,limThr:S.limThr,limCeil:S.limCeil,duckSrc:S.channels.findIndex(c=>c.id===S.duckSrc),duckRel:S.duckRel,master:S.master,delayDiv:S.delayDiv,delayFb:S.delayFb,verbSize:S.verbSize,
+    al:S.asrc.length?alSnap(withAudio):undefined,
     patterns:S.patterns,curPat:S.curPat,song:S.song,selClip:S.selClip,mode:S.mode,songLoop:S.songLoop,
     ml:Object.keys(S.lanes).length?S.lanes:undefined,
     scn:S.scenes.length?S.scenes.map(q=>({n:q.name,m:q.mutes.map(id=>S.channels.findIndex(c=>c.id===id)).filter(i=>i>=0)})):undefined,
@@ -4273,6 +4307,7 @@ async function loadProject(p){
   $('#dlDiv').value=String(S.delayDiv);$('#dlFb').value=S.delayFb;$('#rvSize').value=String(S.verbSize);
   if(master)master.gain.value=S.master;
   liveBpm=S.bpm;if(bus){updateDelay(bus,true);bus.conv.buffer=makeIR(ctx,S.verbSize);}
+  await alLoad(p.al,p._alRaw);
   let missing=0;const cache={};
   for(const pc of p.channels){
     let ent=null,key=pc.audioKey||null;
@@ -4446,6 +4481,387 @@ window.addEventListener('keydown',e=>{
 let tlPos=[];
 const patDur=(p,reps)=>{const tm=tmOf(p);return tm.total*tm.stepDur*reps;};
 let TLZ=1;const tlpx=()=>26*TLZ;
+/* ---------- audio lane: import a song, cut it up, arrange it with your beats ---------- */
+S.asrc=S.asrc||[];S.alane=S.alane||[];
+let alSel=-1,alCur=null,alNodes=[],alBusy=false;
+const abpm=()=>{const c=S.song[0],p=c&&patById(c.pat);return +((c&&c.bpm)||(p&&p.bpm)||S.bpm)||120;};
+const alSrc=id=>S.asrc.find(x=>x.id===id);
+const alPpb=()=>(60/abpm())*26*TLZ;
+const alColor=sid=>COLORS[Math.max(0,S.asrc.findIndex(x=>x.id===sid))%COLORS.length];
+const alEndBeat=()=>S.alane.reduce((m,c)=>Math.max(m,c.a+c.l),0);
+const alEnd=()=>alEndBeat()*60/abpm();
+const alNeedFit=src=>!!src.bpm&&Math.abs(src.bpm-abpm())>.05;
+async function alFit(){
+  if(alBusy)return;alBusy=true;
+  try{
+    for(const src of S.asrc){
+      if(!alNeedFit(src)){src._fit=null;continue;}
+      const bpm=abpm();if(src._fit&&Math.abs(src._fit.bpm-bpm)<.01)continue;
+      const el=$('#alInfo');if(el)el.textContent='Matching "'+src.name+'" to '+Math.round(bpm)+' BPM…';
+      await new Promise(r=>setTimeout(r,30));
+      src._fit={bpm,buf:stretchBuf(src.buf,src.bpm/bpm)};
+    }
+  }catch(e){}finally{alBusy=false;alInfo();}
+}
+function alInfo(){
+  const el=$('#alInfo');if(!el)return;
+  if(!S.alane.length){el.textContent='No audio yet. Import a song, split it, move the pieces, and press Play as song to hear it with your beats.';return;}
+  const c=S.alane[alSel],src=c&&alSrc(c.s);
+  el.textContent=(c&&src?'"'+src.name+'" · starts at beat '+(c.a+1).toFixed(2)+', '+c.l.toFixed(1)+' beats long. ':'')+S.alane.length+' clip'+(S.alane.length===1?'':'s')+'. Drag to move, drag the edges to trim, right-click for more. Audio plays in Play as song.';
+}
+function alSchedule(c,t0,dest,nodes,ob,lenB){
+  ob=ob||0;lenB=lenB==null?Infinity:lenB;
+  if(alSilent())return;
+  const bpm=abpm(),spb=60/bpm,vol=S.alv==null?1:S.alv;
+  S.alane.forEach(cl=>{
+    if(cl.m)return;const src=alSrc(cl.s);if(!src||!src.buf)return;
+    const s0=Math.max(cl.a,ob),e0=Math.min(cl.a+cl.l,ob+lenB);if(e0<=s0+.001)return;
+    const fit=!!(src._fit&&Math.abs(src._fit.bpm-bpm)<.01&&alNeedFit(src));
+    const needRate=alNeedFit(src)&&!fit,sbpm=src.bpm||bpm;
+    const buf=fit?src._fit.buf:src.buf,perBeat=(fit||!src.bpm)?spb:60/sbpm;
+    const off=(cl.o+(s0-cl.a))*perBeat,dur=(e0-s0)*perBeat;if(off>=buf.duration)return;
+    const at=t0+(s0-ob)*spb,playDur=(e0-s0)*spb,node=c.createBufferSource();node.buffer=buf;
+    if(needRate)node.playbackRate.value=sbpm/bpm;
+    const g=c.createGain(),lv=Math.pow(10,(cl.g||0)/20)*vol;
+    const fi=Math.max(.004,s0===cl.a?(cl.fi||0)*spb:0),fo=Math.max(.004,e0===cl.a+cl.l?(cl.fo||0)*spb:0);
+    g.gain.setValueAtTime(0,at);g.gain.linearRampToValueAtTime(lv,at+Math.min(fi,playDur/2));
+    g.gain.setValueAtTime(lv,Math.max(at+fi,at+playDur-fo));g.gain.linearRampToValueAtTime(0,at+playDur);
+    node.connect(g);g.connect(dest);
+    try{node.start(at,off,Math.min(dur,buf.duration-off));}catch(e){}
+    nodes.push({src:node,g});
+  });
+}
+let alWin=null,alSilentPrev=false;
+const alSilent=()=>!!S.alm||(!S.als&&S.channels.some(c=>c.solo));
+function alSoloSync(){const q=alSilent();if(q!==alSilentPrev){alSilentPrev=q;alResync();}}
+function alResync(){
+  try{
+    if(!ctx||!playing||!alWin||!master)return;
+    const now=ctx.currentTime+.03,el=(now-alWin.t)*abpm()/60;if(el<0)return;
+    alStop(now);const keep=[];alSchedule(ctx,now,master,keep,alWin.ob+el,alWin.len===Infinity?Infinity:alWin.len-el);alNodes=keep;
+  }catch(e){}
+}
+function alStop(at){
+  alNodes.forEach(n=>{try{n.src.stop(at||0);}catch(e){}if(!at)try{n.g.disconnect();}catch(e){}});if(!at){alNodes=[];alWin=null;}
+}
+function alStart(t){
+  if(!S.alane.length||!ctx||!master)return;
+  alStop(t);const keep=[];alSchedule(ctx,t,master,keep);alNodes=keep;alWin={t,ob:0,len:Infinity};
+  if(S.asrc.some(x=>alNeedFit(x)&&!(x._fit&&Math.abs(x._fit.bpm-abpm())<.01)))alFit();
+}
+function alStartWin(t,ob,lenB){
+  if(!S.alane.length||!ctx||!master)return;
+  alStop(t);const keep=[];alSchedule(ctx,t,master,keep,ob,lenB);alNodes=keep;alWin={t,ob,len:lenB};
+  if(S.asrc.some(x=>alNeedFit(x)&&!(x._fit&&Math.abs(x._fit.bpm-abpm())<.01)))alFit();
+}
+function alOffline(off,dest){alSchedule(off,0,dest,[]);}
+function alRegionBuf(cl){
+  const src=alSrc(cl.s);if(!src)return null;const sb=src.bpm||abpm(),b=src.buf,sr=b.sampleRate;
+  const i0=Math.max(0,Math.floor(cl.o*60/sb*sr)),i1=Math.min(b.length,Math.ceil((cl.o+cl.l)*60/sb*sr));if(i1<=i0+1)return null;
+  const out=new AudioBuffer({length:i1-i0,numberOfChannels:b.numberOfChannels,sampleRate:sr});
+  for(let c=0;c<b.numberOfChannels;c++)out.getChannelData(c).set(b.getChannelData(c).subarray(i0,i1));return out;
+}
+function alCommit(msg){markDirty();scheduleCommit();renderAudioLane();alResync();if(msg)toast(msg);}
+const AL_BTNS=['alSplit','alDup','alMute','alDel','alCh','alBpm','alHalf','alDbl','alGain'];
+function alSyncBar(){
+  const c=S.alane[alSel],src=c&&alSrc(c.s);
+  $('#alBpm').value=src&&src.bpm?+src.bpm.toFixed(2):'';
+  $('#alGain').value=c?c.g||0:0;$('#alGainO').textContent=(c?c.g||0:0)+' dB';
+  AL_BTNS.forEach(id=>{$('#'+id).disabled=!c;});
+  $('#alMute').textContent=c&&c.m?'Unmute':'Mute';alInfo();
+}
+function renderAudioLane(){
+  const lane=$('#tlAudio');if(!lane)return;
+  lane.hidden=false;
+  const ppb=alPpb(),songBeats=S.song.reduce((a,c)=>{const p=patById(c.pat);return a+(p?clipDur(c,p):0);},0)/(60/abpm());
+  const W=Math.max(alEndBeat(),songBeats)+4;
+  lane.style.setProperty('--abeat',ppb+'px');lane.style.width=Math.max(300,W*ppb)+'px';
+  [...lane.querySelectorAll('.alc')].forEach(e=>e.remove());
+  S.alane.forEach((cl,i)=>{
+    const src=alSrc(cl.s);if(!src)return;
+    const d=document.createElement('div');d.className='alc'+(cl.m?' mt':'');d.dataset.i=i;d.setAttribute('aria-pressed',i===alSel);d.style.setProperty('--c',alColor(cl.s));
+    const w=Math.max(8,cl.l*ppb);d.style.left=(cl.a*ppb)+'px';d.style.width=w+'px';
+    d.innerHTML='<canvas></canvas><span>'+esc(src.name)+'</span><i class="alh l"></i><i class="alh r"></i>'+(alCur&&alCur.i===i?'<i class="cur" style="left:'+((alCur.b-cl.a)*ppb)+'px"></i>':'');
+    lane.appendChild(d);alWave(d.querySelector('canvas'),cl,src,Math.ceil(w));
+  });
+  alSyncBar();
+  if(!!rack.querySelector('.alrow')!==!!S.alane.length)render();else alRowDraw();
+}
+function alWave(cv,cl,src,w){
+  const h=80;cv.width=Math.max(1,Math.min(w,4000));cv.height=h;const g=cv.getContext('2d');g.clearRect(0,0,cv.width,h);
+  const b=src.buf,d=b.getChannelData(0),sb=src.bpm||abpm(),sr=b.sampleRate,i0=Math.floor(cl.o*60/sb*sr),n=Math.floor(cl.l*60/sb*sr),cw=cv.width,per=n/cw;
+  g.fillStyle='rgba(255,255,255,.55)';
+  for(let x=0;x<cw;x++){const a=Math.floor(i0+x*per),z=Math.min(b.length,Math.max(a+1,Math.floor(i0+(x+1)*per)));let mx=0;const st=Math.max(1,Math.floor((z-a)/48));for(let k=a;k<z;k+=st){const v=Math.abs(d[k]);if(v>mx)mx=v;}const bh=Math.max(1,mx*(h-6));g.fillRect(x,(h-bh)/2,1,bh);}
+}
+
+/* ---------- song row in the channel rack ---------- */
+const alBarBeats=()=>{const p=curPat();return p.num*4/p.den;};
+function alRowHTML(){
+  try{
+    if(!S.alane||!S.alane.length)return '';
+    const bb=alBarBeats(),bar=Math.round(((S.aref||0)/bb+1)*100)/100;
+    return '<div class="alrow"><div class="head"><div class="alh"><b>Song audio</b><span class="tgs"><button class="tg s" data-al="solo" aria-pressed="'+!!S.als+'" title="Solo the song: hear only the song audio, and silence the channels. Press again to bring them back.">S</button><button class="tg" data-al="remove" title="Remove the song audio from this project. Undo brings it back." aria-label="Remove song audio">✕</button><button class="tg m" data-al="mute" aria-pressed="'+!!S.alm+'" title="Mute the song audio">M</button><button class="tg s" data-al="hear" aria-pressed="'+(S.ahear!==false)+'" title="Play the song along with this pattern while it loops. Turn off to hear only the beat.">♪</button></span></div>'
+      +'<div class="alh"><label class="lbl">From bar <input type="number" data-al="bar" min="1" step="0.25" value="'+bar+'" aria-label="Which bar of the song this pattern lines up with"></label><button class="btn sm" data-al="prev" title="Go back one bar of the song" aria-label="Back one bar">◀</button><button class="btn sm" data-al="next" title="Go forward one bar of the song" aria-label="Forward one bar">▶</button></div>'
+      +'<div class="alh"><button class="btn sm" data-al="match" title="Jump to where this pattern sits in your arrangement">Match arrangement</button><label class="lbl">Vol <input type="range" data-al="vol" min="0" max="1.5" step="0.01" value="'+(S.alv==null?1:S.alv)+'" aria-label="Song audio volume"></label></div></div>'
+      +'<div class="steps"><div class="alt" role="toolbar" aria-label="Edit the song audio"><button class="btn sm" data-al="slice" title="Cut the song in two at the marker (S)">Slice</button><button class="btn sm" data-al="del" title="Remove the selected part (Delete)">Delete</button><button class="btn sm" data-al="cut" title="Cut the selected part to the clipboard (Ctrl+X)">Cut</button><button class="btn sm" data-al="copy" title="Copy the selected part (Ctrl+C)">Copy</button><button class="btn sm" data-al="paste" title="Paste at the marker (Ctrl+V)">Paste</button><label class="lbl" title="Ripple: Delete and Paste move the later song audio, so there is no gap and nothing is covered"><input type="checkbox" data-al="rip"'+(S.alrip?' checked':'')+'> Ripple</label><span class="hint">Click to place the marker. Drag across the waveform to select, then drag the selection to move it.</span></div><canvas tabindex="0" aria-label="Song waveform lined up with the steps. Click to place a marker, drag to select. S slices, Delete removes, Ctrl+C, X and V copy, cut and paste."></canvas></div></div>';
+  }catch(e){return '';}
+}
+function alAmp(b0,b1){
+  let mx=0;
+  for(const cl of S.alane){
+    if(cl.m)continue;const s0=Math.max(cl.a,b0),e0=Math.min(cl.a+cl.l,b1);if(e0<=s0)continue;
+    const src=alSrc(cl.s);if(!src||!src.buf)continue;const d=src.buf.getChannelData(0),sb=src.bpm||abpm(),sr=src.buf.sampleRate;
+    const i0=Math.floor((cl.o+(s0-cl.a))*60/sb*sr),i1=Math.min(d.length,Math.ceil((cl.o+(e0-cl.a))*60/sb*sr)),st=Math.max(1,Math.floor((i1-i0)/40));
+    for(let k=Math.max(0,i0);k<i1;k+=st){const v=Math.abs(d[k]);if(v>mx)mx=v;}
+  }
+  return mx;
+}
+function alRowDraw(){
+  try{
+    const row=rack.querySelector('.alrow');if(!row){rack.classList.remove('als');return;}
+    rack.classList.toggle('als',!!S.als);
+    const ru=rack.querySelector('.ruler .steps'),st=row.querySelector('.steps'),cv=st.querySelector('canvas');
+    const w=ru?ru.offsetWidth:600;st.style.width=w+'px';const cw=Math.max(40,w-14);cv.style.width=cw+'px';cv.width=Math.min(cw,4000);cv.height=56;
+    alBase=document.createElement('canvas');alBase.width=cv.width;alBase.height=56;
+    const g=alBase.getContext('2d');
+    const pat=curPat(),tm=tmOf(pat),lenB=tm.total*tm.stepDur*abpm()/60,ob=S.aref||0;
+    let ink=false;g.fillStyle=S.alm?'rgba(160,170,180,.35)':'rgba(190,210,230,.85)';
+    for(let x=0;x<cv.width;x++){
+      const a=ob+x/cv.width*lenB,b=ob+(x+1)/cv.width*lenB,v=alAmp(a,b),h=v?Math.max(2,Math.min(1,v)*50):0;
+      if(h){g.fillRect(x,(56-h)/2,1,h);ink=true;}
+    }
+    if(!ink){g.fillStyle='rgba(200,210,220,.7)';g.font='12px sans-serif';g.fillText(S.alm?'Song muted':'No song audio in this part. Use From bar, the arrows, or Match arrangement.',10,32);}
+    g.fillStyle='rgba(255,255,255,.35)';
+    for(const cl of S.alane){for(const bt of [cl.a,cl.a+cl.l]){if(bt>ob&&bt<ob+lenB)g.fillRect(Math.round((bt-ob)/lenB*cv.width),0,1,56);}}
+    alOverlay();
+  }catch(e){}
+}
+(()=>{
+  const act=(el)=>{
+    const k=el.dataset.al,bb=alBarBeats();
+    if(k==='solo'){S.als=!S.als;applyMix();}
+    else if(k==='mute'){S.alm=!S.alm;alStop();}
+    else if(k==='hear'){S.ahear=S.ahear===false;if(S.ahear===false)alStop();}
+    else if(k==='prev'){S.aref=Math.max(0,(S.aref||0)-bb);}
+    else if(k==='next'){S.aref=(S.aref||0)+bb;}
+    else if(k==='match'){
+      let t=0,found=false;for(const c of S.song){const p=patById(c.pat);if(c.pat===S.curPat){found=true;break;}t+=p?clipDur(c,p):0;}
+      if(!found){toast('This pattern is not in your arrangement yet. Add it in the Timeline first.');return;}
+      S.aref=Math.round(t*abpm()/60*4)/4;toast('Lined up with where this pattern sits in your song.');
+    }
+    else return;
+    markDirty();scheduleCommit();render();
+  };
+  rack.addEventListener('click',e=>{const b=e.target.closest('button[data-al]');if(b)act(b);});
+  rack.addEventListener('change',e=>{
+    const i=e.target.closest('input[data-al="bar"]');
+    if(i){S.aref=Math.max(0,(+i.value-1)*alBarBeats());markDirty();scheduleCommit();alRowDraw();}
+  });
+  rack.addEventListener('input',e=>{const i=e.target.closest('input[data-al="vol"]');if(i){S.alv=+i.value;markDirty();}});
+})();
+
+/* ---------- live editing in the rack row ---------- */
+let alBase=null,alSelR=null,alCursor=null,alClipbd=null,alGhost=0;
+const alWinInfo=()=>{const tm=tmOf(curPat()),lenB=tm.total*tm.stepDur*abpm()/60;return {ob:S.aref||0,lenB,stepB:lenB/tm.total};};
+function alOverlay(){
+  const row=rack.querySelector('.alrow');if(!row||!alBase)return;
+  const cv=row.querySelector('canvas'),g=cv.getContext('2d'),{ob,lenB}=alWinInfo(),W=cv.width,X=b=>(b-ob)/lenB*W;
+  g.clearRect(0,0,W,56);g.drawImage(alBase,0,0);
+  const acc=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#ff9a3c';
+  if(alSelR){
+    const a=X(alSelR.a),b=X(alSelR.b);g.fillStyle='rgba(255,154,60,.28)';g.fillRect(a,0,b-a,56);g.fillStyle=acc;g.fillRect(a,0,2,56);g.fillRect(b-2,0,2,56);
+    if(alGhost){const ga=X(alSelR.a+alGhost),gb=X(alSelR.b+alGhost);g.strokeStyle='#fff';g.setLineDash([4,3]);g.strokeRect(ga+.5,1.5,gb-ga-1,53);g.setLineDash([]);}
+  }
+  if(alCursor!=null&&alCursor>=ob&&alCursor<=ob+lenB){g.fillStyle=acc;g.fillRect(Math.round(X(alCursor))-1,0,2,56);g.beginPath();g.moveTo(X(alCursor)-5,0);g.lineTo(X(alCursor)+5,0);g.lineTo(X(alCursor),7);g.fill();}
+  const has=!!alSelR&&alSelR.b-alSelR.a>.001,cur=alCursor!=null||has;
+  const dis=(k,v)=>{const b=row.querySelector('[data-al="'+k+'"]');if(b)b.disabled=!v;};
+  dis('slice',alCursor!=null||has);dis('del',has);dis('cut',has);dis('copy',has);dis('paste',!!alClipbd&&cur);
+}
+function alCutAt(beat){
+  let did=false;
+  for(const c of S.alane.slice()){if(beat>c.a+.001&&beat<c.a+c.l-.001){const r=Object.assign({},c,{o:c.o+(beat-c.a),a:beat,l:c.a+c.l-beat,fi:0});c.l=beat-c.a;c.fo=0;S.alane.splice(S.alane.indexOf(c)+1,0,r);did=true;}}
+  return did;
+}
+function alClearRange(a,b){alCutAt(a);alCutAt(b);S.alane=S.alane.filter(c=>!(c.a>=a-.001&&c.a+c.l<=b+.001));}
+function alPeek(a,b){
+  const out=[];for(const c of S.alane){const s0=Math.max(c.a,a),e0=Math.min(c.a+c.l,b);if(e0-s0<.001)continue;
+    out.push(Object.assign({},c,{o:c.o+(s0-c.a),a:s0-a,l:e0-s0,fi:s0===c.a?c.fi:0,fo:e0===c.a+c.l?c.fo:0}));}
+  return out;
+}
+function alRemoveAll(){
+  if(!S.alane.length)return;histMark();S.alane=[];S.aref=0;S.als=false;alSelR=null;alCursor=null;alClipbd=null;alStop();applyMix();
+  alAfter();toastUndo('Song audio removed.');
+}
+function alAfter(msg){alSel=-1;alCur=null;markDirty();scheduleCommit();renderAudioLane();alResync();if(msg)toast(msg);}
+function alEdSlice(){
+  const at=alCursor!=null?alCursor:(alSelR?alSelR.a:null);if(at==null){toast('Click the waveform to place the marker first.');return;}
+  histMark();const did=alCutAt(at);if(alSelR&&alCursor==null){alCutAt(alSelR.b);}
+  if(!did&&!(alSelR&&alSelR.b>alSelR.a)){toast('There is no song audio at the marker.');return;}
+  alAfter('Sliced at the marker.');
+}
+function alEdDelete(cut){
+  if(!alSelR||alSelR.b-alSelR.a<.001)return;const {a,b}=alSelR,len=b-a;
+  if(cut)alClipbd={len,clips:alPeek(a,b)};
+  histMark();alClearRange(a,b);if(S.alrip)S.alane.forEach(c=>{if(c.a>=b-.001)c.a-=len;});
+  alSelR=null;alCursor=a;alAfter(cut?'Cut. Paste it anywhere with Ctrl+V or Paste.':'Deleted'+(S.alrip?' and closed the gap.':'.'));
+}
+function alEdCopy(){
+  if(!alSelR||alSelR.b-alSelR.a<.001)return;alClipbd={len:alSelR.b-alSelR.a,clips:alPeek(alSelR.a,alSelR.b)};alOverlay();toast('Copied. Place the marker and press Paste.');
+}
+function alEdPaste(){
+  if(!alClipbd)return;const at=alCursor!=null?alCursor:(alSelR?alSelR.a:null);if(at==null){toast('Click the waveform to place the marker first.');return;}
+  histMark();const len=alClipbd.len;
+  if(S.alrip){alCutAt(at);S.alane.forEach(c=>{if(c.a>=at-.001)c.a+=len;});}else alClearRange(at,at+len);
+  alClipbd.clips.forEach(c=>S.alane.push(Object.assign({},c,{a:c.a+at})));
+  S.alane.sort((x,y)=>x.a-y.a);alSelR={a:at,b:at+len};alCursor=at+len;alAfter('Pasted.');
+}
+function alEdMove(d){
+  if(!alSelR||!d)return;let {a,b}=alSelR;d=Math.max(d,-a);if(!d)return;
+  histMark();alCutAt(a);alCutAt(b);
+  const mv=S.alane.filter(c=>c.a>=a-.001&&c.a+c.l<=b+.001);S.alane=S.alane.filter(c=>!mv.includes(c));
+  alClearRange(a+d,b+d);mv.forEach(c=>{c.a+=d;S.alane.push(c);});S.alane.sort((x,y)=>x.a-y.a);
+  alSelR={a:a+d,b:b+d};alCursor=a+d;alAfter('Moved.');
+}
+(()=>{
+  let drag=null;
+  const beatOf=(e,cv)=>{const r=cv.getBoundingClientRect(),{ob,lenB,stepB}=alWinInfo(),raw=ob+Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*lenB;return Math.max(0,ob+Math.round((raw-ob)/stepB)*stepB);};
+  rack.addEventListener('pointerdown',e=>{
+    const cv=e.target.closest&&e.target.closest('.alrow canvas');if(!cv)return;
+    cv.focus({preventScroll:true});const b=beatOf(e,cv);
+    try{cv.setPointerCapture(e.pointerId);}catch(x){}
+    const inSel=alSelR&&b>=alSelR.a-.001&&b<=alSelR.b+.001&&alSelR.b-alSelR.a>.001;
+    drag={cv,x0:e.clientX,b0:b,mode:inSel?'move':'sel',moved:false};
+  });
+  rack.addEventListener('pointermove',e=>{
+    if(!drag)return;if(!drag.moved&&Math.abs(e.clientX-drag.x0)<4)return;drag.moved=true;const b=beatOf(e,drag.cv);
+    if(drag.mode==='sel'){alSelR={a:Math.min(drag.b0,b),b:Math.max(drag.b0,b)};alCursor=null;}
+    else alGhost=b-drag.b0;
+    alOverlay();
+  });
+  const up=e=>{
+    if(!drag)return;const d=drag;drag=null;const b=beatOf(e,d.cv);
+    if(!d.moved){alSelR=null;alCursor=d.b0;alGhost=0;alOverlay();return;}
+    if(d.mode==='sel'){if(alSelR&&alSelR.b-alSelR.a<.001){alSelR=null;alCursor=d.b0;}else if(alSelR)alCursor=alSelR.a;alOverlay();}
+    else{const g=alGhost;alGhost=0;if(Math.abs(g)<.001)alOverlay();else alEdMove(g);}
+  };
+  rack.addEventListener('pointerup',up);rack.addEventListener('pointercancel',()=>{drag=null;alGhost=0;alOverlay();});
+  rack.addEventListener('keydown',e=>{
+    const cv=e.target.closest&&e.target.closest('.alrow canvas');if(!cv)return;const k=e.key.toLowerCase(),m=e.ctrlKey||e.metaKey;
+    if(k==='s'&&!m)alEdSlice();
+    else if(k==='delete'||k==='backspace')alEdDelete(false);
+    else if(m&&k==='x')alEdDelete(true);
+    else if(m&&k==='c')alEdCopy();
+    else if(m&&k==='v')alEdPaste();
+    else if(k==='escape'){alSelR=null;alCursor=null;alOverlay();}
+    else return;
+    e.preventDefault();e.stopPropagation();
+  });
+  rack.addEventListener('click',e=>{
+    const b=e.target.closest&&e.target.closest('.alrow button[data-al]');if(!b)return;const k=b.dataset.al;
+    if(k==='remove')alRemoveAll();else if(k==='slice')alEdSlice();else if(k==='del')alEdDelete(false);else if(k==='cut')alEdDelete(true);else if(k==='copy')alEdCopy();else if(k==='paste')alEdPaste();
+  });
+  rack.addEventListener('change',e=>{const c=e.target.closest&&e.target.closest('input[data-al="rip"]');if(c){S.alrip=c.checked;}});
+})();
+async function alImportBuf(ab,name){
+  ensureCtx();const buf=await decode(ab.slice(0)),key=uid();idbPut(key,ab);
+  let bpm=null;try{if(buf.duration>=3)bpm=detectBpm(buf,0,1);}catch(e){}
+  const src={id:'s'+uid(),name:String(name||'Song').replace(/\.[^.]+$/,'').slice(0,28),key,raw:ab,buf,bpm:bpm&&bpm>=40&&bpm<=240?Math.round(bpm*10)/10:null,_fit:null};
+  histMark();S.asrc.push(src);
+  const tb=buf.duration*(src.bpm||abpm())/60;
+  S.alane.push({s:src.id,o:0,l:tb,a:Math.ceil(alEndBeat()/4)*4,g:0,fi:0,fo:0});alSel=S.alane.length-1;alCur=null;
+  if(!S.song.length){const p=curPat(),one=clipDur({pat:p.id,reps:1},p),reps=Math.max(1,Math.min(16,Math.ceil(buf.duration/one/Math.max(1,Math.ceil(buf.duration/one/16)))));
+    const n=Math.max(1,Math.min(12,Math.ceil(buf.duration/(one*reps))));for(let i=0;i<n;i++)S.song.push({pat:p.id,reps});S.selClip=0;}
+  S.mode='song';syncMode();renderSong();
+  alCommit('Imported "'+src.name+'"'+(src.bpm?' (about '+Math.round(src.bpm)+' BPM. If that is half or double, use ÷2 or ×2).':'. Type its tempo in Audio BPM so it lines up with your beats.'));
+  alFit();return src;
+}
+async function alImport(files){
+  for(const f of files){
+    try{toast('Reading '+f.name+'…');await alImportBuf(await f.arrayBuffer(),f.name);}
+    catch(err){toast('Could not read '+f.name+'. Try an MP3, WAV, M4A or OGG file.');}
+  }
+}
+function alSplit(i,beat){
+  const c=S.alane[i];if(!c)return false;
+  if(beat==null)beat=alCur&&alCur.i===i?alCur.b:c.a+c.l/2;
+  if(beat<=c.a+.1||beat>=c.a+c.l-.1){toast('Place the marker inside the clip first: click the clip where you want the cut.');return false;}
+  histMark();const r=Object.assign({},c,{o:c.o+(beat-c.a),a:beat,l:c.a+c.l-beat,fi:0});c.l=beat-c.a;c.fo=0;S.alane.splice(i+1,0,r);alSel=i+1;alCur=null;alCommit('Split into two clips. Drag them apart or around.');return true;
+}
+(()=>{
+  const lane=$('#tlAudio');let d=null;
+  const beatAt=e=>{const r=lane.getBoundingClientRect();return Math.max(0,(e.clientX-r.left)/alPpb());};
+  lane.addEventListener('pointerdown',e=>{
+    const el=e.target.closest('.alc');
+    if(!el){alSel=-1;alCur=null;renderAudioLane();return;}
+    const i=+el.dataset.i,c=S.alane[i];if(!c)return;
+    alSel=i;alCur={i,b:Math.round(beatAt(e)*4)/4};
+    const mode=e.target.closest('.alh.l')?'l':e.target.closest('.alh.r')?'r':'m';
+    d={i,mode,x0:e.clientX,o:c.o,l:c.l,a:c.a,moved:false,marked:false};try{el.setPointerCapture(e.pointerId);}catch(x){}
+    lane.querySelectorAll('.alc').forEach(q=>q.setAttribute('aria-pressed',+q.dataset.i===i));
+    lane.querySelectorAll('.alc .cur').forEach(q=>q.remove());
+    const cu=document.createElement('i');cu.className='cur';cu.style.left=((alCur.b-c.a)*alPpb())+'px';el.appendChild(cu);
+    alSyncBar();
+  });
+  lane.addEventListener('pointermove',e=>{
+    if(!d)return;const c=S.alane[d.i];if(!c)return;const dx=e.clientX-d.x0;if(!d.moved&&Math.abs(dx)<4)return;
+    if(!d.marked){histMark();d.marked=true;}d.moved=true;alCur=null;
+    const db=Math.round(dx/alPpb()*4)/4,src=alSrc(c.s),tot=src?src.buf.duration*(src.bpm||abpm())/60:1e9;
+    if(d.mode==='m')c.a=Math.max(0,d.a+db);
+    else if(d.mode==='l'){const n=Math.max(-d.o,Math.min(d.l-.25,db));c.o=d.o+n;c.a=Math.max(0,d.a+n);c.l=d.l-n;}
+    else c.l=Math.max(.25,Math.min(tot-d.o,d.l+db));
+    const el=lane.querySelector('.alc[data-i="'+d.i+'"]');if(el){el.style.left=(c.a*alPpb())+'px';el.style.width=Math.max(8,c.l*alPpb())+'px';el.classList.add('drag');}
+  });
+  const up=()=>{if(!d)return;const was=d;d=null;if(was.moved)alCommit();else renderAudioLane();};
+  lane.addEventListener('pointerup',up);lane.addEventListener('pointercancel',up);
+  lane.addEventListener('contextmenu',e=>{
+    const el=e.target.closest('.alc');if(!el)return;e.preventDefault();const i=+el.dataset.i,c=S.alane[i];if(!c)return;alSel=i;const b=Math.round(beatAt(e)*4)/4;
+    popMenu(e.clientX,e.clientY,[
+      {l:'Split here',fn:()=>alSplit(i,b)},{l:'Duplicate',fn:()=>alDup(i)},{l:c.m?'Unmute':'Mute',fn:()=>{histMark();c.m=!c.m;alCommit();}},
+      {sep:1},{l:'Fade in over 1 beat',hint:c.fi?'on':'',fn:()=>{histMark();c.fi=c.fi?0:1;alCommit();}},{l:'Fade out over 1 beat',hint:c.fo?'on':'',fn:()=>{histMark();c.fo=c.fo?0:1;alCommit();}},
+      {l:'To sample channel',fn:()=>alToChannel(i)},{sep:1},{l:'Delete',fn:()=>alDel(i)}]);
+  });
+})();
+function alDup(i){const c=S.alane[i];if(!c)return;histMark();const r=Object.assign({},c,{a:c.a+c.l});S.alane.splice(i+1,0,r);alSel=i+1;alCur=null;alCommit('Duplicated. It sits right after the original.');}
+function alDel(i){if(!S.alane[i])return;histMark();S.alane.splice(i,1);alSel=-1;alCur=null;
+  alCommit();}
+async function alToChannel(i){
+  const c=S.alane[i];if(!c)return;const src=alSrc(c.s),buf=alRegionBuf(c);if(!buf){toast('That clip is too short to turn into a channel.');return;}
+  const wav=await encodeWav(buf).arrayBuffer(),key=uid();idbPut(key,wav);histMark();
+  const nc=addChannel({kind:'sample',name:(src.name+' clip').slice(0,24),buf,peaks:peaksOf(buf),raw:wav,audioKey:key});
+  nc.steps[0]=100;S.activeId=nc.id;render();markDirty();scheduleCommit();
+  toast('Made a sample channel from this clip. Open its editor to slice it, chop it to pads, or add warp markers.');
+}
+$('#alImport').onclick=()=>$('#alFile').click();
+$('#importSong').onclick=()=>$('#alFile').click();
+$('#alFile').onchange=e=>{const f=[...e.target.files];e.target.value='';if(f.length)alImport(f);};
+$('#alRemoveAll').onclick=()=>alRemoveAll();
+$('#alSplit').onclick=()=>alSplit(alSel);$('#alDup').onclick=()=>alDup(alSel);$('#alDel').onclick=()=>alDel(alSel);$('#alCh').onclick=()=>alToChannel(alSel);
+$('#alMute').onclick=()=>{const c=S.alane[alSel];if(!c)return;histMark();c.m=!c.m;alCommit();};
+const alSetBpm=v=>{const c=S.alane[alSel],src=c&&alSrc(c.s);if(!src||!(v>=40&&v<=240))return;
+  const old=src.bpm||abpm();histMark();const k=v/old;S.alane.forEach(q=>{if(q.s===src.id){q.o*=k;q.l*=k;}});src.bpm=Math.round(v*100)/100;src._fit=null;alCommit();alFit();};
+$('#alBpm').onchange=e=>alSetBpm(+e.target.value);
+$('#alHalf').onclick=()=>{const c=S.alane[alSel],src=c&&alSrc(c.s);if(src)alSetBpm((src.bpm||abpm())/2);};
+$('#alDbl').onclick=()=>{const c=S.alane[alSel],src=c&&alSrc(c.s);if(src)alSetBpm((src.bpm||abpm())*2);};
+$('#alGain').addEventListener('input',e=>{const c=S.alane[alSel];if(!c)return;c.g=+e.target.value;$('#alGainO').textContent=c.g+' dB';markDirty();});
+$('#alGain').addEventListener('change',()=>{scheduleCommit();});
+function alSnap(withAudio){
+  return {solo:S.als?1:undefined,rip:S.alrip?1:undefined,ref:S.aref||undefined,hear:S.ahear===false?0:undefined,mute:S.alm?1:undefined,vol:S.alv!=null&&S.alv!==1?S.alv:undefined,src:S.asrc.filter(x=>S.alane.some(c=>c.s===x.id)).map(x=>({id:x.id,name:x.name,key:x.key,bpm:x.bpm,audio:withAudio&&x.raw?b64(x.raw):undefined})),clips:S.alane.map(c=>Object.assign({},c))};
+}
+async function alLoad(al,getRaw){
+  S.asrc=[];S.alane=[];alSel=-1;alCur=null;S.als=!!(al&&al.solo);S.alrip=!!(al&&al.rip);S.aref=al&&+al.ref>0?+al.ref:0;S.ahear=!(al&&al.hear===0);S.alm=!!(al&&al.mute);S.alv=al&&al.vol!=null?Math.max(0,Math.min(1.5,+al.vol)):1;
+  if(al&&Array.isArray(al.src)){
+    for(const q of al.src.slice(0,16)){
+      if(!q||typeof q.id!=='string')continue;
+      let raw=q.audio?unb64(q.audio):(q.key?await idbGet(q.key):null);if(!raw&&getRaw&&q.key)raw=await getRaw(q.key);
+      let buf=null;if(raw){try{buf=await decode(raw.slice(0));}catch(e){}}
+      if(!buf)continue;if(q.audio&&q.key)idbPut(q.key,raw);
+      S.asrc.push({id:q.id,name:String(q.name||'Audio').slice(0,28),key:q.key||null,raw,buf,bpm:q.bpm>=40&&q.bpm<=240?+q.bpm:null,_fit:null});
+    }
+    S.alane=(Array.isArray(al.clips)?al.clips:[]).filter(c=>c&&alSrc(c.s)).slice(0,400).map(c=>({s:c.s,o:Math.max(0,+c.o||0),l:Math.max(.25,+c.l||1),a:Math.max(0,+c.a||0),g:Math.max(-24,Math.min(6,+c.g||0)),fi:c.fi?1:0,fo:c.fo?1:0,m:c.m?true:undefined}));
+  }
+  renderAudioLane();alFit();
+}
+
 function clipPrev(c,p,w){
   const T=tmOf(p).total,rows=[];
   S.channels.forEach(ch=>{const d=ch.pats[p.id];if(!d)return;
@@ -4466,6 +4882,7 @@ function tlRuler(){
   return '<div class="tl-ruler" aria-hidden="true">'+h+'</div>';
 }
 function renderTimeline(){
+  try{renderAudioLane();}catch(e){}
   const tr=$('#tlTrack'),head=$('#tlHead');tlPos=[];let x=0;
   const blocks=S.song.map((c,ci)=>{
     const p=patById(c.pat),one=Math.max(34,clipDur(c,p)/c.reps*tlpx()),w=one*c.reps;tlPos.push({x,w,one});x+=w+2;
@@ -5239,6 +5656,9 @@ const GUIDE=(()=>{
    {id:'song',t:'Patterns and songs',sub:'Turn a loop into a track',intro:'A pattern is one loop. A song is patterns lined up in order.',
     steps:['Song sections: in the Timeline, press Section to label the selected clip as Intro, Verse, Build, Chorus, Drop, Bridge, Outro or your own name. Matching neighbours join into one coloured band. Drag a band to move the whole section, or use Duplicate and Move earlier or later in the same menu.','Take lanes: a channel\'s menu has Takes. Save the current notes as a take, swap another one in, or delete it. Recording in Replace mode saves the old pass as a take, so nothing is lost. In the MIDI map, Undo last recorded take drops the last recording.','+ New adds a pattern, Duplicate copies one. Double-click or right-click a name to rename it. Tempo, time signature and bars belong to the selected pattern.','Arrange opens the song bar: add patterns, move them, set how many times each repeats.','Timeline view shows the song as blocks you can drag.','Switch Plays from Pattern to Song to play the arranged song. Compose, then Build song, makes an intro, drop and outro for you.','Tempo changes: select a clip in the Timeline and type a Tempo for it, for example 70 for a slow intro and 140 for the drop. Ramp to speeds up or slows down smoothly across the clip. Leave them empty to use the pattern tempo.','Master automation (under the Timeline) draws a lane across the whole song for Volume, a Low-pass filter, a High-pass filter, Reverb or Delay. Click to add a point, drag to shape it, right-click a point to remove it. Quick shape fills in a sweep, a dip or a build-then-drop.','Lanes and clip tempos are heard when you play as Song and in a Render of the song.'],
     acts:[{l:'Show the pattern bar',run:()=>{closeGuide();coach('#pats','Patterns live here. Arrange opens the song bar.');}},{l:'Open Timeline',run:()=>{closeGuide();view('viewTl');coach('#timeline','Drag clips to arrange your song.');}},show('#clBpm','Give the selected clip its own tempo, or ramp it to a new one.',()=>{view('viewTl');},'Show clip tempo'),show('#mlCv','Draw a master lane here: volume, filters, reverb or delay across the song.',()=>{view('viewTl');},'Show master automation')]},
+   {id:'songaudio',t:'Import a song and cut it up',sub:'Mix a real track in with your beats',intro:'Bring in any song, chop it into pieces, and arrange the pieces among your own patterns.',
+    steps:['Open Timeline and press Import song. Pick an MP3, WAV, M4A or OGG. It appears as a wavy clip in the audio lane under your patterns. The audio lane lines up with the pattern blocks above it, so you can see which beat each piece lands on.','Set Audio BPM to the song\'s tempo (the app guesses it, and ÷2 or ×2 fix a half-time or double-time guess). The song is stretched to match your project tempo without changing its pitch, so it stays in time with your drums.','Click a clip to place a white marker, then press Split to cut it there. Cut as many times as you like. Drag a piece to move it, drag its edges to trim it, and Duplicate to repeat a bit, like a hook or a drum break.','Right-click a clip for fades, Mute and Delete. Level changes how loud the selected piece is.','To Sample channel turns a piece into a normal channel, so you can slice it to pads, chop it by hits, or play it from the keys.','Edit your channels against the song: once a song is imported, a Song audio row appears at the top of the Channel Rack, lined up with the steps. It shows the part of the song under the pattern you are editing. Use From bar or the arrows to pick which part, or Match arrangement to jump to where this pattern sits in your song. In Pattern mode the song loops along with your beat; the ♪ button turns that off and M mutes it.','Edit the song live in that row, even while it plays. Click the waveform to place a marker and press Slice (or S). Drag across it to select a part, then use Delete, Cut, Copy and Paste (or Ctrl+X, C and V). Drag a selection to move it. The S button on the row solos the song so you hear only the song audio; press it again to bring the channels back. Ripple makes Delete close the gap and Paste push the later audio along. Ctrl+Z undoes any edit.','Press Play as song to hear the audio together with your patterns. Export Render includes the audio lane too. It saves with your project; use ZIP to keep the song file inside the project.'],
+    acts:[{l:'Open Timeline',run:()=>{closeGuide();view('viewTl');coach('#alBar','Import a song here, then split and arrange it.');}}]},
    {id:'live',t:'Play and record live',sub:'Keys, MIDI, recording, looper',intro:'The Play tools handle everything you perform.',
     steps:['Keys plays the active channel from your computer keyboard. Z and X move the octave. With Keys follow scale on, A to ; play only notes in your key and scale. Piano shows an on-screen keyboard.','Connect MIDI links a keyboard or controller. MIDI learn links a knob to any slider: click the slider, then move the knob.','Record writes what you play into the active channel while the pattern runs. Use Metronome and Count-in for timing.','Loop rec records the mic or the whole mix for 1 to 8 bars, exactly in time. Mic loops get a vocal chain (clean, rap, sing or big space) that you can change or switch off. Reference lets you A/B against a finished track.','Open Settings, MIDI map, More for recording options: quantize every step, every 2 steps or every beat, and whether each loop pass layers on top of the last or replaces it. Undo last recorded take removes one pass. MPE controllers can be switched on there too.'],
     acts:[show('#keysBtn','Keys, MIDI, Record, Loop rec and the metronome are in the Play tools.',()=>{tools();tab('play');})]},
@@ -5342,8 +5762,11 @@ function macroRender(){
     +m.map.map((q,j)=>'<div class="ml" data-j="'+j+'"><b>'+esc(mmLabel(q.k))+'</b>from <input type="number" class="btn sm" data-f="lo" min="0" max="100" value="'+Math.round(q.lo*100)+'" aria-label="Start percent">% to <input type="number" class="btn sm" data-f="hi" min="0" max="100" value="'+Math.round(q.hi*100)+'" aria-label="End percent">%<button class="btn sm" data-f="del" aria-label="Remove link">✕</button></div>').join('')+(m.map.length?'':'<div class="hint">Nothing linked yet.</div>')+'</div>').join('');
 }
 (()=>{
-  const mod=$('#macroMod'),open=()=>{macroRender();mod.hidden=false;},close=()=>{mod.hidden=true;macLink=null;};
-  $('#macroBtn').onclick=open;$('#macroClose').onclick=close;mod.addEventListener('pointerdown',e=>{if(e.target===mod)close();});
+  const mod=$('#macroMod'),box=$('#macroBox'),open=()=>{macroRender();mod.hidden=false;},close=()=>{mod.hidden=true;macLink=null;};
+  const isFl=()=>box.classList.contains('fl');
+  const syncFl=()=>{const f=isFl();mod.classList.toggle('mfl',f);mod.setAttribute('aria-modal',f?'false':'true');$('#macroFloat').setAttribute('aria-pressed',f);$('#macroFloat').textContent=f?'⧉ Dock':'⧉ Float';};
+  $('#macroFloat').onclick=()=>{if(!isFl()&&!flGeo.macroBox)flGeo.macroBox={x:Math.max(8,innerWidth-450),y:90,w:420,h:Math.max(260,Math.min(520,innerHeight-120))};flToggle(box);syncFl();};
+  $('#macroBtn').onclick=()=>{open();closeDd();};$('#macroClose').onclick=close;mod.addEventListener('pointerdown',e=>{if(e.target===mod)close();});
   window.addEventListener('keydown',e=>{if(e.key==='Escape'&&macLink!=null){macLink=null;mod.hidden=false;toast('Linking cancelled.');e.stopPropagation();}else if(e.key==='Escape'&&!mod.hidden){close();e.stopPropagation();}},true);
   $('#macroList').addEventListener('input',e=>{
     const el=e.target,card=el.closest('.macro-card');if(!card)return;const i=+card.dataset.i,m=S.macros[i],f=el.dataset.f;
@@ -5353,7 +5776,7 @@ function macroRender(){
   });
   $('#macroList').addEventListener('click',e=>{
     const el=e.target.closest('button[data-f]');if(!el)return;const card=el.closest('.macro-card'),i=+card.dataset.i,m=S.macros[i];
-    if(el.dataset.f==='link'){macLink=i;mod.hidden=true;toast('Click any slider to link it to '+m.n+'. Press Esc to cancel.');}
+    if(el.dataset.f==='link'){macLink=i;if(!isFl())mod.hidden=true;toast('Click any slider to link it to '+m.n+'. Press Esc to cancel.');}
     else if(el.dataset.f==='del'){histMark();m.map.splice(+el.closest('.ml').dataset.j,1);macroRender();markDirty();}
   });
   document.addEventListener('pointerdown',e=>{
@@ -5677,7 +6100,7 @@ function applyScene(set,t){
   const tok=++sceneTok;
   if(ctx&&playing&&t!=null){
     const solo=S.channels.some(c=>c.solo);
-    S.channels.forEach(c=>{if(!c.chain)return;const on=solo?c.solo:!set.has(c.id);c.chain.g.gain.setTargetAtTime(on?c.vol:0,Math.max(t,ctx.currentTime),.006);});
+    S.channels.forEach(c=>{if(!c.chain)return;const on=S.als?false:solo?c.solo:!set.has(c.id);c.chain.g.gain.setTargetAtTime(on?c.vol:0,Math.max(t,ctx.currentTime),.006);});
     setTimeout(()=>{if(tok!==sceneTok)return;S.channels.forEach(c=>{c.mute=set.has(c.id);});syncMuteUI();markDirty();},Math.max(0,(t-ctx.currentTime)*1000));
   }else{S.channels.forEach(c=>{c.mute=set.has(c.id);});applyMix();syncMuteUI();markDirty();}
 }
@@ -6032,6 +6455,7 @@ $('#zipBtn').onclick=()=>{
   if(inFrame){toast('Saving files is blocked in this embedded view. Open thebeatsynth.com in its own tab to save or export.');return;}
   const enc=new TextEncoder(),files=[{name:'project.json',data:enc.encode(JSON.stringify(snapshot(false)))}],seen={};
   S.channels.forEach(c=>{if(c.raw&&c.audioKey&&!seen[c.audioKey]){seen[c.audioKey]=1;files.push({name:'audio/'+c.audioKey+'.bin',data:new Uint8Array(c.raw)});}});
+  S.asrc.forEach(a=>{if(a.raw&&a.key&&!seen[a.key]){seen[a.key]=1;files.push({name:'audio/'+a.key+'.bin',data:new Uint8Array(a.raw)});}});
   files.push({name:'README.txt',data:enc.encode('thebeatsynth project.\nOpen this ZIP with Project > Open. project.json is the beat; audio/ holds imported samples as the original files.\n')});
   if(saveBlob(zipFiles(files),'my-beat.zip'))toast('Saved my-beat.zip with '+(files.length-2)+' audio file'+(files.length-2===1?'':'s')+'.');
 };
@@ -6043,6 +6467,7 @@ $('#projFile').onchange=async e=>{
       const z=await readZip(ab);if(!z['project.json'])throw new Error('That ZIP has no project.json.');
       p=JSON.parse(new TextDecoder().decode(z['project.json']));
       (p.channels||[]).forEach(pc=>{if(pc.audioKey&&!pc.audio&&z['audio/'+pc.audioKey+'.bin'])pc.audio=b64(z['audio/'+pc.audioKey+'.bin'].buffer.slice(z['audio/'+pc.audioKey+'.bin'].byteOffset,z['audio/'+pc.audioKey+'.bin'].byteOffset+z['audio/'+pc.audioKey+'.bin'].byteLength));});
+      if(p.al&&Array.isArray(p.al.src))p.al.src.forEach(q=>{const f=q.key&&z['audio/'+q.key+'.bin'];if(f&&!q.audio)q.audio=b64(f.buffer.slice(f.byteOffset,f.byteOffset+f.byteLength));});
     }else p=JSON.parse(new TextDecoder().decode(ab));
     await loadProject(p);toast('Opened '+f.name);markDirty();
   }catch(err){toast(err.message||'Could not open that file.');}
@@ -6575,7 +7000,8 @@ function planList(plan){
 async function renderPlan(plan,only){
   await gmEnsureAll();
   const sr=44100,{list,T}=planList(plan);
-  const len=T+Math.max(2,S.verbSize+1.5);
+  const alOn=only==null&&plan.length&&plan.every(e=>e.clip)&&S.alane.length;
+  const len=(alOn?Math.max(T,alEnd()):T)+Math.max(2,S.verbSize+1.5);
   const off=new OfflineAudioContext(2,Math.ceil(sr*len),sr);
   const chs=S.channels.slice(),sessWas=sessOn,sv={ctx,master,noiseBuf,bus,liveBpm,st:chs.map(c=>[c.chain,c.last])};sessOn=false;
   try{
@@ -6583,11 +7009,12 @@ async function renderPlan(plan,only){
     liveBpm=(plan[0].clip&&plan[0].clip.bpm)||plan[0].pat.bpm;bus=buildBuses(off,master);
     noiseBuf=off.createBuffer(1,sr*2,sr);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
     const solo=chs.some(c=>c.solo);
-    chs.forEach(c=>{c.fxA=null;c.chain=null;c.last=null;makeChain(c);c.chain.g.gain.value=(only!=null?c.id===only:(solo?c.solo:!c.mute))?c.vol:0;if(c.chain.p)c.chain.p.pan.value=c.pan;});
+    chs.forEach(c=>{c.fxA=null;c.chain=null;c.last=null;makeChain(c);c.chain.g.gain.value=(only!=null?c.id===only:(S.als?false:solo?c.solo:!c.mute))?c.vol:0;if(c.chain.p)c.chain.p.pan.value=c.pan;});
     list.forEach(e=>playStepAt(e.pid,e.i,e.tk,e.t,e.tm));
     {let T0=0;for(const e of plan){const tm=tmOf(e.pat,e.clip&&e.clip.bpm||0),dur=e.clip?clipDur(e.clip,e.pat):tm.total*tm.stepDur*e.reps;if(e.clip)clipAuto(mc,e.clip,T0,dur,tm);T0+=dur;}}
     if(plan.some(e=>e.clip&&(e.clip.sweep==='up'||e.clip.sweep==='down')))mc.cf.type='lowpass';
     if(plan.length&&plan.every(e=>e.clip)&&Object.keys(S.lanes).length)laneApply(mc,bus,0,T);
+    if(alOn)alOffline(off,master);
     return await off.startRendering();
   }finally{
     sessOn=sessWas;renderOnly=null;ctx=sv.ctx;master=sv.master;noiseBuf=sv.noiseBuf;bus=sv.bus;liveBpm=sv.liveBpm;
@@ -6941,7 +7368,7 @@ window.__acts={ACTS,kbOf,openPalette};
     ['The Channel Rack','Each row is one sound. Click the squares to place hits, and drag a lit square up or down to change how hard it hits.','.rack-scroll','This is the Channel Rack. Click squares to draw a beat.'],
     ['Views','Switch between the Rack, a Mixer and drum Pads. The song Timeline and Perform for live sets appear in All tools.','#viewBtn','View: Rack, Mixer and Pads. Press + beside a second view to show two at once.'],
     ['Simple or All tools','You start with just the essentials. Press All tools when you want more: the Timeline, Perform, chord and melody writers, recording, time signatures and more. Your choice is remembered.','.seg.lay','Simple shows the essentials. All tools shows everything.'],
-    ['Get sounds and starters','Make me a beat, Templates, Import audio and Real instruments are along the bottom of the page.','#mmbBtn','Make me a beat writes a whole starter for you. Templates and imports are beside it.',openTools],
+    ['Get sounds and starters','Make me a beat, Library, Import audio and Real instruments are along the bottom of the page.','#mmbBtn','Make me a beat writes a whole starter for you. The Library and imports are beside it.',openTools],
     ['Save and export','Export renders your beat to WAV or MP3. The File menu has New, Open, Save and the Library, where your beats are remembered.','#expDd .dd-btn','Export renders your beat to WAV or MP3. File saves and opens projects.'],
     ['The Guide','Your help window. Every topic has Show me buttons that point at the real controls. You can replay this welcome from there any time.','#guideBtn','The Guide explains every feature, step by step.']];
   function wlEnd(){W.hidden=true;try{localStorage.setItem('beatsynth.tour','1');}catch(e){}if(wPrev&&wPrev.focus){try{wPrev.focus();}catch(e){}}wPrev=null;}
