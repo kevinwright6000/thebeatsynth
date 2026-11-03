@@ -790,6 +790,17 @@ body.lite *{transition:none!important;animation:none!important}
 .mb-dropdown-item:hover { background:var(--pad); color:var(--accent); }
 .mb-dropdown-item.danger:hover { color:var(--danger); }
 .mb-dropdown-divider { height:1px; background:var(--line); margin:4px 0; }
+.mb-dd-hint { padding:2px 16px 6px; font:600 11px 'Rajdhani',sans-serif; color:var(--dim); white-space:nowrap; }
+.mb-dd-row { display:flex; align-items:stretch; }
+.mb-dd-row .mb-dropdown-item { flex:1; }
+.mb-dd-split {
+  flex:none; width:26px; margin:3px 6px 3px 0; border-radius:5px;
+  background:none; border:1px solid var(--line); color:var(--dim);
+  font:700 13px 'Rajdhani',sans-serif; cursor:pointer;
+}
+.mb-dd-split:hover { color:var(--fg); border-color:var(--dim); }
+.mb-dd-split[aria-pressed="true"] { color:var(--accent); border-color:var(--accent); background:rgba(255,154,60,.12); }
+.mb-view-pill.split { color:var(--accent); }
 .mb-dropdown-item .shortcut {
   margin-left:auto;
   font:500 11px 'JetBrains Mono',monospace;
@@ -824,6 +835,18 @@ body.lite *{transition:none!important;animation:none!important}
 }
 .mb-project-name:hover { background:rgba(255,255,255,.06); }
 :root[data-theme="light"] .mb-project-name { color:#eaecf0; }
+.mb-project-name-input {
+  background:rgba(255,255,255,.08);
+  border:1px solid var(--accent);
+  color:var(--fg);
+  font:700 13px 'Rajdhani',system-ui,sans-serif;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  padding:3px 7px;
+  border-radius:4px;
+  width:200px;
+  outline:none;
+}
 
 /* Undo/redo in menu bar */
 .mb-history {
@@ -925,7 +948,7 @@ body.lite *{transition:none!important;animation:none!important}
 .mb-ts-den:hover, .mb-ts-bars:hover { color: var(--accent); }
 .mb-ts-lbl {
   font: 10px 'Rajdhani', sans-serif;
-  color: var(--dim);
+  color: var(--accent);
   letter-spacing: .05em;
   margin-left: 1px;
 }
@@ -1946,30 +1969,31 @@ header.transport {
   <div class="mb-menu" id="mbViewMenu">
     <button class="mb-menu-btn" onclick="toggleMbMenu('mbViewMenu')">View</button>
     <div class="mb-dropdown">
-      <button class="mb-dropdown-item" id="mbVRack" onclick="closeMbMenus();mbSwitchView('viewRack')">
+      <div class="mb-dd-hint">Click a view, or + to show two together</div>
+      <div class="mb-dd-row"><button class="mb-dropdown-item" id="mbVRack" onclick="mbSwitchView('viewRack')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="4" rx="1"/><rect x="3" y="10" width="18" height="4" rx="1"/><rect x="3" y="16" width="18" height="4" rx="1"/></svg>
         Rack
-      </button>
-      <button class="mb-dropdown-item" id="mbVMixer" onclick="closeMbMenus();mbSwitchView('viewMixer')">
+      </button><button class="mb-dd-split" type="button" id="mbVRackPlus" aria-pressed="false" title="Show Rack alongside another view (up to two)" onclick="event.stopPropagation();mbSplitView('viewRack')">+</button></div>
+      <div class="mb-dd-row"><button class="mb-dropdown-item" id="mbVMixer" onclick="mbSwitchView('viewMixer')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="4" y2="18"/><line x1="9" y1="4" x2="9" y2="18"/><line x1="14" y1="8" x2="14" y2="18"/><line x1="19" y1="2" x2="19" y2="18"/><line x1="2" y1="18" x2="22" y2="18"/></svg>
         Mixer
-      </button>
-      <button class="mb-dropdown-item" id="mbVPads" onclick="closeMbMenus();mbSwitchView('viewPads')">
+      </button><button class="mb-dd-split" type="button" id="mbVMixerPlus" aria-pressed="false" title="Show Mixer alongside another view (up to two)" onclick="event.stopPropagation();mbSplitView('viewMixer')">+</button></div>
+      <div class="mb-dd-row"><button class="mb-dropdown-item" id="mbVPads" onclick="mbSwitchView('viewPads')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
         Pads
-      </button>
-      <button class="mb-dropdown-item" id="mbVSession" onclick="closeMbMenus();mbSwitchView('viewSession')">
+      </button><button class="mb-dd-split" type="button" id="mbVPadsPlus" aria-pressed="false" title="Show Pads alongside another view (up to two)" onclick="event.stopPropagation();mbSplitView('viewPads')">+</button></div>
+      <div class="mb-dd-row"><button class="mb-dropdown-item" id="mbVSession" onclick="mbSwitchView('viewSession')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="4" height="4" rx=".5"/><rect x="10" y="3" width="4" height="4" rx=".5"/><rect x="17" y="3" width="4" height="4" rx=".5"/><rect x="3" y="10" width="4" height="4" rx=".5"/><rect x="10" y="10" width="4" height="4" rx=".5"/><rect x="17" y="10" width="4" height="4" rx=".5"/></svg>
         Session
-      </button>
-      <button class="mb-dropdown-item" id="mbVTimeline" onclick="closeMbMenus();mbSwitchView('viewTl')">
+      </button><button class="mb-dd-split" type="button" id="mbVSessionPlus" aria-pressed="false" title="Show Session alongside another view (up to two)" onclick="event.stopPropagation();mbSplitView('viewSession')">+</button></div>
+      <div class="mb-dd-row"><button class="mb-dropdown-item" id="mbVTimeline" onclick="mbSwitchView('viewTl')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><polyline points="8 8 3 12 8 16"/><rect x="11" y="8" width="10" height="8" rx="1"/></svg>
         Timeline
-      </button>
-      <button class="mb-dropdown-item" id="mbVPerf" onclick="closeMbMenus();mbSwitchView('viewPerf')">
+      </button><button class="mb-dd-split" type="button" id="mbVTimelinePlus" aria-pressed="false" title="Show Timeline alongside another view (up to two)" onclick="event.stopPropagation();mbSplitView('viewTl')">+</button></div>
+      <div class="mb-dd-row"><button class="mb-dropdown-item" id="mbVPerf" onclick="mbSwitchView('viewPerf')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
         Perform
-      </button>
+      </button><button class="mb-dd-split" type="button" id="mbVPerfPlus" aria-pressed="false" title="Show Perform alongside another view (up to two)" onclick="event.stopPropagation();mbSplitView('viewPerf')">+</button></div>
       <div class="mb-dropdown-divider"></div>
       <button class="mb-dropdown-item" onclick="closeMbMenus();document.getElementById('macroBtn')&&document.getElementById('macroBtn').click()">
         Macro Rack…
@@ -2426,38 +2450,54 @@ header.transport {
   }
 
   // ── View switching ──
+  // Map the menubar's "viewXxx" ids to the real view keys setView()/S.views use.
+  const MBV_KEY = {viewRack:'rack',viewMixer:'mixer',viewPads:'pads',viewSession:'session',viewTl:'timeline',viewPerf:'perf'};
+  const MBV_PLUS = {viewRack:'mbVRackPlus',viewMixer:'mbVMixerPlus',viewPads:'mbVPadsPlus',viewSession:'mbVSessionPlus',viewTl:'mbVTimelinePlus',viewPerf:'mbVPerfPlus'};
+
   function mbSwitchView(viewId) {
-    // Click the vname button inside the existing viewDd for this view
-    const vrow = document.querySelector('.vrow[data-v="'+viewId+'"]');
-    if (vrow) {
-      const vname = vrow.querySelector('.vname');
-      if (vname) vname.click();
-    }
-    // Update view pills active state
-    document.querySelectorAll('.mb-view-pill').forEach(function(p) {
-      p.classList.toggle('active', p.dataset.mbv === viewId);
-    });
-    // Update view menu items active state
-    const map = {viewRack:'mbVRack',viewMixer:'mbVMixer',viewPads:'mbVPads',viewSession:'mbVSession',viewTl:'mbVTimeline',viewPerf:'mbVPerf'};
-    Object.entries(map).forEach(([v, id]) => {
-      const el = document.getElementById(id);
-      if (el) el.style.color = v === viewId ? 'var(--accent)' : '';
-    });
+    const k = MBV_KEY[viewId]; if (!k || typeof setView !== 'function') return;
+    setView(k);
+    closeMbMenus();
+    mbSyncViewUI();
   }
   window.mbSwitchView = mbSwitchView;
+
+  // Show a view alongside whatever's already showing (up to two at once),
+  // or drop it back to one if it's already one of the two shown.
+  function mbSplitView(viewId) {
+    const k = MBV_KEY[viewId]; if (!k || typeof setView !== 'function') return;
+    const cur = (window.S && S.views) || ['rack'];
+    if (cur.includes(k)) { if (cur.length > 1) setView(cur.find(x => x !== k)); }
+    else if (cur.length === 1) setView(cur[0], k);
+    else setView(cur[1], k);
+    mbSyncViewUI();
+  }
+  window.mbSplitView = mbSplitView;
+
+  // Reflect S.views (one or two active views) onto the pills and the View menu.
+  function mbSyncViewUI() {
+    const vs = (window.S && S.views) || ['rack'], split = vs.length > 1;
+    document.querySelectorAll('.mb-view-pill').forEach(function(p) {
+      const k = MBV_KEY[p.dataset.mbv];
+      p.classList.toggle('active', vs.includes(k));
+      p.classList.toggle('split', split && vs.includes(k));
+    });
+    Object.entries(MBV_KEY).forEach(([viewId, k]) => {
+      const el = document.getElementById({viewRack:'mbVRack',viewMixer:'mbVMixer',viewPads:'mbVPads',viewSession:'mbVSession',viewTl:'mbVTimeline',viewPerf:'mbVPerf'}[viewId]);
+      if (el) el.style.color = vs[0] === k ? 'var(--accent)' : '';
+      const plus = document.getElementById(MBV_PLUS[viewId]);
+      if (plus) plus.setAttribute('aria-pressed', split && vs.includes(k));
+    });
+    const btn = document.getElementById('viewBtn');
+    if (btn) btn.textContent = (split ? vs.map(k => Object.keys(MBV_KEY).find(id => MBV_KEY[id] === k)).map(id => ({viewRack:'Rack',viewMixer:'Mixer',viewPads:'Pads',viewSession:'Session',viewTl:'Timeline',viewPerf:'Perform'}[id])).join(' + ') : (({rack:'Rack',mixer:'Mixer',pads:'Pads',session:'Session',timeline:'Timeline',perf:'Perform'})[vs[0]] || 'Rack')) + ' ▾';
+  }
+  window.mbSyncViewUI = mbSyncViewUI;
 
   // Observe viewDd viewBtn label changes to sync pill state
   function watchViewBtn() {
     const viewBtn = document.getElementById('viewBtn');
     if (!viewBtn) return;
-    const observer = new MutationObserver(function() {
-      const label = viewBtn.textContent.replace('▾','').trim().toLowerCase();
-      const map = { rack:'viewRack', mixer:'viewMixer', pads:'viewPads', session:'viewSession', timeline:'viewTl', perform:'viewPerf' };
-      const matched = map[label];
-      if (matched) {
-        document.querySelectorAll('.mb-view-pill').forEach(p => p.classList.toggle('active', p.dataset.mbv === matched));
-      }
-    });
+    const observer = new MutationObserver(function() { mbSyncViewUI(); });
     observer.observe(viewBtn, { childList: true, characterData: true, subtree: true });
   }
 
@@ -5782,12 +5822,34 @@ function newPattern(copyData){
 }
 function resetPatterns(){
   S.scenes=[];S.lanes={};sceneQ=null;
-  S.patterns=[{id:1,name:'Pattern 1',color:COLORS[0],num:4,den:4,bars:1,bpm:120}];S.curPat=1;S.nextPat=2;S.song=[];S.selClip=-1;S.mode='pattern';S.asrc=[];S.alane=[];S.aref=0;S.alrip=false;S.als=false;S.alsnap=true;S.ahear=true;S.alm=false;S.alv=1;alSel=-1;alCur=null;if(typeof renderAudioLane==='function')renderAudioLane();syncMode();syncTransport();
+  S.patterns=[{id:1,name:'Pattern 1',color:COLORS[0],num:4,den:4,bars:1,bpm:120}];S.curPat=1;S.nextPat=2;S.song=[];S.selClip=-1;S.mode='pattern';S.asrc=[];S.alane=[];S.aref=0;S.alrip=false;S.als=false;S.alsnap=true;S.ahear=true;S.alm=false;S.alv=1;alSel=-1;alCur=null;S.title='Untitled Beat';if(typeof syncTitle==='function')syncTitle();if(typeof renderAudioLane==='function')renderAudioLane();syncMode();syncTransport();
 }
 function syncMode(){
   {const b=$('#modeBtn');if(b){b.textContent=S.mode==='song'?'SONG':'PAT';b.dataset.m=S.mode==='song'?'song':'pat';}}
   $('#modePat').setAttribute('aria-pressed',S.mode==='pattern');$('#modeSong').setAttribute('aria-pressed',S.mode==='song');$('#songLoop').checked=S.songLoop;$('#metroBtn').setAttribute('aria-pressed',S.metro);$('#countIn').value=String(S.countIn);
 }
+function syncTitle(){
+  const el=$('#mbProjectName');if(el&&!el.querySelector('input'))el.textContent=S.title||'Untitled Beat';
+  document.title=(S.title||'Untitled Beat')+' – The Beat Synth';
+}
+(()=>{
+  const nameEl=$('#mbProjectName');
+  if(nameEl){
+    let fin=false;
+    const renameTitle=()=>{
+      if(nameEl.querySelector('input'))return;
+      const cur=S.title||'Untitled Beat';
+      nameEl.innerHTML='';const inp=document.createElement('input');inp.value=cur;inp.maxLength=40;inp.setAttribute('aria-label','Project title');inp.className='mb-project-name-input';
+      nameEl.appendChild(inp);inp.focus();inp.select();fin=false;
+      const done=ok=>{if(fin)return;fin=true;if(ok&&inp.value.trim())S.title=inp.value.trim().slice(0,40);syncTitle();markDirty();scheduleCommit();};
+      inp.addEventListener('keydown',ev=>{if(ev.key==='Enter')done(true);else if(ev.key==='Escape')done(false);ev.stopPropagation();});
+      inp.addEventListener('blur',()=>done(true),{once:true});
+    };
+    nameEl.addEventListener('click',renameTitle);
+    nameEl.setAttribute('tabindex','0');nameEl.setAttribute('role','button');
+    nameEl.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&!nameEl.querySelector('input')){e.preventDefault();renameTitle();}});
+  }
+})();
 (()=>{
   $('#pats').addEventListener('click',e=>{const b=e.target.closest('.pchip');if(b&&!e.target.closest('input'))selectPattern(+b.dataset.id);});
   function renamePat(id){
@@ -7044,7 +7106,7 @@ async function idbPut(k,v){try{const d=await idb();d.transaction('audio','readwr
 async function idbGet(k){try{const d=await idb();return await new Promise(res=>{const r=d.transaction('audio').objectStore('audio').get(k);r.onsuccess=()=>res(r.result||null);r.onerror=()=>res(null);});}catch(e){return null;}}
 function snapshot(withAudio){
   const seen={};
-  return {v:3,metro:S.metro,countIn:S.countIn,swing:S.swing,groove:S.groove||null,macros:S.macros,human:S.human,key:S.key,scale:S.scale,lock:S.lock,groups:S.groups,pads:S.pads.map(id=>S.channels.findIndex(c=>c.id===id)),mEq:S.mEq,mComp:S.mComp,pol:S.polish?1:undefined,polPrev:S.polish?S.polishPrev:undefined,limThr:S.limThr,limCeil:S.limCeil,duckSrc:S.channels.findIndex(c=>c.id===S.duckSrc),duckRel:S.duckRel,master:S.master,delayDiv:S.delayDiv,delayFb:S.delayFb,verbSize:S.verbSize,
+  return {v:3,title:S.title||undefined,metro:S.metro,countIn:S.countIn,swing:S.swing,groove:S.groove||null,macros:S.macros,human:S.human,key:S.key,scale:S.scale,lock:S.lock,groups:S.groups,pads:S.pads.map(id=>S.channels.findIndex(c=>c.id===id)),mEq:S.mEq,mComp:S.mComp,pol:S.polish?1:undefined,polPrev:S.polish?S.polishPrev:undefined,limThr:S.limThr,limCeil:S.limCeil,duckSrc:S.channels.findIndex(c=>c.id===S.duckSrc),duckRel:S.duckRel,master:S.master,delayDiv:S.delayDiv,delayFb:S.delayFb,verbSize:S.verbSize,
     al:S.asrc.length?alSnap(withAudio):undefined,
     patterns:S.patterns,curPat:S.curPat,song:S.song,selClip:S.selClip,mode:S.mode,songLoop:S.songLoop,
     ml:Object.keys(S.lanes).length?S.lanes:undefined,
@@ -7079,6 +7141,7 @@ async function loadProject(p){
   S.song=(Array.isArray(p.song)?p.song:[]).filter(c=>pats.some(x=>x.id===+c.pat)).map(c=>({pat:+c.pat,reps:Math.min(16,Math.max(1,Math.round(+c.reps)||1)),fin:[1,2].includes(+c.fin)?+c.fin:0,fout:[1,2].includes(+c.fout)?+c.fout:0,lvl:Math.max(-12,Math.min(6,+c.lvl||0)),sweep:['up','down'].includes(c.sweep)?c.sweep:'off',bpm:clampBpm(c.bpm),ramp:clampBpm(c.ramp),sec:c.sec&&typeof c.sec.n==='string'&&c.sec.n?{i:String(c.sec.i||'').slice(0,12),n:c.sec.n.slice(0,24)}:undefined}));
   S.selClip=S.song.length?Math.min(Math.max(0,+p.selClip||0),S.song.length-1):-1;
   S.mode=p.mode==='song'?'song':'pattern';S.songLoop=p.songLoop!==false;
+  S.title=typeof p.title==='string'&&p.title.trim()?p.title.trim().slice(0,40):'Untitled Beat';syncTitle();
   S.mEq=Array.isArray(p.mEq)?[0,1,2].map(i=>Math.max(-12,Math.min(12,+p.mEq[i]||0))):[0,0,0];S.limThr=Math.max(-24,Math.min(0,p.limThr==null?-3:+p.limThr));S.limCeil=Math.max(-6,Math.min(0,p.limCeil==null?-1:+p.limCeil));
   {const q=p.mComp||{};S.mComp={thr:Math.max(-40,Math.min(0,q.thr==null?-12:+q.thr)),ratio:Math.max(1,Math.min(20,+q.ratio||4)),knee:Math.max(0,Math.min(40,q.knee==null?30:+q.knee))};S.polish=!!p.pol&&!!p.polPrev;S.polishPrev=S.polish?JSON.parse(JSON.stringify(p.polPrev)):null;syncPolish();}
   applyMaster();
@@ -10386,6 +10449,7 @@ function seed(){
   const shared=await openSharedHash();
   if(EMBED)embedInit(shared);
   if(!S.activeId)S.activeId=(S.channels.find(c=>c.kind==='inst')||S.channels[0]||{}).id||null;
+  if(!S.title)S.title='Untitled Beat';syncTitle();
   render();updateKbInfo();histReset();requestAnimationFrame(frame);
   setTimeout(()=>window.__tour&&window.__tour(),700);
 })();
