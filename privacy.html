@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privacy Policy — thebeatsynth</title>
+<meta name="description" content="How thebeatsynth handles your data: what stays on your device, what you choose to share, and what we never collect.">
+<meta name="theme-color" content="#1d232a">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+  :root{
+    --bg:#13171c; --panel:#1d232a; --panel2:#252c35; --line:#2e3542;
+    --fg:#e2e8f0; --dim:#8a97a8; --accent:#6c63ff; --accent-ink:#fff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--fg);
+    font:15px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:48px 20px 80px}
+  header.page{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .logo{width:30px;height:30px;border-radius:7px;display:block;flex:none}
+  .brand{font-weight:800;font-size:16px;letter-spacing:.2px}
+  .back{margin-left:auto;font-size:13px;color:var(--dim);text-decoration:none;border:1px solid var(--line);padding:6px 12px;border-radius:6px}
+  .back:hover{color:var(--fg);border-color:var(--accent)}
+  h1{font-size:28px;margin:28px 0 4px;letter-spacing:-.3px}
+  .updated{color:var(--dim);font-size:13px;margin:0 0 36px}
+  h2{font-size:17px;margin:36px 0 10px;color:var(--fg);border-top:1px solid var(--line);padding-top:28px}
+  h2:first-of-type{border-top:0;padding-top:0}
+  p{margin:0 0 14px;color:#c4ccd6}
+  ul{margin:0 0 14px;padding-left:20px;color:#c4ccd6}
+  li{margin:0 0 6px}
+  strong{color:var(--fg)}
+  code{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-size:13px;color:#b9c6ff}
+  a{color:var(--accent)}
+  a:hover{text-decoration:none}
+  .note{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:6px;padding:14px 16px;margin:0 0 14px;color:#c4ccd6;font-size:14px}
+  footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--line);color:var(--dim);font-size:13px}
+  footer a{color:var(--dim)}
+  footer a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="page">
+      <svg class="logo" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" fill="#1d232a"/><g fill="#6c63ff"><rect x="96" y="96" width="76" height="76" rx="12"/><rect x="218" y="96" width="76" height="76" rx="12" opacity=".35"/><rect x="340" y="96" width="76" height="76" rx="12"/><rect x="96" y="218" width="76" height="76" rx="12" opacity=".35"/><rect x="218" y="218" width="76" height="76" rx="12"/><rect x="340" y="218" width="76" height="76" rx="12" opacity=".35"/><rect x="96" y="340" width="76" height="76" rx="12"/><rect x="218" y="340" width="76" height="76" rx="12" opacity=".35"/><rect x="340" y="340" width="76" height="76" rx="12"/></g></svg>
+      <span class="brand">thebeatsynth</span>
+      <a class="back" href="/">← Back to the app</a>
+    </header>
+
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated November 2, 2026</p>
+
+    <p>thebeatsynth is a beat-making app that runs in your browser. It doesn't require an account, and almost everything you do — building a beat, importing a sound, recording with your microphone — stays on your own device. This page explains exactly what that means, and the few things that do leave your device when you choose to share something.</p>
+
+    <h2>What stays on your device</h2>
+    <p>Your projects, patterns, imported audio, and app settings are stored locally in your browser, using <strong>localStorage</strong> and <strong>IndexedDB</strong>. None of this is sent to us or to anyone else. It's never transmitted anywhere unless you explicitly choose to export, share, or publish it (see below).</p>
+    <p>This also means your beats live in that one browser, on that one device. Clearing your browser's site data, using a different browser, or switching devices will not bring them with you — there's nothing to "sync," because nothing is stored on a server in the first place. If you want to move a project, use <strong>File → ZIP</strong> to save it as a file you can open elsewhere.</p>
+
+    <h2>What you choose to share</h2>
+    <p>A few features send data to our server, and only when you take an action that clearly does so:</p>
+    <ul>
+      <li><strong>Share a link</strong> — uploads a snapshot of your project (and a small amount of metadata, like tempo and key, used to build the preview card) so the link can load it. Anyone with the link can open it.</li>
+      <li><strong>Publish to the Gallery</strong> — uploads your project along with the title and tags you give it, and lists it publicly for other users to browse and open. Published beats can be reported by other users for review.</li>
+      <li><strong>Export</strong> (WAV, MP3, MIDI, stems, video) — this renders and downloads a file straight to your device. Nothing is uploaded.</li>
+    </ul>
+    <p>If you'd like something you shared or published removed, contact us at the email below.</p>
+
+    <h2>Microphone and MIDI</h2>
+    <p><strong>Hum to notes</strong> asks for microphone access to listen to your pitch and turn it into notes in the piano roll. That audio is processed entirely in your browser — it is never recorded, stored, or sent anywhere.</p>
+    <p>Connecting a MIDI controller uses your browser's Web MIDI API to talk to your hardware directly. This communication stays on your device.</p>
+
+    <h2>Analytics</h2>
+    <p>We use <a href="https://vercel.com/docs/analytics/privacy-policy" target="_blank" rel="noopener">Vercel Web Analytics</a> to see how many people visit the site. It's cookie-free and doesn't track you individually — it reports aggregated, anonymized numbers like page views and approximate country, not anything tied to you personally.</p>
+
+    <h2>Sound libraries</h2>
+    <p>Built-in instrument sounds are loaded on demand from two third-party content hosts: <code>gleitz.github.io</code> (GitHub Pages) and <code>cdn.jsdelivr.net</code> (jsDelivr). Loading a file from any website involves an ordinary HTTP request, which incidentally exposes your IP address to that host, the same as loading an image from any site would. We don't control what those hosts do with that request, but no project data or personal information is included in it.</p>
+
+    <h2>Cookies</h2>
+    <p>thebeatsynth doesn't set cookies. App data is kept in localStorage and IndexedDB as described above.</p>
+
+    <h2>Children's privacy</h2>
+    <p>thebeatsynth doesn't ask for or knowingly collect personal information from anyone, including children. There's no account system and no form that asks who you are.</p>
+
+    <h2>Data retention and deletion</h2>
+    <p>Local data is yours to clear at any time, by clearing your browser's site data for thebeatsynth.com, or using "New Project" in the app. Anything you shared or published to the gallery lives on our server until you ask us to remove it or (for gallery items) it's taken down after review.</p>
+
+    <h2>Changes to this policy</h2>
+    <p>If this policy changes, we'll update the date at the top of this page.</p>
+
+    <h2>Contact</h2>
+    <p>Questions, or want something you shared taken down? Email <a href="mailto:kevinwright6000@gmail.com">kevinwright6000@gmail.com</a>.</p>
+
+    <footer>
+      <a href="/">thebeatsynth.com</a>
+    </footer>
+  </div>
+</body>
+</html>
