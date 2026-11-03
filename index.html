@@ -3990,7 +3990,7 @@ const NATIVE=!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNative
 const APP_BASE=NATIVE?'https://www.thebeatsynth.com/':location.href;
 if(NATIVE)document.documentElement.classList.add('native');
 const EMBED=new URLSearchParams(location.search).get('embed')==='1';if(EMBED)document.body.classList.add('embed');
-const S={lanes:{},scenes:[],patterns:[{id:1,name:'Pattern 1',color:COLORS[0],num:4,den:4,bars:1,bpm:120}],curPat:1,nextPat:2,song:[],selClip:-1,mode:'pattern',songLoop:true,metro:false,countIn:0,rec:false,keys:true,sel:null,activeId:null,view:'rack',swing:0,human:0,duckSrc:null,duckRel:.22,autoRec:false,mEq:[0,0,0],mComp:{thr:-12,ratio:4,knee:30},polish:false,polishPrev:null,key:0,scale:'minp',lock:false,groups:[0,1,2,3].map(()=>({vol:1,mute:false,cut:1,comp:0,rev:0})),grpOpen:false,pads:Array(16).fill(null),stepOpt:false,limThr:-3,limCeil:-1,master:.8,delayDiv:.75,delayFb:.4,verbSize:2.2,channels:[],nextId:1};
+const S={lanes:{},scenes:[],patterns:[{id:1,name:'Pattern 1',color:'#6c63ff',num:4,den:4,bars:1,bpm:120}],curPat:1,nextPat:2,song:[],selClip:-1,mode:'pattern',songLoop:true,metro:false,countIn:0,rec:false,keys:true,sel:null,activeId:null,view:'rack',swing:0,human:0,duckSrc:null,duckRel:.22,autoRec:false,mEq:[0,0,0],mComp:{thr:-12,ratio:4,knee:30},polish:false,polishPrev:null,key:0,scale:'minp',lock:false,groups:[0,1,2,3].map(()=>({vol:1,mute:false,cut:1,comp:0,rev:0})),grpOpen:false,pads:Array(16).fill(null),stepOpt:false,limThr:-3,limCeil:-1,master:.8,delayDiv:.75,delayFb:.4,verbSize:2.2,channels:[],nextId:1};
 const SPB={2:4,4:4,8:2,16:1};              // steps per beat for each beat unit
 const spb=()=>SPB[S.den];
 const perBar=()=>S.num*spb();
@@ -5913,7 +5913,7 @@ function newPattern(copyData){
 }
 function resetPatterns(){
   S.scenes=[];S.lanes={};sceneQ=null;
-  S.patterns=[{id:1,name:'Pattern 1',color:COLORS[0],num:4,den:4,bars:1,bpm:120}];S.curPat=1;S.nextPat=2;S.song=[];S.selClip=-1;S.mode='pattern';S.asrc=[];S.alane=[];S.aref=0;S.alrip=false;S.als=false;S.alsnap=true;S.ahear=true;S.alm=false;S.alv=1;alSel=-1;alCur=null;S.title='Untitled Beat';if(typeof syncTitle==='function')syncTitle();if(typeof renderAudioLane==='function')renderAudioLane();syncMode();syncTransport();
+  S.patterns=[{id:1,name:'Pattern 1',color:'#6c63ff',num:4,den:4,bars:1,bpm:120}];S.curPat=1;S.nextPat=2;S.song=[];S.selClip=-1;S.mode='pattern';S.asrc=[];S.alane=[];S.aref=0;S.alrip=false;S.als=false;S.alsnap=true;S.ahear=true;S.alm=false;S.alv=1;alSel=-1;alCur=null;S.title='Untitled Beat';if(typeof syncTitle==='function')syncTitle();if(typeof renderAudioLane==='function')renderAudioLane();syncMode();syncTransport();
 }
 function syncMode(){
   {const b=$('#modeBtn');if(b){b.textContent=S.mode==='song'?'SONG':'PAT';b.dataset.m=S.mode==='song'?'song':'pat';}}
