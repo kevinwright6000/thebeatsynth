@@ -1535,9 +1535,16 @@ header.transport {
   width: auto;
 }
 
-/* editbar lives inside sidebar — override original show/hide */
-.app:not(.et-open) .editbar { display: flex !important; }
-.app.et-open .editbar { display: flex !important; max-height: none !important; overflow: visible !important; }
+/* NOTE: #daw-left-sidebar is NOT inside .app (they're siblings under body),
+   so an ".app ... .editbar" rule here can only ever match the ORIGINAL
+   #editbarBox before JS moves it into the sidebar - never the moved one.
+   That's exactly what caused the refresh glitch: the old unscoped
+   ".app:not(.et-open) .editbar{display:flex!important}" rule was
+   out-specificity-ing the "hidden" attribute on the original #editbarBox
+   and forcing it visible in its old spot for a frame on every page load.
+   The sidebar's own editbar visibility is handled unconditionally by the
+   "#daw-left-sidebar .editbar" rule just below, so no .app-scoped rule is
+   needed here at all. */
 
 /* Editbar inside sidebar: vertical stack layout */
 #daw-left-sidebar .editbar {
@@ -2450,13 +2457,21 @@ header.transport {
   }
 
   // ── View switching ──
-  // Map the menubar's "viewXxx" ids to the real view keys setView()/S.views use.
-  const MBV_KEY = {viewRack:'rack',viewMixer:'mixer',viewPads:'pads',viewSession:'session',viewTl:'timeline',viewPerf:'perf'};
+  // NOTE: this script block runs in its own closure, separate from the main
+  // app script where setView()/S/VIEWS actually live (they're not on
+  // window) - so this can't call setView() or read S.views directly. It
+  // instead proxy-clicks the real, already-wired-up .vname/.vplus buttons
+  // inside the original #viewDd dropdown (hidden inside header.transport
+  // but still fully functional), and reads view state back off the DOM
+  // (.vrow.cur, which the main script keeps in sync on every setView()
+  // call) rather than off S.
+  const MBV_IDS = ['viewRack','viewMixer','viewPads','viewSession','viewTl','viewPerf'];
+  const MBV_PILL_EL = {viewRack:'mbVRack',viewMixer:'mbVMixer',viewPads:'mbVPads',viewSession:'mbVSession',viewTl:'mbVTimeline',viewPerf:'mbVPerf'};
   const MBV_PLUS = {viewRack:'mbVRackPlus',viewMixer:'mbVMixerPlus',viewPads:'mbVPadsPlus',viewSession:'mbVSessionPlus',viewTl:'mbVTimelinePlus',viewPerf:'mbVPerfPlus'};
 
   function mbSwitchView(viewId) {
-    const k = MBV_KEY[viewId]; if (!k || typeof setView !== 'function') return;
-    setView(k);
+    const row = document.querySelector('.vrow[data-v="'+viewId+'"]');
+    if (row) { const vname = row.querySelector('.vname'); if (vname) vname.click(); }
     closeMbMenus();
     mbSyncViewUI();
   }
@@ -2465,40 +2480,42 @@ header.transport {
   // Show a view alongside whatever's already showing (up to two at once),
   // or drop it back to one if it's already one of the two shown.
   function mbSplitView(viewId) {
-    const k = MBV_KEY[viewId]; if (!k || typeof setView !== 'function') return;
-    const cur = (window.S && S.views) || ['rack'];
-    if (cur.includes(k)) { if (cur.length > 1) setView(cur.find(x => x !== k)); }
-    else if (cur.length === 1) setView(cur[0], k);
-    else setView(cur[1], k);
+    const row = document.querySelector('.vrow[data-v="'+viewId+'"]');
+    if (row) { const vplus = row.querySelector('.vplus'); if (vplus) vplus.click(); }
     mbSyncViewUI();
   }
   window.mbSplitView = mbSplitView;
 
-  // Reflect S.views (one or two active views) onto the pills and the View menu.
+  // Reflect the real #viewDd row state (set by the main script's setView())
+  // onto the menubar pills and the View dropdown's pills/+ buttons.
   function mbSyncViewUI() {
-    const vs = (window.S && S.views) || ['rack'], split = vs.length > 1;
+    const curIds = new Set();
+    document.querySelectorAll('#viewDd .vrow.cur').forEach(r => curIds.add(r.dataset.v));
+    const split = curIds.size > 1;
     document.querySelectorAll('.mb-view-pill').forEach(function(p) {
-      const k = MBV_KEY[p.dataset.mbv];
-      p.classList.toggle('active', vs.includes(k));
-      p.classList.toggle('split', split && vs.includes(k));
+      const on = curIds.has(p.dataset.mbv);
+      p.classList.toggle('active', on);
+      p.classList.toggle('split', split && on);
     });
-    Object.entries(MBV_KEY).forEach(([viewId, k]) => {
-      const el = document.getElementById({viewRack:'mbVRack',viewMixer:'mbVMixer',viewPads:'mbVPads',viewSession:'mbVSession',viewTl:'mbVTimeline',viewPerf:'mbVPerf'}[viewId]);
-      if (el) el.style.color = vs[0] === k ? 'var(--accent)' : '';
+    MBV_IDS.forEach(viewId => {
+      const el = document.getElementById(MBV_PILL_EL[viewId]);
+      if (el) el.style.color = curIds.has(viewId) ? 'var(--accent)' : '';
       const plus = document.getElementById(MBV_PLUS[viewId]);
-      if (plus) plus.setAttribute('aria-pressed', split && vs.includes(k));
+      if (plus) plus.setAttribute('aria-pressed', split && curIds.has(viewId));
     });
-    const btn = document.getElementById('viewBtn');
-    if (btn) btn.textContent = (split ? vs.map(k => Object.keys(MBV_KEY).find(id => MBV_KEY[id] === k)).map(id => ({viewRack:'Rack',viewMixer:'Mixer',viewPads:'Pads',viewSession:'Session',viewTl:'Timeline',viewPerf:'Perform'}[id])).join(' + ') : (({rack:'Rack',mixer:'Mixer',pads:'Pads',session:'Session',timeline:'Timeline',perf:'Perform'})[vs[0]] || 'Rack')) + ' ▾';
   }
   window.mbSyncViewUI = mbSyncViewUI;
 
-  // Observe viewDd viewBtn label changes to sync pill state
+  // Observe viewDd viewBtn label changes to sync pill state - #viewBtn's
+  // text is updated by the main script on every setView() call (any path:
+  // these proxy clicks, keyboard shortcuts, programmatic calls), so this
+  // catches all of them, not just ones made through the menubar.
   function watchViewBtn() {
     const viewBtn = document.getElementById('viewBtn');
     if (!viewBtn) return;
     const observer = new MutationObserver(function() { mbSyncViewUI(); });
     observer.observe(viewBtn, { childList: true, characterData: true, subtree: true });
+    mbSyncViewUI();
   }
 
   // ── Library sidebar ──
@@ -5841,7 +5858,7 @@ function syncTitle(){
       const cur=S.title||'Untitled Beat';
       nameEl.innerHTML='';const inp=document.createElement('input');inp.value=cur;inp.maxLength=40;inp.setAttribute('aria-label','Project title');inp.className='mb-project-name-input';
       nameEl.appendChild(inp);inp.focus();inp.select();fin=false;
-      const done=ok=>{if(fin)return;fin=true;if(ok&&inp.value.trim())S.title=inp.value.trim().slice(0,40);syncTitle();markDirty();scheduleCommit();};
+      const done=ok=>{if(fin)return;fin=true;if(ok&&inp.value.trim())S.title=inp.value.trim().slice(0,40);inp.remove();syncTitle();markDirty();scheduleCommit();};
       inp.addEventListener('keydown',ev=>{if(ev.key==='Enter')done(true);else if(ev.key==='Escape')done(false);ev.stopPropagation();});
       inp.addEventListener('blur',()=>done(true),{once:true});
     };
