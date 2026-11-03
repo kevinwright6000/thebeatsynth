@@ -1,4 +1,38 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>thebeatsynth</title>
+<meta name="description" content="Make beats in your browser. Multiple channels, custom time signatures, imported audio and pre-loaded drum/piano sounds. Pads, piano roll, mixer, export.">
+<meta name="theme-color" content="#1d232a">
+
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="thebeatsynth">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="thebeatsynth">
+<meta property="og:title" content="thebeatsynth — make beats in your browser">
+<meta property="og:description" content="Multiple channels, custom time signatures, imported audio and pre-loaded drum/piano sounds. Pads, piano roll, mixer, export.">
+<meta property="og:url" content="https://thebeatsynth.com/">
+<meta property="og:image" content="https://thebeatsynth.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="thebeatsynth — make beats in your browser">
+<meta name="twitter:description" content="Multiple channels, custom time signatures, imported audio and pre-loaded drum/piano sounds. Pads, piano roll, mixer, export.">
+<meta name="twitter:image" content="https://thebeatsynth.com/og.png">
+
+<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
 <title>thebeatsynth</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/jetbrains-mono-latin-500-normal.woff2) format('woff2')}@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/jetbrains-mono-latin-700-normal.woff2) format('woff2')}@font-face{font-family:'Rajdhani';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/rajdhani-latin-500-normal.woff2) format('woff2')}@font-face{font-family:'Rajdhani';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/rajdhani-latin-600-normal.woff2) format('woff2')}@font-face{font-family:'Rajdhani';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/rajdhani-latin-700-normal.woff2) format('woff2')}</style>
@@ -304,7 +338,7 @@ html.native .topbar::-webkit-scrollbar{display:none}
 .gkeys kbd{font:600 12px var(--f-mono);background:var(--inset);border:1px solid var(--line);border-radius:4px;padding:2px 6px}
 @media (max-width:700px){.editbar .lbl,.patbar>.lbl{display:none}.guide-body{grid-template-columns:1fr;grid-template-rows:auto 1fr;height:80vh}.guide-nav{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}.guide-nav button{flex:none}.guide-nav small{display:none}.guide-nav button{padding:6px 10px}.guide-pane{padding:14px}}
 .spot{outline:2px solid var(--accent)!important;outline-offset:3px;animation:spotp 1.1s ease-in-out 4}
-@keyframes spotp{50%{box-shadow:0 0 0 7px rgba(255,154,60,.35)}}
+@keyframes spotp{50%{box-shadow:0 0 0 7px rgba(108,99,255,.35)}}
 #coach{position:fixed;z-index:95;width:min(300px,calc(100vw - 16px));background:var(--panel2);border:1px solid var(--accent);border-radius:8px;padding:10px 12px;box-shadow:0 12px 34px rgba(0,0,0,.55)}
 #coach p{margin:0 0 8px;font-size:14px}#coach div{display:flex;gap:6px}
 @media (prefers-reduced-motion:reduce){.spot{animation:none}}
@@ -427,7 +461,7 @@ html.native .topbar::-webkit-scrollbar{display:none}
 .tl-head{position:absolute;top:0;bottom:0;width:2px;background:var(--accent);z-index:6;pointer-events:none}
 body.learn input[type=range]{outline:2px dashed var(--accent);outline-offset:3px}
 body.learn input[type=range].learning{outline-style:solid;outline-color:#fff}
-.welcome{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;background:radial-gradient(1100px 620px at 50% -10%,rgba(255,154,60,.18),transparent 62%),rgba(9,12,15,.95);overflow:auto}
+.welcome{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;background:radial-gradient(1100px 620px at 50% -10%,rgba(108,99,255,.18),transparent 62%),rgba(9,12,15,.95);overflow:auto}
 .welcome[hidden]{display:none}
 .wl-card{width:100%;max-width:840px;max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow:auto;background:var(--panel2);border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:16px;padding:28px 30px 22px;box-shadow:0 24px 80px rgba(0,0,0,.6)}
 .wl-logo{width:56px;height:56px;border-radius:12px;display:block}
@@ -742,10 +776,11 @@ body.lite *{transition:none!important;animation:none!important}
   transition:opacity .12s, background .12s;
   display:flex; align-items:center; gap:4px;
 }
-.mb-menu-btn:hover, .mb-menu.open .mb-menu-btn {
+.mb-menu-btn:hover, .mb-menu.open .mb-menu-btn, .mb-menu-btn.sidebar-open {
   opacity:1;
   background:rgba(255,255,255,.06);
 }
+.mb-menu-btn.sidebar-open { color:var(--accent); opacity:1; }
 :root[data-theme="light"] .mb-menu-btn { color:#eaecf0; }
 :root[data-theme="light"] .mb-menu-btn:hover,
 :root[data-theme="light"] .mb-menu.open .mb-menu-btn { background:rgba(255,255,255,.1); }
@@ -799,7 +834,7 @@ body.lite *{transition:none!important;animation:none!important}
   font:700 13px 'Rajdhani',sans-serif; cursor:pointer;
 }
 .mb-dd-split:hover { color:var(--fg); border-color:var(--dim); }
-.mb-dd-split[aria-pressed="true"] { color:var(--accent); border-color:var(--accent); background:rgba(255,154,60,.12); }
+.mb-dd-split[aria-pressed="true"] { color:var(--accent); border-color:var(--accent); background:rgba(108,99,255,.12); }
 .mb-view-pill.split { color:var(--accent); }
 .mb-dropdown-item .shortcut {
   margin-left:auto;
@@ -1377,9 +1412,27 @@ body { padding-top:calc(var(--menubar-h) + 2px) !important; }
 .app.lib-open .mixer,
 .app.lib-open .tlv,
 .app.lib-open .padsv,
-.app.lib-open .sessv {
+.app.lib-open .sessv,
+.app.lib-open .patbar,
+.app.lib-open .kbd {
   margin-right:280px;
   transition:margin-right .22s cubic-bezier(.4,0,.2,1);
+}
+
+/* Shift app when the left tools sidebar is open - mirrors lib-open above,
+   so Tools behaves exactly like the Library/Effects panel: it shrinks the
+   rack in from the side instead of overlaying/blocking it, and stays open
+   (no backdrop to click through) until explicitly closed. */
+.app.tools-open .rack-scroll,
+.app.tools-open #scroll,
+.app.tools-open .mixer,
+.app.tools-open .tlv,
+.app.tools-open .padsv,
+.app.tools-open .sessv,
+.app.tools-open .patbar,
+.app.tools-open .kbd {
+  margin-left:300px;
+  transition:margin-left .22s cubic-bezier(.4,0,.2,1);
 }
 
 /* ── Audio edit panel ── */
@@ -1871,21 +1924,17 @@ header.transport {
 
 <!-- ── MENU BAR HTML ── -->
 <div id="daw-menubar">
-  <!-- Hamburger — opens left sidebar -->
-  <button class="mb-ham-btn" id="mbHamBtn" title="Show tools & patterns">
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-      <line x1="3" y1="5" x2="17" y2="5"/>
-      <line x1="3" y1="10" x2="17" y2="10"/>
-      <line x1="3" y1="15" x2="17" y2="15"/>
-    </svg>
-  </button>
-
   <div class="mb-logo" title="thebeatsynth">
-    <svg viewBox="0 0 20 20" fill="none">
-      <rect x="2" y="13" width="3" height="5" rx="1" fill="#6c63ff"/>
-      <rect x="6" y="9" width="3" height="9" rx="1" fill="#6c63ff" opacity=".85"/>
-      <rect x="10" y="5" width="3" height="13" rx="1" fill="#6c63ff" opacity=".7"/>
-      <rect x="14" y="2" width="3" height="16" rx="1" fill="#6c63ff" opacity=".55"/>
+    <svg viewBox="0 0 20 20" fill="#6c63ff">
+      <rect x="2" y="2" width="4.4" height="4.4" rx=".7"/>
+      <rect x="7.8" y="2" width="4.4" height="4.4" rx=".7" opacity=".35"/>
+      <rect x="13.6" y="2" width="4.4" height="4.4" rx=".7"/>
+      <rect x="2" y="7.8" width="4.4" height="4.4" rx=".7" opacity=".35"/>
+      <rect x="7.8" y="7.8" width="4.4" height="4.4" rx=".7"/>
+      <rect x="13.6" y="7.8" width="4.4" height="4.4" rx=".7" opacity=".35"/>
+      <rect x="2" y="13.6" width="4.4" height="4.4" rx=".7"/>
+      <rect x="7.8" y="13.6" width="4.4" height="4.4" rx=".7" opacity=".35"/>
+      <rect x="13.6" y="13.6" width="4.4" height="4.4" rx=".7"/>
     </svg>
   </div>
 
@@ -1948,6 +1997,13 @@ header.transport {
       </button>
     </div>
   </div>
+
+  <!-- Tools — opens the left sidebar (Edit/Compose/Play tools + patterns).
+       Not a dropdown: it directly toggles the sidebar, same as the old
+       hamburger icon did. #mbHamBtn kept as the id so the existing
+       initLeftSidebar() wiring (hamBtn.click handler, .sidebar-open class)
+       needs no change. -->
+  <button class="mb-menu-btn" id="mbHamBtn" title="Show tools & patterns">Tools</button>
 
   <!-- Settings menu -->
   <div class="mb-menu" id="mbSettingsMenu">
@@ -3116,20 +3172,26 @@ header.transport {
     }
 
     // ── Open / close ──
+    // No blocking backdrop here on purpose: like the Library/Effects panel,
+    // this docks beside the rack (shrinking it in via .tools-open's
+    // margin-left) rather than covering it, so you can keep adjusting the
+    // rack with the panel open. It only closes when you explicitly close
+    // it - the hamburger button, the X, or Escape - never by clicking
+    // elsewhere on the page.
+    const appEl = document.querySelector('.app');
     function openSidebar() {
       sidebar.classList.add('open');
-      overlay.classList.add('show');
+      if (appEl) appEl.classList.add('tools-open');
       hamBtn && hamBtn.classList.add('sidebar-open');
     }
     function closeSidebar() {
       sidebar.classList.remove('open');
-      overlay.classList.remove('show');
+      if (appEl) appEl.classList.remove('tools-open');
       hamBtn && hamBtn.classList.remove('sidebar-open');
     }
     hamBtn   && hamBtn.addEventListener('click', () => sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
     closeBtn && closeBtn.addEventListener('click', closeSidebar);
-    overlay  && overlay.addEventListener('click', closeSidebar);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && sidebar.classList.contains('open')) closeSidebar(); });
 
     // ── Tab switching ──
     // Tabs: edit / compose / play → drive real #toolSeg
@@ -3462,7 +3524,7 @@ header.transport {
     </div>
   </div>
 
-  <section class="kbd" id="kbd" hidden aria-label="On-screen piano"><div class="kbd-bar"><span class="lbl">Play with</span><select id="kbdInst" class="btn sm" aria-label="Instrument for the piano and keyboard"></select><select id="kbdPreset" class="btn sm" hidden aria-label="Custom synth preset"></select><span class="sep"></span><span class="kg"><span class="lbl">Chord</span><select id="kbdChord" class="btn sm" aria-label="Chord mode"><option value="off">Off</option><option value="maj">Major</option><option value="min">Minor</option><option value="dom7">Dominant 7th</option><option value="maj7">Major 7th</option><option value="min7">Minor 7th</option><option value="sus2">Sus 2</option><option value="sus4">Sus 4</option><option value="pow">Power (5th)</option><option value="dim">Diminished</option><option value="aug">Augmented</option><option value="add9">Add 9</option></select></span><span class="sep"></span><span class="kg"><span class="lbl">Arp</span><select id="kbdArp" class="btn sm" aria-label="Arpeggiator mode"><option value="off">Off</option><option value="up">Up</option><option value="down">Down</option><option value="ud">Up and down</option><option value="rnd">Random</option></select><select id="kbdRate" class="btn sm" aria-label="Arpeggiator rate"><option value="1">1/4</option><option value="0.5">1/8</option><option value="0.25" selected>1/16</option><option value="0.125">1/32</option></select><label class="chk" title="Keep the arpeggio going after you let go. Pressing a new key replaces it."><input type="checkbox" id="kbdLatch"> Latch</label></span><button class="btn sm" id="kbdCloseBtn" title="Close piano" style="margin-left:auto;font-size:16px;line-height:1;padding:0 8px;min-width:28px;color:var(--dim)">×</button></div><div class="kbd-keys" id="kbdKeys"></div></section>
+  <section class="kbd" id="kbd" hidden aria-label="On-screen piano"><div class="kbd-bar"><span class="lbl">Play with</span><select id="kbdInst" class="btn sm" aria-label="Instrument for the piano and keyboard"></select><select id="kbdPreset" class="btn sm" hidden aria-label="Custom synth preset"></select><span class="sep"></span><span class="kg"><span class="lbl">Key</span><select id="kbdKeyRoot" class="btn sm" aria-label="Key" title="Key"><option value="0">C</option><option value="1">C#</option><option value="2">D</option><option value="3">D#</option><option value="4">E</option><option value="5">F</option><option value="6">F#</option><option value="7">G</option><option value="8">G#</option><option value="9">A</option><option value="10">A#</option><option value="11">B</option></select><select id="kbdKeyScale" class="btn sm" aria-label="Scale" title="Scale"><option value="minp">Minor pentatonic</option><option value="majp">Major pentatonic</option><option value="min">Natural minor</option><option value="maj">Major</option><option value="dor">Dorian</option><option value="mix">Mixolydian</option><option value="phr">Phrygian</option><option value="har">Harmonic minor</option><option value="blues">Blues</option><option value="chr">Chromatic (no scale)</option></select></span><span class="sep"></span><span class="kg"><span class="lbl">Chord</span><select id="kbdChord" class="btn sm" aria-label="Chord mode"><option value="off">Off</option><option value="maj">Major</option><option value="min">Minor</option><option value="dom7">Dominant 7th</option><option value="maj7">Major 7th</option><option value="min7">Minor 7th</option><option value="sus2">Sus 2</option><option value="sus4">Sus 4</option><option value="pow">Power (5th)</option><option value="dim">Diminished</option><option value="aug">Augmented</option><option value="add9">Add 9</option></select></span><span class="sep"></span><span class="kg"><span class="lbl">Arp</span><select id="kbdArp" class="btn sm" aria-label="Arpeggiator mode"><option value="off">Off</option><option value="up">Up</option><option value="down">Down</option><option value="ud">Up and down</option><option value="rnd">Random</option></select><select id="kbdRate" class="btn sm" aria-label="Arpeggiator rate"><option value="1">1/4</option><option value="0.5">1/8</option><option value="0.25" selected>1/16</option><option value="0.125">1/32</option></select><label class="chk" title="Keep the arpeggio going after you let go. Pressing a new key replaces it."><input type="checkbox" id="kbdLatch"> Latch</label></span><button class="btn sm" id="kbdCloseBtn" title="Close piano" style="margin-left:auto;font-size:16px;line-height:1;padding:0 8px;min-width:28px;color:var(--dim)">×</button></div><div class="kbd-keys" id="kbdKeys"></div></section>
 
   <div class="patbar">
     <button class="btn sm toggle etbtn" id="etBtn" aria-pressed="false" aria-controls="editbarBox" title="Show or hide the editing tools: copy, random, rhythm, variation, automation and more">Edit tools ▾</button>
@@ -6162,11 +6224,13 @@ function snapNote(m){if(!S.lock||inScale(m))return m;for(let d=1;d<=6;d++){if(in
 $('#etBtn').onclick=e=>{const on=!$('.app').classList.contains('et-open');$('.app').classList.toggle('et-open',on);e.currentTarget.setAttribute('aria-pressed',on);};
 window.__bs={get alN(){return alNodes.length},alZoomTo,alView,get alZoom(){return alZoom},alRemoveAll,alEdSlice,alEdDelete,alEdCopy,alEdPaste,alEdMove,setAlSel(a,b,c){alSelR=a==null?null:{a,b};alCursor=c==null?null:c;alOverlay();},alSplit,alDup,alDel,alSnap,loadProject,warpMarkers,wkPoints,freezeChannel,unfreezeChannel,audioToNotes,audioToDrums,macroApply,macroRender,grooveFromLoop,grooveDef,openLaunchSet,followAction,captureMidi,get capBuf(){return capBuf},takeSave,takeSwap,takeDel,secGroups,secLabel,secMove,secDuplicate,normalizeLufs,measureLufs,loadKit,onMidi,recUndoTake,get recLog(){return recLog},get mset(){return mset},set msetV(v){mset=cleanSet(v);},mmApplyTpl,get midiMap(){return midiMap},get btnMap(){return btnMap},flToggle,coffeeNudge,get held(){return held},get snapshot(){return snapshot},get cleanMi(){return cleanMi},setMidiOut:o=>{midiOut=o;},setClk:m=>{clkMode=m;},addChannel,render,renderMixer,get shareCard(){return shareCard},get audTakes(){return audTakes},get audStartFn(){return audStart},get audStopNow(){return audStopNow},get planList(){return planList},get renderPlan(){return renderPlan},get clipDur(){return clipDur},get planFromUI(){return planFromUI},get encodeWav(){return encodeWav},parseProg,degTones,chordEvents,bassNotes,writeBass,writeProgression,get SOUNDS(){return SOUNDS},yinPitch,pitchTrack,framesToNotes,notesToSteps,detectKey,chordTones,chordLabel,importMidi,parseMidi,readZip,clipAuto,detectBpm,findHits,stretchBuf,measureLufs,normalizeLufs,renderOne,get PACKS(){return PACKS},get S(){return S},inScale,snapNote,midi:(a,ts)=>onMidi({data:a,timeStamp:ts}),padHit,renderPlan,foldLoop,planList,encodeMp3,PRESETS:()=>PRESETS,setView,get playing(){return playing},activeCh,applyFxPreset,toast,get FACTORY_FX(){return FACTORY_FX}};
 function scaleChanged(){if(!$('#kbd').hidden)buildKbd();if(rollCh)drawRoll();if(typeof drawChordStrip==='function'&&document.querySelector('#chStrip'))drawChordStrip();}
-$('#keyRoot').onchange=e=>{S.key=+e.target.value;scaleChanged();markDirty();};
-$('#keyScale').onchange=e=>{S.scale=e.target.value;scaleChanged();markDirty();};
+$('#keyRoot').onchange=e=>{S.key=+e.target.value;scaleChanged();markDirty();syncKey();};
+$('#keyScale').onchange=e=>{S.scale=e.target.value;scaleChanged();markDirty();syncKey();};
+$('#kbdKeyRoot').onchange=e=>{S.key=+e.target.value;scaleChanged();markDirty();syncKey();};
+$('#kbdKeyScale').onchange=e=>{S.scale=e.target.value;scaleChanged();markDirty();syncKey();};
 $('#kScaleBtn').onclick=e=>{kScale=!kScale;e.currentTarget.setAttribute('aria-pressed',kScale);try{localStorage.setItem('beatsynth.kscale',kScale?'1':'0');}catch(err){}scaleChanged();toast(kScale?'Keys A to ; now follow your key and scale.':'Keys A to ; are a normal piano layout.');};
 $('#lockBtn').onclick=e=>{S.lock=!S.lock;e.currentTarget.setAttribute('aria-pressed',S.lock);scaleChanged();markDirty();};
-function syncKey(){if(typeof drawChordStrip==='function')try{drawChordStrip();}catch(e){}$('#keyRoot').value=String(S.key);$('#keyScale').value=S.scale;$('#lockBtn').setAttribute('aria-pressed',S.lock);}
+function syncKey(){if(typeof drawChordStrip==='function')try{drawChordStrip();}catch(e){}$('#keyRoot').value=String(S.key);$('#keyScale').value=S.scale;$('#lockBtn').setAttribute('aria-pressed',S.lock);const kr=$('#kbdKeyRoot'),ks=$('#kbdKeyScale');if(kr)kr.value=String(S.key);if(ks)ks.value=S.scale;}
 function doRandom(){
   const ch=activeCh();if(!ch)return;const [a,b]=selRange(ch),dens=+$('#rndDens').value/100;
   const bias=i=>i%spb()===0?1.35:(i%2===1?.6:.95);
@@ -7103,7 +7167,7 @@ $('#kbdLatch').onchange=e=>{arpLatch=e.target.checked;if(!arpLatch){[...arpNotes
 function closePiano(){$('#kbd').hidden=true;const pb=$('#pianoBtn');if(pb){pb.setAttribute('aria-pressed','false');pb.textContent='Piano ▾';}}
 $('#pianoBtn').onclick=e=>{
   const h=$('#kbd').hidden=!$('#kbd').hidden;e.currentTarget.setAttribute('aria-pressed',!h);e.currentTarget.textContent=h?'Piano ▾':'Piano ▴';
-  if(!h)buildKbd();
+  if(!h){buildKbd();syncKey();}
 };
 $('#kbdCloseBtn').onclick=()=>closePiano();
 (()=>{
@@ -8525,10 +8589,10 @@ const GUIDE=(()=>{
   const T=[
    {id:'start',t:'Start here',sub:'Your first minute',intro:'thebeatsynth is a step sequencer. You build a beat from channels, each one a sound, and turn steps on to decide when it plays.',
     steps:['Press the orange Play button, or Space, to hear the starter beat.','Click squares in the Channel Rack to turn steps on or off. It changes while it plays.','Press + Add channel (bottom) to add another sound.','Your beat saves itself in this browser. Use File, then Save, to keep a copy as a file.','New here? You are in Simple view, which shows only the essentials. Press All tools (top left) any time to see the timeline, Perform, composing tools and more.'],
-    acts:[{l:'Play the starter beat',run:()=>{closeGuide();$('#play').click();}},show('#play','Play and stop. Space does the same.'),show('.seg.lay','Simple shows the essentials. All tools shows everything.',null,'Show Simple / All tools'),{l:'Play the welcome message again',run:()=>{closeGuide();$('#tourBtn').click();}}]},
+    acts:[{l:'Play the starter beat',run:()=>{closeGuide();$('#mbPlayBtn').click();}},show('#mbPlayBtn','Play and stop. Space does the same.'),{l:'Play the welcome message again',run:()=>{closeGuide();$('#tourBtn').click();}}]},
    {id:'layout',t:'Finding your way around',sub:'Where everything lives',intro:'Everything is on one screen, grouped by job.',
-    steps:['The top bar has Play and Stop, tempo and Tap, time signature and bars, and the File, Export, Browser, Tools and Rack menus.','Under it: Swing, Master and Level, Steps and Random, then Rhythm, Variation, Transitions, Mutate and Automation.','The Channel Rack is the grid. Each row has its volume, pan and pitch, an FX button and a piano roll for instrument channels.','The File menu holds New, Open, Save, ZIP, Version history and the Library. The Export menu holds loudness, format, Render, Stems, Video and MIDI.','Ctrl+K opens the command palette: type what you want to do and press Enter. Settings has Keyboard shortcuts, so you can change any key.','Settings also has Compact view, which makes everything about 90% size. Panels such as the mixer, effects and piano roll can float in their own windows with the ⧉ button.'],
-    acts:[show('#fileDd .dd-btn','New, Open, Save, ZIP, Version history and the Library.',null,'Show the File menu'),show('#expDd .dd-btn','Render, Stems, Video and MIDI.',null,'Show the Export menu')]},
+    steps:['The top menu bar has File, Edit, View, Import, Settings and Help, the view pills (Rack, Mixer, Pads, Session, Timeline), tempo and time signature, Play and Stop, and the Library and Export buttons.','Press Tools, between Edit and Settings, for Swing, Master and Level, Steps and Random, then Rhythm, Variation, Transitions, Mutate and Automation.','The Channel Rack is the grid. Each row has its volume, pan and pitch, an FX button and a piano roll for instrument channels.','The File menu holds New, Open, Save, ZIP, Version history and the Library. The Export menu holds loudness, format, Render, Stems, Video and MIDI.','Ctrl+K opens the command palette: type what you want to do and press Enter. Settings has Keyboard shortcuts, so you can change any key.','Settings also has Compact view, which makes everything about 90% size. Panels such as the mixer, effects and piano roll can float in their own windows with the ⧉ button.'],
+    acts:[show('#mbFileMenu .mb-menu-btn','New, Open, Save, ZIP, Version history and the Library.',null,'Show the File menu'),show('.mb-export-btn','Render, Stems, Video and MIDI are here and in the File menu.',null,'Show Export')]},
    {id:'make',t:'Make me a beat',sub:'Pick a mood, get a starter',intro:'Not sure where to begin? Choose a mood and the app writes a whole starter for you: drums, chords, a bass line and a melody, in a key that fits.',
     steps:['Press Make me a beat (in Start from, at the bottom).','Pick a mood: Chill, Dark, Hype, Dreamy, Sad, Happy, Groovy, Night drive, Romantic, Summer, Epic, Aggressive, Club, Retro, Mystery or Focus. Each one chooses its own drum style, key, tempo, chords, bass and melody sound.','Choose a loop length of 1, 2 or 4 bars. Turn the melody off if you only want the backing. Tick Build a full song too to get an intro, verse, build, drop and outro.','Press Make it, or Surprise me to let the app choose the mood. Then press Play.','Not quite right? Press Make me a beat again. Every try is different. Your previous beat is saved in the Library first, so nothing is lost.','Want a different take? Press Remix this on the main page. Vary keeps your key and changes the drums and notes a little (or a lot). Swap drums keeps the key and changes the drum style. Your original pattern is never touched.','The Surprise me button on the main page picks a mood and plays it at once.','Everything it writes is normal channels and notes. Open any piano roll to change the melody, or swap a sound with the channel menu.'],
     acts:[{l:'Open Make me a beat',run:()=>{closeGuide();$('#mmbBtn').click();}},show('#mmbBtn','Make me a beat: pick a mood and get a full starter.',tools,'Show me where')]},
@@ -10391,20 +10455,19 @@ window.__acts={ACTS,kbOf,openPalette};
   // welcome
   const W=$('#welcome'),wlSeen=()=>{try{return !!localStorage.getItem('beatsynth.tour');}catch(e){return false;}};
   let wStep=0,wMood='chill',wPrev=null;
-  const LOGO='<svg class="wl-logo" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" fill="#1d232a"/><g fill="#ff9a3c"><rect x="96" y="96" width="76" height="76" rx="12"/><rect x="218" y="96" width="76" height="76" rx="12" opacity=".35"/><rect x="340" y="96" width="76" height="76" rx="12"/><rect x="96" y="218" width="76" height="76" rx="12" opacity=".35"/><rect x="218" y="218" width="76" height="76" rx="12"/><rect x="340" y="218" width="76" height="76" rx="12" opacity=".35"/><rect x="96" y="340" width="76" height="76" rx="12"/><rect x="218" y="340" width="76" height="76" rx="12" opacity=".35"/><rect x="340" y="340" width="76" height="76" rx="12"/></g></svg>';
+  const LOGO='<svg class="wl-logo" viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" fill="#1d232a"/><g fill="#6c63ff"><rect x="96" y="96" width="76" height="76" rx="12"/><rect x="218" y="96" width="76" height="76" rx="12" opacity=".35"/><rect x="340" y="96" width="76" height="76" rx="12"/><rect x="96" y="218" width="76" height="76" rx="12" opacity=".35"/><rect x="218" y="218" width="76" height="76" rx="12"/><rect x="340" y="218" width="76" height="76" rx="12" opacity=".35"/><rect x="96" y="340" width="76" height="76" rx="12"/><rect x="218" y="340" width="76" height="76" rx="12" opacity=".35"/><rect x="340" y="340" width="76" height="76" rx="12"/></g></svg>';
   const FEATS=[['Draw beats','Click squares in the Channel Rack to place drums and sounds. It changes while it plays.',COLORS[0]],
     ['Play notes','A piano roll, chord, bass and melody writers, and keyboard keys that stay in your key.',COLORS[2]],
     ['Shape the sound','Mixer, effects, and a one-click Polish that makes the whole mix sound finished.',COLORS[4]],
     ['Build and share','Patterns, songs and a live Perform mode. Export WAV, MP3 or MIDI, or share a link.',COLORS[3]]];
   const phone=()=>matchMedia('(max-width:700px)').matches;
-  const openTools=()=>{};
-  const ROWS=[['Play and tempo','Play starts and stops the music (Space does the same). Next to it you set the tempo, or press Tap in time with a song.','#play','Play and stop. Space does the same.'],
+  const ROWS=[['Play and tempo','Play starts and stops the music (Space does the same). Tempo and time signature are right next to it in the top menu bar.','#mbPlayBtn','Play and stop. Space does the same.'],
     ['The Channel Rack','Each row is one sound. Click the squares to place hits, and drag a lit square up or down to change how hard it hits.','.rack-scroll','This is the Channel Rack. Click squares to draw a beat.'],
-    ['Views','Switch between the Rack, a Mixer and drum Pads. The song Timeline and Perform for live sets appear in All tools.','#viewBtn','View: Rack, Mixer and Pads. Press + beside a second view to show two at once.'],
-    ['Simple or All tools','You start with just the essentials. Press All tools when you want more: the Timeline, Perform, chord and melody writers, recording, time signatures and more. Your choice is remembered.','.seg.lay','Simple shows the essentials. All tools shows everything.'],
-    ['Get sounds and starters','Make me a beat, Library, Import audio and Real instruments are along the bottom of the page.','#mmbBtn','Make me a beat writes a whole starter for you. The Library and imports are beside it.',openTools],
-    ['Save and export','Export renders your beat to WAV or MP3. The File menu has New, Open, Save and the Library, where your beats are remembered.','#expDd .dd-btn','Export renders your beat to WAV or MP3. File saves and opens projects.'],
-    ['The Guide','Your help window. Every topic has Show me buttons that point at the real controls. You can replay this welcome from there any time.','#guideBtn','The Guide explains every feature, step by step.']];
+    ['Views','Switch between Rack, Mixer, Pads, Session and Timeline here. Open View ▾ in the menu bar for Perform, and to show two views side by side.','#mbViewPills','Views: Rack, Mixer, Pads, Session and Timeline.'],
+    ['Tools and patterns','Press Tools to open editing, composing and playing tools beside the rack. It stays open while you work, and the pattern list, bars and undo/redo live in the bar just below.','#mbHamBtn','Tools: edit, compose and play controls, plus your patterns.'],
+    ['Get sounds and starters','Make me a beat, Library, Import audio and Real instruments are along the bottom of the page.','#mmbBtn','Make me a beat writes a whole starter for you. The Library and imports are beside it.'],
+    ['Save and export','Export renders your beat to WAV or MP3. The File menu has New, Open, Save and the Library, where your beats are remembered.','.mb-export-btn','Export renders your beat to WAV or MP3.'],
+    ['The Guide','Your help window, under Help in the menu bar. Every topic has Show me buttons that point at the real controls. You can replay this welcome from there any time.','#mbHelpMenu .mb-menu-btn','The Guide is under Help. It explains every feature, step by step.']];
   function wlEnd(){W.hidden=true;try{localStorage.setItem('beatsynth.tour','1');}catch(e){}if(wPrev&&wPrev.focus){try{wPrev.focus();}catch(e){}}wPrev=null;}
   function wlOpen(from){wPrev=document.activeElement;wStep=from||0;wlDraw();W.hidden=false;}
   function wlDraw(){
