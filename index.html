@@ -3888,6 +3888,18 @@ header.transport {
     <div class="lib-body"><canvas id="auCv" height="190" style="width:100%;touch-action:none;display:block;border-radius:6px"></canvas><p class="hint" style="margin:8px 0 0">Drag across the lane to draw values, one per step. Shift-drag or right-drag erases. Steps with no value keep the channel's own setting. Playback needs the pattern to run.</p></div>
   </div>
 </div>
+<div class="modal" id="confirmMod" hidden role="dialog" aria-modal="true" aria-labelledby="confirmT">
+  <div class="modal-box" style="width:min(380px,100%)">
+    <div class="roll-bar"><strong id="confirmT">Are you sure?</strong></div>
+    <div style="padding:16px 18px">
+      <p id="confirmMsg" style="margin:0 0 18px;color:var(--fg);line-height:1.4"></p>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn sm" id="confirmCancel">Cancel</button>
+        <button class="btn sm" id="confirmOk" style="background:var(--danger);border-color:var(--danger);color:#fff">Yes</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="modal" id="help" hidden role="dialog" aria-modal="true" aria-labelledby="helpT">
   <div class="modal-box">
     <div class="roll-bar"><strong id="helpT">Keyboard shortcuts</strong><button class="btn sm" id="helpClose">Close</button></div>
@@ -7232,12 +7244,26 @@ $('#saveBtn').onclick=()=>{if(saveBlob(new Blob([JSON.stringify(snapshot(true))]
 $('#openBtn').onclick=()=>$('#projFile').click();
 $('#projFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
   try{await loadProject(JSON.parse(await f.text()));toast('Opened '+f.name);markDirty();}catch(err){toast(err.message||'Could not open that file.');}};
-let newArm=0;
-$('#newBtn').onclick=e=>{
-  const b=e.currentTarget;
-  if(!newArm){b.textContent='Sure?';newArm=setTimeout(()=>{newArm=0;b.textContent='New';},3000);return;}
-  clearTimeout(newArm);newArm=0;b.textContent='New';stop();rollCh=fxCh=edCh=synCh=null;
-  S.channels.forEach(dropChain);S.channels=[];resetPatterns();render();markDirty();
+// Generic centered confirm dialog, used anywhere a destructive action
+// (like New Project) needs a real "are you sure?" instead of a silent
+// double-click-to-arm pattern on a button the person may not even see
+// (e.g. when triggered via the File menu, which proxy-clicks this button).
+let confirmYes=null;
+function showConfirm(msg,onYes){
+  confirmYes=onYes;$('#confirmMsg').textContent=msg;$('#confirmMod').hidden=false;
+  setTimeout(()=>$('#confirmOk').focus(),0);
+}
+function hideConfirm(){$('#confirmMod').hidden=true;confirmYes=null;}
+$('#confirmOk').onclick=()=>{const fn=confirmYes;hideConfirm();if(fn)fn();};
+$('#confirmCancel').onclick=()=>hideConfirm();
+$('#confirmMod').addEventListener('pointerdown',e=>{if(e.target===$('#confirmMod'))hideConfirm();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#confirmMod').hidden)hideConfirm();});
+
+$('#newBtn').onclick=()=>{
+  showConfirm('Start a new project? This clears the current one — unsaved changes will be lost.',()=>{
+    stop();rollCh=fxCh=edCh=synCh=null;
+    S.channels.forEach(dropChain);S.channels=[];resetPatterns();render();markDirty();
+  });
 };
 
 /* ---------- pads ---------- */
