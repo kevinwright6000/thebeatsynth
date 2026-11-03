@@ -3335,17 +3335,28 @@ header.transport {
     if (mbMode  && realMode)   mbMode.addEventListener('click',  () => realMode.click());
 
     // Poll sync
+    let mbPlayWasPlaying = null; // force the first tick to set the icon once
     setInterval(() => {
       // Play state
       if (mbPlay && realPlay) {
         const playing = realPlay.getAttribute('aria-pressed') === 'true' || realPlay.classList.contains('active');
-        mbPlay.classList.toggle('playing', playing);
-        mbPlay.setAttribute('aria-pressed', playing);
-        // Swap icon play↔pause
-        if (playing) {
-          mbPlay.innerHTML = '<svg viewBox="0 0 20 20"><rect x="4" y="3" width="4" height="14" rx="1" fill="currentColor"/><rect x="12" y="3" width="4" height="14" rx="1" fill="currentColor"/></svg>';
-        } else {
-          mbPlay.innerHTML = '<svg viewBox="0 0 20 20"><path d="M5 3l12 7-12 7z" fill="currentColor"/></svg>';
+        // Only touch the DOM when the state actually changes. Replacing the
+        // button's innerHTML on every single tick (even while idle) could
+        // destroy the SVG mid-click - if a mousedown landed on the icon right
+        // as a tick fired, the browser could lose track of the pressed
+        // element and the click would silently never complete. That's what
+        // caused "play button doesn't click every time" while Space (which
+        // doesn't depend on hit-testing a DOM node) always worked.
+        if (playing !== mbPlayWasPlaying) {
+          mbPlayWasPlaying = playing;
+          mbPlay.classList.toggle('playing', playing);
+          mbPlay.setAttribute('aria-pressed', playing);
+          // Swap icon play↔pause
+          if (playing) {
+            mbPlay.innerHTML = '<svg viewBox="0 0 20 20"><rect x="4" y="3" width="4" height="14" rx="1" fill="currentColor"/><rect x="12" y="3" width="4" height="14" rx="1" fill="currentColor"/></svg>';
+          } else {
+            mbPlay.innerHTML = '<svg viewBox="0 0 20 20"><path d="M5 3l12 7-12 7z" fill="currentColor"/></svg>';
+          }
         }
       }
       // Pattern name
