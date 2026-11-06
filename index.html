@@ -5035,6 +5035,23 @@ const byId=id=>S.channels.find(c=>c.id==id);
 
 /* ---------- rendering ---------- */
 const rack=$('#rack');
+(()=>{
+  const scroller=$('#scroll')||rack.parentElement;let pan=null;
+  scroller.addEventListener('pointerdown',e=>{
+    if(e.button>0)return;
+    if(e.target.closest('.step,.grip,input,select,button'))return;
+    pan={x0:e.clientX,y0:e.clientY,scrollStart:scroller.scrollLeft,scrollTopStart:scroller.scrollTop};
+    try{scroller.setPointerCapture(e.pointerId);}catch(x){}
+  });
+  scroller.addEventListener('pointermove',e=>{
+    if(!pan)return;
+    scroller.scrollLeft=pan.scrollStart-(e.clientX-pan.x0)*PAN_SPEED;
+    scroller.scrollTop=pan.scrollTopStart-(e.clientY-pan.y0)*PAN_SPEED;
+  });
+  const up=()=>{pan=null;};
+  scroller.addEventListener('pointerup',up);
+  scroller.addEventListener('pointercancel',up);
+})();
 let rollCh=null,fxCh=null,edCh=null,synCh=null;const rollN=ch=>ch.len||total();const hasFx=ch=>ch.fx.type!=='off'||ch.fx.crush>0||ch.fx.tape>0||ch.fx.chor>0||ch.fx.phas>0||ch.fx.wide>0||(ch.fx.lfoT&&ch.fx.lfoT!=='off')||ch.fx.sw>0||ch.fx.hum>0||ch.fx.cO==='man'||(ch.fx.chord&&ch.fx.chord!=='off')||(ch.fx.arp&&ch.fx.arp!=='off')||ch.fx.drive>0||ch.fx.del>0||ch.fx.rev>0||!!ch.fx.eqL||!!ch.fx.eqM||!!ch.fx.eqH||ch.fx.comp>0||ch.fx.duck>0;
 let CW=30;const RH=16,KW=56,LO=24,HI=96,BLACK=[1,3,6,8,10];
 function stepCls(i){return (Math.floor(i/spb())%2?' alt':'')+(i%perBar()===0?(i===0?' first':' barstart'):(i%spb()===0?' beatstart':''));}
