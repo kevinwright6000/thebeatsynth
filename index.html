@@ -751,7 +751,17 @@ body.lite *{transition:none!important;animation:none!important}
   padding:0 8px 0 4px;
   gap:0;
   box-shadow:0 2px 12px rgba(0,0,0,.5);
+  /* On a phone-width screen the full bar (menus, transport, tempo, time sig,
+     view pills, export) is wider than the viewport. It used to just spill off
+     the right edge with no way back to it; make the bar itself the horizontal
+     scroller instead, so every control stays reachable with a swipe. */
+  overflow-x:auto;
+  overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
 }
+#daw-menubar::-webkit-scrollbar{display:none}
+#daw-menubar>*{flex-shrink:0}
 :root[data-theme="light"] #daw-menubar {
   border-bottom-color:rgba(0,0,0,.12);
   box-shadow:0 2px 8px rgba(0,0,0,.15);
