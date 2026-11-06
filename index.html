@@ -7264,7 +7264,7 @@ $('#viewRack').onclick=()=>setView('rack');$('#viewSession').onclick=()=>setView
   const faderVal=(f,e)=>{const r=f.getBoundingClientRect();return Math.max(0,Math.min(1,1-((e.clientY-r.top-7)/(r.height-14))));};
   function applyFader(f,v){
     if(f.dataset.act==='mmaster'){S.master=v;if(master)master.gain.setTargetAtTime(v,ctx.currentTime,.01);$('#master').value=v;}
-    else if(f.dataset.act==='svol'){S.alv=v;markDirty();}
+    else if(f.dataset.act==='svol'){alSetVol(v);markDirty();}
     else{const ch=chOf(f);if(!ch)return;ch.vol=v;applyMix();autoRec(ch,'vol',v);}
     setFader(f,v);
   }
@@ -7707,10 +7707,26 @@ function alInfo(){
   const c=S.alane[alSel],src=c&&alSrc(c.s);
   el.textContent=(c&&src?'"'+src.name+'" · starts at beat '+(c.a+1).toFixed(2)+', '+c.l.toFixed(1)+' beats long. ':'')+S.alane.length+' clip'+(S.alane.length===1?'':'s')+'. Drag to move, drag the edges to trim, right-click for more. Audio plays in Play as song.';
 }
+let alBus=null;
+function alBusFor(dest){
+  // Live playback routes every clip through one persistent bus node, so the volume
+  // fader (Mixer or Timeline) can move it instantly without re-scheduling anything.
+  // Offline renders (dest is some other, one-shot destination) skip the bus and bake
+  // the volume into each clip's gain directly, since nothing needs to move live there.
+  if(dest!==master)return null;
+  if(!alBus||alBus.context!==ctx){alBus=ctx.createGain();alBus.gain.value=S.alv==null?1:S.alv;alBus.connect(master);}
+  else alBus.gain.value=S.alv==null?1:S.alv;
+  return alBus;
+}
+function alSetVol(v){
+  S.alv=v;
+  try{if(alBus&&ctx&&alBus.context===ctx)alBus.gain.setTargetAtTime(v,ctx.currentTime,.01);}catch(e){}
+}
 function alSchedule(c,t0,dest,nodes,ob,lenB){
   ob=ob||0;lenB=lenB==null?Infinity:lenB;
   if(alSilent())return;
-  const bpm=abpm(),spb=60/bpm,vol=S.alv==null?1:S.alv;
+  const bus=alBusFor(dest),out=bus||dest;
+  const bpm=abpm(),spb=60/bpm,vol=bus?1:(S.alv==null?1:S.alv);
   S.alane.forEach(cl=>{
     if(cl.m)return;const src=alSrc(cl.s);if(!src||!src.buf)return;
     const s0=Math.max(cl.a,ob),e0=Math.min(cl.a+cl.l,ob+lenB);if(e0<=s0+.001)return;
@@ -7724,7 +7740,7 @@ function alSchedule(c,t0,dest,nodes,ob,lenB){
     const fi=Math.max(.004,s0===cl.a?(cl.fi||0)*spb:0),fo=Math.max(.004,e0===cl.a+cl.l?(cl.fo||0)*spb:0);
     g.gain.setValueAtTime(0,at);g.gain.linearRampToValueAtTime(lv,at+Math.min(fi,playDur/2));
     g.gain.setValueAtTime(lv,Math.max(at+fi,at+playDur-fo));g.gain.linearRampToValueAtTime(0,at+playDur);
-    node.connect(g);g.connect(dest);
+    node.connect(g);g.connect(out);
     try{node.start(at,off,Math.min(dur,buf.duration-off));}catch(e){}
     nodes.push({src:node,g});
   });
@@ -7854,7 +7870,7 @@ function alRowDraw(){
     markDirty();scheduleCommit();render();
   };
   document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#tlEditorSlot button[data-al]');if(b)act(b);});
-  document.addEventListener('input',e=>{const i=e.target.closest&&e.target.closest('#tlEditorSlot input[data-al="vol"]');if(i){S.alv=+i.value;markDirty();}});
+  document.addEventListener('input',e=>{const i=e.target.closest&&e.target.closest('#tlEditorSlot input[data-al="vol"]');if(i){alSetVol(+i.value);markDirty();}});
 })();
 
 /* ---------- live editing in the rack row ---------- */
