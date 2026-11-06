@@ -578,6 +578,12 @@ body.lite *{transition:none!important;animation:none!important}
 .vrow .vplus[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .app.split .rack-scroll{flex:1 1 0;min-height:240px}
 .app.split .mixer{flex:1 1 0;min-height:300px}
+.app.split .sessv,.app.split .padsv,.app.split .perfv,.app.split .tlv{flex:1 1 0;min-height:200px;overflow-y:auto}
+.vsplit{flex:none;height:14px;margin:-3px 0;display:flex;align-items:center;justify-content:center;cursor:row-resize;touch-action:none;position:relative;z-index:3}
+.vsplit[hidden]{display:none}
+.vsplit i{width:72px;height:4px;border-radius:2px;background:var(--line);transition:background .12s}
+.vsplit:hover i,.vsplit:focus-visible i,.vsplit.drag i{background:var(--accent)}
+.vsplit:focus-visible{outline:none}
 .patbar{width:fit-content;max-width:100%}
 @media (max-width:700px){.patbar>.gt{display:none}}
 .pats{display:flex;gap:4px;flex-wrap:wrap}
@@ -3657,6 +3663,8 @@ select option{background:var(--panel2);color:var(--fg)}
       <span class="hint" id="mlHint">Click to add a point and drag it to shape the lane. Right-click a point to remove it. The lane stretches across your whole song and is heard when you play as Song or export the Song.</span></div>
     <div class="ml-wrap"><canvas id="mlCv" aria-label="Master automation lane" role="img"></canvas><output id="mlRead" class="hint" aria-live="polite"></output></div>
   </section>
+
+  <div class="vsplit" id="vSplit" hidden role="separator" aria-orientation="horizontal" aria-label="Resize the two views" tabindex="0"><i></i></div>
 
   <section class="roll" id="roll" hidden aria-label="Piano roll">
     <div class="roll-bar"><strong id="rollTitle">Piano roll</strong>
@@ -7240,9 +7248,69 @@ function setView(v,v2){
   const vs=v2&&v2!==v?[v,v2]:[v];S.views=vs;S.view=vs[0];
   VIEWS.forEach(([k,b,p])=>{$(b).setAttribute('aria-pressed',vs.includes(k));$(p).hidden=!vs.includes(k);});
   $('.app').classList.toggle('split',vs.length>1);$('.app').dataset.view=vs[0];
+  layoutSplit();
   if(vOn('mixer'))renderMixer();if(vOn('pads')){autoPads();renderPads();}if(vOn('timeline'))renderTimeline();if(vOn('perf'))renderPerf();if(vOn('session'))renderSession();
   syncSels();
 }
+/* ---------- drag-to-resize the split between two active views ---------- */
+let vSplitPair=null; // [topEl,bottomEl] the resize handle is currently wired to
+function layoutSplit(){
+  const vsp=$('#vSplit');if(!vsp)return;
+  const vs=S.views||['rack'];
+  if(vs.length<2){
+    vsp.hidden=true;vSplitPair=null;
+    VIEWS.forEach(([,,p])=>{const el=$(p);el.style.flex='';});
+    return;
+  }
+  const els=VIEWS.filter(x=>vs.includes(x[0])).map(x=>$(x[2]));
+  let[a,b]=els;
+  if(a.compareDocumentPosition(b)&Node.DOCUMENT_POSITION_PRECEDING){const t=a;a=b;b=t;}
+  if(!vSplitPair||vSplitPair[0]!==a||vSplitPair[1]!==b){
+    a.style.flex='1 1 0';b.style.flex='1 1 0';
+    vSplitPair=[a,b];
+  }
+  b.parentNode.insertBefore(vsp,b);
+  vsp.hidden=false;
+}
+(()=>{
+  const vsp=$('#vSplit');let drag=null;
+  const clampTopH=(a,b,h)=>{
+    const appH=$('.app').getBoundingClientRect().height;
+    const minA=parseFloat(getComputedStyle(a).minHeight)||80;
+    const minB=parseFloat(getComputedStyle(b).minHeight)||80;
+    return Math.max(minA,Math.min(h,appH-minB-vsp.getBoundingClientRect().height-24));
+  };
+  vsp.addEventListener('pointerdown',e=>{
+    if(!vSplitPair)return;
+    const[a,b]=vSplitPair;
+    drag={a,b,startY:e.clientY,startH:a.getBoundingClientRect().height};
+    vsp.classList.add('drag');
+    try{vsp.setPointerCapture(e.pointerId);}catch(err){}
+    document.body.style.cursor='row-resize';document.body.style.userSelect='none';
+    e.preventDefault();
+  });
+  window.addEventListener('pointermove',e=>{
+    if(!drag)return;
+    const h=clampTopH(drag.a,drag.b,drag.startH+(e.clientY-drag.startY));
+    drag.a.style.flex='0 0 '+Math.round(h)+'px';
+  });
+  const endDrag=e=>{
+    if(!drag)return;
+    try{vsp.releasePointerCapture(e.pointerId);}catch(err){}
+    vsp.classList.remove('drag');
+    document.body.style.cursor='';document.body.style.userSelect='';
+    drag=null;
+  };
+  window.addEventListener('pointerup',endDrag);
+  window.addEventListener('pointercancel',endDrag);
+  vsp.addEventListener('keydown',e=>{
+    if(!vSplitPair||(e.key!=='ArrowUp'&&e.key!=='ArrowDown'))return;
+    const[a,b]=vSplitPair,step=e.shiftKey?40:10;
+    const h=clampTopH(a,b,a.getBoundingClientRect().height+(e.key==='ArrowDown'?step:-step));
+    a.style.flex='0 0 '+Math.round(h)+'px';
+    e.preventDefault();
+  });
+})();
 (()=>{
   const dd=$('#viewDd');
   const idOf=k=>VIEWS.find(x=>x[0]===k);
