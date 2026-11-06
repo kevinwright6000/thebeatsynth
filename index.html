@@ -3549,15 +3549,21 @@ input[type=range]::-moz-range-thumb{
       <button class="btn sm" id="chUndo" title="Remove the last chord from your progression">Back</button>
       <button class="btn sm" id="chClr" title="Clear your progression and go back to the preset list">Clear</button>
     </div>
-    <div class="egrp" data-tab="play" role="group" aria-label="Recording and metronome"><span class="gt">Record</span>
+    <div class="egrp" data-tab="play" role="group" aria-label="Record"><span class="gt">Record</span>
       <button class="btn sm" id="capBtn" disabled title="Play first, record later: puts the last notes you played into the active channel, starting at step 1, even if Record was off">Capture MIDI</button>
       <button class="btn sm toggle" id="recBtn" aria-pressed="false" title="Record played notes into the active channel while the pattern plays">● Record</button>
       <button class="btn sm" id="refBtn" title="Load a finished track to compare your beat against">Reference…</button><button class="btn sm toggle" id="refAB" aria-pressed="false" title="Switch between your beat and the reference at matched loudness" disabled>A/B</button><input type="file" id="refFile" accept="audio/*" hidden>
+    </div>
+    <div class="egrp" data-tab="play" role="group" aria-label="Loop recording"><span class="gt">Loop recording</span>
       <button class="btn sm toggle" id="micBtn" aria-pressed="false" title="Record the microphone, or the whole mix, for a set number of bars starting exactly at the next bar 1. It becomes a sample channel that loops with the pattern.">● Loop rec</button>
       <select id="loopSrc" class="btn sm" aria-label="Looper source"><option value="mic">Mic</option><option value="mix">Resample the mix</option></select><select id="micChain" class="btn sm" aria-label="Vocal chain for mic recordings" title="Applies cleanup, compression and a little reverb to new mic loops. Pick None to keep the raw recording."><option value="clean" selected>Vocal: clean</option><option value="rap">Vocal: rap</option><option value="sing">Vocal: sing</option><option value="space">Vocal: big space</option><option value="">Vocal: none</option></select><select id="loopMode" class="btn sm" aria-label="Looper mode"><option value="new">New take</option><option value="over">Overdub (layer)</option></select><button class="btn sm" id="loopUndo" disabled>Undo take</button><input id="loopLat" type="number" class="btn sm" min="0" max="500" step="1" placeholder="auto ms" aria-label="Mic latency in milliseconds" title="Latency compensation for the mic. Leave blank for automatic; raise it if your overdubs land late." style="width:84px">
       <select id="micBars" class="btn sm" aria-label="Mic loop length"><option value="1">1 bar</option><option value="2">2 bars</option><option value="4">4 bars</option><option value="8">8 bars</option></select>
+    </div>
+    <div class="egrp" data-tab="play" role="group" aria-label="Click track"><span class="gt">Click track</span>
       <button class="btn sm toggle" id="metroBtn" aria-pressed="false" title="Click track (M)">Metronome</button>
       <select id="countIn" class="btn sm" aria-label="Count-in before recording"><option value="0">No count-in</option><option value="1">1 bar count-in</option><option value="2">2 bars count-in</option></select>
+    </div>
+    <div class="egrp" data-tab="play" role="group" aria-label="Beat Repeat"><span class="gt">Beat Repeat</span>
       <button class="btn sm toggle" id="repeatBtn" aria-pressed="false" title="Hold this (or hold the ` key) to stutter-repeat a short slice of the beat, FL Studio style. Release to carry on right after it.">⟲ Beat Repeat</button>
       <select id="repeatDiv" class="btn sm" aria-label="Beat Repeat slice length" title="How much of a beat repeats while held"><option value=".25">1/4</option><option value=".125">1/8</option><option value=".0625" selected>1/16</option><option value=".03125">1/32</option></select>
     </div>
