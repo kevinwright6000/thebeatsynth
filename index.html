@@ -4803,12 +4803,14 @@ function sched(){
 }
 function start(initStep){
   ensureCtx();if(playing)return;
+  const pa=pausedAt;pausedAt=null;
+  const resume=initStep===undefined&&pa&&pa.mode===S.mode&&(S.mode==='song'?pa.pos.ci<S.song.length:pa.pos.pat===S.curPat);
   if(S.mode==='song'){
     if(!S.song.length){toast('The song is empty. Open Arrange and add a pattern first.');return;}
-    pos={ci:0,rep:0,step:0,pat:S.song[0].pat};
+    pos=resume?Object.assign({},pa.pos):{ci:0,rep:0,step:0,pat:S.song[0].pat};
   }else{
     const cap=Math.max(1,total());
-    pos={ci:-1,rep:0,step:initStep?Math.max(0,Math.min(initStep,cap-1)):0,pat:S.curPat};
+    pos=resume?Object.assign({},pa.pos):{ci:-1,rep:0,step:initStep?Math.max(0,Math.min(initStep,cap-1)):0,pat:S.curPat};
   }
   playing=true;ending=false;tick=0;queue=[];lastStep=null;pre=0;takeLog=[];launchQ=null;
   if(S.rec&&S.countIn>0)pre=preTotal=S.countIn*playPat().num;
@@ -4840,6 +4842,19 @@ function stop(){
 function seekTo(i){
   if(S.mode==='song'){toast('Switch to Pattern mode (next to Song) to scan and start playback at a point in the pattern.');return;}
   stop();start(i);
+}
+function seekSongTo(ci,clientX){
+  const g=tlPos[ci],c=S.song[ci],p=patById(c.pat);if(!g||!c||!p)return;
+  const tr=$('#tlTrack'),rect=tr.getBoundingClientRect(),cx=clientX-rect.left+tr.scrollLeft;
+  const pxIntoClip=Math.max(0,cx-g.x),rep=Math.max(0,Math.min(c.reps-1,Math.floor(pxIntoClip/g.one)));
+  const subPx=pxIntoClip-rep*g.one,tm=tmOf(p,c.bpm||p.bpm),subSec=subPx/tlpx();
+  const step=Math.max(0,Math.min(tm.total-1,Math.floor(subSec/tm.stepDur)));
+  if(playing)stop();
+  if(S.mode!=='song'){S.mode='song';syncMode();}
+  pausedAt={mode:'song',pos:{ci,rep,step,pat:c.pat}};
+  S.selClip=ci;renderSong();
+  start();
+  toast('Scanning to bar '+(Math.floor((rep*tm.total+step)/tm.pb)+1)+' of "'+esc(p.name)+'".');
 }
 function setPlayUI(){
   if(vOn('perf'))setTimeout(renderPerf,0);
@@ -5100,10 +5115,17 @@ rack.addEventListener('change',e=>{
 });
 
 /* transport controls */
-$('#play').onclick=()=>playing?stop():start();
-$('#stop').onclick=()=>stop();
+let pausedAt=null;
+function pauseOrStop(){
+  if(!playing)return;
+  pausedAt={mode:S.mode,pos:Object.assign({},pos)};
+  stop();
+  const pp=patById(pausedAt.pos.pat);if(pp)setPos(pausedAt.pos.step,tmOf(pp));
+}
+$('#play').onclick=()=>playing?pauseOrStop():start();
+$('#stop').onclick=()=>{pausedAt=null;stop();};
 window.addEventListener('keydown',e=>{
-  if(e.code==='Space'&&!/INPUT|SELECT|TEXTAREA|BUTTON/.test(document.activeElement.tagName)){e.preventDefault();playing?stop():start();}
+  if(e.code==='Space'&&!/INPUT|SELECT|TEXTAREA|BUTTON/.test(document.activeElement.tagName)){e.preventDefault();playing?pauseOrStop():start();}
 });
 (()=>{let taps=[];const b=$('#tapBtn');
   b.addEventListener('click',()=>{
@@ -7794,8 +7816,8 @@ function alEdMove(d){
   let wT=0;
   document.addEventListener('wheel',e=>{
     const cv=e.target.closest&&e.target.closest('.alrow canvas');if(!cv)return;
-    if(e.ctrlKey||e.metaKey){e.preventDefault();const now=Date.now();if(now-wT<90)return;wT=now;const r=cv.getBoundingClientRect(),v=alView(),b=v.ob+(e.clientX-r.left)/r.width*v.lenB;alZoomTo(e.deltaY<0?alZoom*2:alZoom/2,b);}
-    else if(alZoom>1&&(e.shiftKey||Math.abs(e.deltaX)>Math.abs(e.deltaY))){e.preventDefault();const v=alView();alPanBy((e.deltaX||e.deltaY)/cv.getBoundingClientRect().width*v.lenB);}
+    if(e.shiftKey||(alZoom>1&&Math.abs(e.deltaX)>Math.abs(e.deltaY))){e.preventDefault();const v=alView();alPanBy((e.deltaX||e.deltaY)/cv.getBoundingClientRect().width*v.lenB);return;}
+    e.preventDefault();const now=Date.now();if(now-wT<90)return;wT=now;const r=cv.getBoundingClientRect(),v=alView(),b=v.ob+(e.clientX-r.left)/r.width*v.lenB;alZoomTo(e.deltaY<0?alZoom*2:alZoom/2,b);
   },{passive:false});
 })();
 async function alImportBuf(ab,name){
@@ -7935,7 +7957,7 @@ function renderTimeline(){
   const bands=secGroups().map((g,gi)=>{const a=tlPos[g.from],b=tlPos[g.to];if(!a||!b)return '';return '<div class="tlsec" data-g="'+gi+'" aria-pressed="'+(S.selClip>=g.from&&S.selClip<=g.to)+'" style="--sc:'+secColor(g.n)+';left:'+a.x+'px;width:'+(b.x+b.w-a.x)+'px" title="'+esc(g.n)+' · drag to move the whole section">'+esc(g.n)+'</div>';}).join('');
   tr.innerHTML=(blocks||'<span class="hint" style="padding:12px 0">The song is empty. Add the current pattern to start.</span>')+tlRuler()+'<div class="tl-secs">'+bands+'</div>';tr.appendChild(head);
   tr.style.setProperty('--bar',Math.max(30,patDur(curPat(),1)*tlpx()/Math.max(1,curPat().bars))+'px');
-  $('#tlHint').textContent=S.mode==='song'?'Drag a block to reorder. Drag its right edge to repeat it more or fewer times.':'Song mode is off. Press "Play as song" to hear the arrangement.';
+  $('#tlHint').textContent=S.mode==='song'?'Drag a block to reorder. Drag its right edge to repeat it more or fewer times. Alt-click anywhere to scan and play from that point.':'Song mode is off. Press "Play as song" to hear the arrangement.';
   $('#tlSong').setAttribute('aria-pressed',S.mode==='song');syncClipUI();if(window.drawLanes)drawLanes();
 }
 /* ---------- song sections: named, coloured groups of clips ---------- */
@@ -8049,7 +8071,7 @@ function tlFrame(){
   });
   tr.addEventListener('pointerup',e=>{
     if(!d)return;const {ci,el,resize,moved}=d;
-    if(!moved){d=null;selectPattern(S.song[ci].pat);renderSong();return;}
+    if(!moved){d=null;if(e.altKey)seekSongTo(ci,e.clientX);else{selectPattern(S.song[ci].pat);renderSong();}return;}
     if(resize){S.song[ci].reps=d.reps||S.song[ci].reps;}
     else{
       const cx=tlPos[ci].x+tlPos[ci].w/2+(e.clientX-d.x0);let to=0;
