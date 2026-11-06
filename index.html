@@ -5669,24 +5669,54 @@ function warpMarkers(b,wk){
   }
   return out;
 }
+/* Off-main-thread time-stretch: the correlation-search phase-vocoder below is
+   billions of ops for a real song, so it runs in a Worker (search window
+   trimmed too) instead of blocking the tab while it computes. */
+let stretchWorker=null,stretchReqId=0;
+function getStretchWorker(){
+  if(stretchWorker)return stretchWorker;
+  const src="function stretchCh(src,ratio){"+
+    "var N=4096,H=N/4,outLen=Math.max(N,Math.round(src.length*ratio));"+
+    "var dst=new Float32Array(outLen),norm=new Float32Array(outLen),win=new Float32Array(N);"+
+    "for(var i=0;i<N;i++)win[i]=.5-.5*Math.cos(2*Math.PI*i/N);"+
+    "var prev=0;"+
+    "for(var o=0,k=0;o<outLen;o+=H,k++){"+
+      "var ap=Math.round(o/ratio);"+
+      "if(k>0){var tg=prev+H;if(tg+512<src.length){var best=0,bc=-1e9;"+
+        "for(var off=-192;off<=192;off+=3){var q=ap+off;if(q<0||q+N>src.length)continue;var cc=0;for(var j=0;j<512;j+=3)cc+=src[q+j]*src[tg+j];if(cc>bc){bc=cc;best=off;}}"+
+        "ap+=best;}}"+
+      "ap=Math.max(0,Math.min(src.length-N,ap));prev=ap;"+
+      "for(var i2=0;i2<N&&o+i2<outLen;i2++){dst[o+i2]+=src[ap+i2]*win[i2];norm[o+i2]+=win[i2];}"+
+    "}"+
+    "for(var i3=0;i3<outLen;i3++)if(norm[i3]>1e-3)dst[i3]/=norm[i3];"+
+    "return dst;}"+
+    "onmessage=function(e){var d=e.data,out=d.channels.map(function(ch){return stretchCh(ch,d.ratio);});postMessage({id:d.id,out:out},out.map(function(a){return a.buffer;}));};";
+  const blob=new Blob([src],{type:'text/javascript'});
+  stretchWorker=new Worker(URL.createObjectURL(blob));
+  return stretchWorker;
+}
+function stretchWorkerRun(channels,ratio){
+  return new Promise((resolve,reject)=>{
+    let w;try{w=getStretchWorker();}catch(e){reject(e);return;}
+    const id=++stretchReqId;
+    const onMsg=e=>{if(e.data.id!==id)return;w.removeEventListener('message',onMsg);w.removeEventListener('error',onErr);resolve(e.data.out);};
+    const onErr=e=>{w.removeEventListener('message',onMsg);w.removeEventListener('error',onErr);reject(e);};
+    w.addEventListener('message',onMsg);w.addEventListener('error',onErr);
+    const copies=channels.map(ch=>{const c=new Float32Array(ch.length);c.set(ch);return c;});
+    w.postMessage({id,channels:copies,ratio},copies.map(c=>c.buffer));
+  });
+}
 async function stretchBufAsync(b,ratio){
   if(Math.abs(ratio-1)<.01)return b;
-  const nc=b.numberOfChannels,N=4096,H=N/4,outLen=Math.max(N,Math.round(b.length*ratio));
-  if(b.length<N*2)return b;
-  const out=new AudioBuffer({length:outLen,numberOfChannels:nc,sampleRate:b.sampleRate}),win=new Float32Array(N);
-  for(let i=0;i<N;i++)win[i]=.5-.5*Math.cos(2*Math.PI*i/N);
-  for(let c=0;c<nc;c++){
-    const src=b.getChannelData(c),dst=out.getChannelData(c),norm=new Float32Array(outLen);let prev=0,hc=0;
-    for(let o=0,k=0;o<outLen;o+=H,k++){
-      let ap=Math.round(o/ratio);
-      if(k>0){const tg=prev+H;if(tg+N/3<src.length){let best=0,bc=-1e9;for(let off=-384;off<=384;off+=2){const q=ap+off;if(q<0||q+N>src.length)continue;let cc=0;for(let i=0;i<N/3;i+=2)cc+=src[q+i]*src[tg+i];if(cc>bc){bc=cc;best=off;}}ap+=best;}}
-      ap=Math.max(0,Math.min(src.length-N,ap));prev=ap;
-      for(let i=0;i<N&&o+i<outLen;i++){dst[o+i]+=src[ap+i]*win[i];norm[o+i]+=win[i];}
-      if(++hc%40===0)await new Promise(r=>setTimeout(r,0));
-    }
-    for(let i=0;i<outLen;i++)if(norm[i]>1e-3)dst[i]/=norm[i];
-  }
-  return out;
+  if(b.length<4096*2)return b;
+  try{
+    const nc=b.numberOfChannels,channels=[];
+    for(let c=0;c<nc;c++)channels.push(b.getChannelData(c));
+    const out=await stretchWorkerRun(channels,ratio);
+    const buf=new AudioBuffer({length:out[0].length,numberOfChannels:nc,sampleRate:b.sampleRate});
+    for(let c=0;c<nc;c++)buf.copyToChannel(out[c],c);
+    return buf;
+  }catch(e){return stretchBuf(b,ratio);} // Workers unavailable: fall back to the main-thread version
 }
 function stretchBuf(b,ratio){
   if(Math.abs(ratio-1)<.01)return b;
