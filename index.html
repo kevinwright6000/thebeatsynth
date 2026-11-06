@@ -801,11 +801,13 @@ body.lite *{transition:none!important;animation:none!important}
 :root[data-theme="light"] .mb-menu-btn:hover,
 :root[data-theme="light"] .mb-menu.open .mb-menu-btn { background:rgba(255,255,255,.1); }
 
-/* Dropdown menus */
+/* Dropdown menus - fixed (not absolute) so they aren't clipped by the menu
+   bar's own overflow-x:auto (needed so the bar can scroll horizontally on
+   narrow screens); position is set in px by toggleMbMenu() on open. */
 .mb-dropdown {
   display:none;
-  position:absolute;
-  top:100%;
+  position:fixed;
+  top:0;
   left:0;
   min-width:200px;
   background:var(--panel);
@@ -2374,7 +2376,23 @@ select option{background:var(--panel2);color:var(--fg)}
     const el = document.getElementById(id);
     const wasOpen = el.classList.contains('open');
     closeMbMenus();
-    if (!wasOpen) el.classList.add('open');
+    if (wasOpen) return;
+    el.classList.add('open');
+    // The dropdown is position:fixed (so it isn't clipped by the menu bar's
+    // own horizontal scroll), so it needs explicit viewport coordinates
+    // instead of the old "relative to the button" CSS positioning.
+    const btn = el.querySelector('.mb-menu-btn'), dd = el.querySelector('.mb-dropdown');
+    if (btn && dd) {
+      const br = btn.getBoundingClientRect();
+      dd.style.left = Math.max(4, br.left) + 'px';
+      dd.style.right = 'auto';
+      dd.style.top = br.bottom + 'px';
+      const dr = dd.getBoundingClientRect();
+      if (dr.right > window.innerWidth - 4) {
+        dd.style.left = 'auto';
+        dd.style.right = Math.max(4, window.innerWidth - br.right) + 'px';
+      }
+    }
   }
   window.toggleMbMenu = toggleMbMenu;
 
@@ -2382,6 +2400,7 @@ select option{background:var(--panel2);color:var(--fg)}
     document.querySelectorAll('.mb-menu.open').forEach(m => m.classList.remove('open'));
   }
   window.closeMbMenus = closeMbMenus;
+  {const mb=document.getElementById('daw-menubar');if(mb)mb.addEventListener('scroll',closeMbMenus,{passive:true});}
 
   document.addEventListener('click', function(e) {
     if (!e.target.closest('.mb-menu')) closeMbMenus();
@@ -8128,11 +8147,18 @@ function alSplit(i,beat){
   histMark();const r=Object.assign({},c,{o:c.o+(beat-c.a),a:beat,l:c.a+c.l-beat,fi:0});c.l=beat-c.a;c.fo=0;S.alane.splice(i+1,0,r);alSel=i+1;alCur=null;alCommit('Split into two clips. Drag them apart or around.');return true;
 }
 (()=>{
-  const lane=$('#tlAudio');let d=null;
+  const lane=$('#tlAudio'),scroller=lane.closest('.tl-scroll')||lane.parentElement;let d=null,pan=null;
   const beatAt=e=>{const r=lane.getBoundingClientRect();return Math.max(0,(e.clientX-r.left)/alPpb());};
   lane.addEventListener('pointerdown',e=>{
     const el=e.target.closest('.alc');
-    if(!el){alSel=-1;alCur=null;renderAudioLane();return;}
+    if(!el){
+      alSel=-1;alCur=null;renderAudioLane();
+      // Nothing to edit here - most of the lane is empty once the song runs
+      // past the imported audio, and that used to just be a dead click with
+      // no way to drag further into the song. Let it pan like the clip row.
+      pan={x0:e.clientX,scrollStart:scroller.scrollLeft};try{lane.setPointerCapture(e.pointerId);}catch(x){}
+      return;
+    }
     const i=+el.dataset.i,c=S.alane[i];if(!c)return;
     alSel=i;alCur={i,b:Math.round(beatAt(e)*4)/4};
     const mode=e.target.closest('.alh.l')?'l':e.target.closest('.alh.r')?'r':'m';
@@ -8143,6 +8169,7 @@ function alSplit(i,beat){
     alSyncBar();
   });
   lane.addEventListener('pointermove',e=>{
+    if(pan){scroller.scrollLeft=pan.scrollStart-(e.clientX-pan.x0);return;}
     if(!d)return;const c=S.alane[d.i];if(!c)return;const dx=e.clientX-d.x0;if(!d.moved&&Math.abs(dx)<4)return;
     if(!d.marked){histMark();d.marked=true;}d.moved=true;alCur=null;
     const db=Math.round(dx/alPpb()*4)/4,src=alSrc(c.s),tot=src?src.buf.duration*(src.bpm||abpm())/60:1e9;
@@ -8151,7 +8178,7 @@ function alSplit(i,beat){
     else c.l=Math.max(.25,Math.min(tot-d.o,d.l+db));
     const el=lane.querySelector('.alc[data-i="'+d.i+'"]');if(el){el.style.left=(c.a*alPpb())+'px';el.style.width=Math.max(8,c.l*alPpb())+'px';el.classList.add('drag');}
   });
-  const up=()=>{if(!d)return;const was=d;d=null;if(was.moved)alCommit();else renderAudioLane();};
+  const up=()=>{if(pan){pan=null;return;}if(!d)return;const was=d;d=null;if(was.moved)alCommit();else renderAudioLane();};
   lane.addEventListener('pointerup',up);lane.addEventListener('pointercancel',up);
   lane.addEventListener('contextmenu',e=>{
     const el=e.target.closest('.alc');if(!el)return;e.preventDefault();const i=+el.dataset.i,c=S.alane[i];if(!c)return;alSel=i;const b=Math.round(beatAt(e)*4)/4;
