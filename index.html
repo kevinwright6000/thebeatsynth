@@ -7973,8 +7973,13 @@ function alEdMove(d){
 async function alImportBuf(ab,name){
   ensureCtx();const buf=await decode(ab.slice(0)),key=uid();idbPut(key,ab);
   let bpm=null;try{if(buf.duration>=3)bpm=detectBpm(buf,0,1);}catch(e){}
-  const src={id:'s'+uid(),name:String(name||'Song').replace(/\.[^.]+$/,'').slice(0,28),key,raw:ab,buf,bpm:bpm&&bpm>=40&&bpm<=240?Math.round(bpm*10)/10:null,_fit:null};
+  const detected=bpm&&bpm>=40&&bpm<=240?Math.round(bpm*10)/10:null;
+  const src={id:'s'+uid(),name:String(name||'Song').replace(/\.[^.]+$/,'').slice(0,28),key,raw:ab,buf,bpm:detected,_fit:null};
   histMark();S.asrc.push(src);
+  // Set the project's own tempo to the imported song's detected tempo, so the
+  // song plays back unstretched by default; the user can still retune via ÷2/×2
+  // or the top-bar BPM field afterward.
+  if(detected){$('#bpm').value=Math.round(detected);$('#bpm').dispatchEvent(new Event('change',{bubbles:true}));}
   // Song length (the Timeline/audio lane) is independent of the pattern's own bar length -
   // the audio lane always shows and plays the full imported song regardless of S.bars.
   const tb=buf.duration*(src.bpm||abpm())/60;
@@ -7982,7 +7987,7 @@ async function alImportBuf(ab,name){
   if(!S.song.length){const p=curPat(),one=clipDur({pat:p.id,reps:1},p),reps=Math.max(1,Math.min(16,Math.ceil(buf.duration/one/Math.max(1,Math.ceil(buf.duration/one/16)))));
     const n=Math.max(1,Math.min(12,Math.ceil(buf.duration/(one*reps))));for(let i=0;i<n;i++)S.song.push({pat:p.id,reps});S.selClip=0;}
   S.mode='song';syncMode();renderSong();
-  alCommit('Imported "'+src.name+'"'+(src.bpm?' (about '+Math.round(src.bpm)+' BPM. If that is half or double, use ÷2 or ×2).':'. Type its tempo in Audio BPM so it lines up with your beats.'));
+  alCommit('Imported "'+src.name+'"'+(detected?'. Project tempo set to '+Math.round(detected)+' BPM to match (if that is half or double, use ÷2 or ×2).':'. Type its tempo in Audio BPM so it lines up with your beats.'));
   alFit();return src;
 }
 async function alImport(files){
