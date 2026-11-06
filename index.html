@@ -5669,6 +5669,25 @@ function warpMarkers(b,wk){
   }
   return out;
 }
+async function stretchBufAsync(b,ratio){
+  if(Math.abs(ratio-1)<.01)return b;
+  const nc=b.numberOfChannels,N=4096,H=N/4,outLen=Math.max(N,Math.round(b.length*ratio));
+  if(b.length<N*2)return b;
+  const out=new AudioBuffer({length:outLen,numberOfChannels:nc,sampleRate:b.sampleRate}),win=new Float32Array(N);
+  for(let i=0;i<N;i++)win[i]=.5-.5*Math.cos(2*Math.PI*i/N);
+  for(let c=0;c<nc;c++){
+    const src=b.getChannelData(c),dst=out.getChannelData(c),norm=new Float32Array(outLen);let prev=0,hc=0;
+    for(let o=0,k=0;o<outLen;o+=H,k++){
+      let ap=Math.round(o/ratio);
+      if(k>0){const tg=prev+H;if(tg+N/3<src.length){let best=0,bc=-1e9;for(let off=-384;off<=384;off+=2){const q=ap+off;if(q<0||q+N>src.length)continue;let cc=0;for(let i=0;i<N/3;i+=2)cc+=src[q+i]*src[tg+i];if(cc>bc){bc=cc;best=off;}}ap+=best;}}
+      ap=Math.max(0,Math.min(src.length-N,ap));prev=ap;
+      for(let i=0;i<N&&o+i<outLen;i++){dst[o+i]+=src[ap+i]*win[i];norm[o+i]+=win[i];}
+      if(++hc%40===0)await new Promise(r=>setTimeout(r,0));
+    }
+    for(let i=0;i<outLen;i++)if(norm[i]>1e-3)dst[i]/=norm[i];
+  }
+  return out;
+}
 function stretchBuf(b,ratio){
   if(Math.abs(ratio-1)<.01)return b;
   const nc=b.numberOfChannels,N=4096,H=N/4,outLen=Math.max(N,Math.round(b.length*ratio));
@@ -7561,7 +7580,10 @@ const alNeedFit=src=>!!src.bpm&&Math.abs(src.bpm-abpm())>.05;
 const alFitNeeded=()=>S.asrc.some(x=>alNeedFit(x)&&!(x._fit&&Math.abs(x._fit.bpm-abpm())<.01));
 function alFitAsync(){
   if(alFitPromise)return alFitPromise;
-  alFitPromise=alFit().then(()=>{if(playing)alResync();}).finally(()=>{alFitPromise=null;});
+  alFitPromise=alFit().then(()=>{if(playing)alResync();}).finally(()=>{
+    alFitPromise=null;
+    if(alFitNeeded())alFitAsync();
+  });
   return alFitPromise;
 }
 async function alFit(){
@@ -7572,7 +7594,10 @@ async function alFit(){
       const bpm=abpm();if(src._fit&&Math.abs(src._fit.bpm-bpm)<.01)continue;
       const el=$('#alInfo');if(el)el.textContent='Matching "'+src.name+'" to '+Math.round(bpm)+' BPM…';
       await new Promise(r=>setTimeout(r,30));
-      src._fit={bpm,buf:stretchBuf(src.buf,src.bpm/bpm)};
+      const srcBpmAtStart=src.bpm,ratio=src.bpm/bpm;
+      const buf=await stretchBufAsync(src.buf,ratio);
+      if(src.bpm!==srcBpmAtStart||Math.abs(abpm()-bpm)>.01)continue; // stale: bpm changed mid-stretch, let the next pass redo it
+      src._fit={bpm,buf};
     }
   }catch(e){}finally{alBusy=false;alInfo();}
 }
