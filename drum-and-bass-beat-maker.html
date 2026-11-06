@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Free Drum &amp; Bass Beat Maker — thebeatsynth</title>
+<meta name="description" content="Make drum and bass beats free in your browser. Fast breakbeats, a reese bassline, wide strings — no install, no account.">
+<link rel="canonical" href="https://thebeatsynth.com/drum-and-bass-beat-maker">
+<meta name="theme-color" content="#1d232a">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icon-180.png">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="thebeatsynth">
+<meta property="og:title" content="Free Drum &amp; Bass Beat Maker — thebeatsynth">
+<meta property="og:description" content="Make drum and bass beats free in your browser. Fast breakbeats, a reese bassline, wide strings — no install, no account.">
+<meta property="og:url" content="https://thebeatsynth.com/drum-and-bass-beat-maker">
+<meta property="og:image" content="https://thebeatsynth.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Free Drum &amp; Bass Beat Maker — thebeatsynth">
+<meta name="twitter:description" content="Make drum and bass beats free in your browser. Fast breakbeats, a reese bassline, wide strings — no install, no account.">
+<meta name="twitter:image" content="https://thebeatsynth.com/og.png">
+
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "thebeatsynth \u2014 Drum and Bass Beat Maker", "applicationCategory": "MusicApplication", "operatingSystem": "Any (runs in browser)", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "url": "https://thebeatsynth.com/drum-and-bass-beat-maker", "description": "Make drum and bass beats free in your browser. Fast breakbeats, a reese bassline, wide strings \u2014 no install, no account."}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What BPM is drum and bass?", "acceptedAnswer": {"@type": "Answer", "text": "DNB is almost always 160\u2013180 BPM. thebeatsynth's starter loads at 172 BPM."}}, {"@type": "Question", "name": "Can I design my own bass sound?", "acceptedAnswer": {"@type": "Answer", "text": "Yes \u2014 there's a full synth editor for custom instruments, including reese-style basses, alongside the pre-loaded presets."}}]}]</script>
+
+<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<style>:root{--bg:#1d232a;--panel:#272f38;--panel2:#303a45;--line:#3b4753;--fg:#e3e9ee;--dim:#8c9cab;--accent:#ff9a3c;--accent-ink:#2a1700}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#e8ecf0;--panel:#f5f7f9;--panel2:#e2e7ec;--line:#bfc9d3;--fg:#18222c;--dim:#566574;--accent:#d4690a;--accent-ink:#fff}}
+:root[data-theme="light"]{--bg:#e8ecf0;--panel:#f5f7f9;--panel2:#e2e7ec;--line:#bfc9d3;--fg:#18222c;--dim:#566574;--accent:#d4690a;--accent-ink:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 'Rajdhani',system-ui,-apple-system,sans-serif;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+a{color:var(--accent)}
+.wrap{max-width:720px;margin:0 auto;padding:28px 0 64px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0 28px}
+header.top .brand{font-weight:700;font-size:18px;letter-spacing:.3px;text-decoration:none;color:var(--fg)}
+header.top .brand b{color:var(--accent)}
+header.top nav a{text-decoration:none;font-weight:600;font-size:14px;margin-left:14px}
+h1{font-size:clamp(28px,6vw,42px);font-weight:700;line-height:1.1;margin:0 0 14px;text-wrap:balance}
+.lede{font-size:18px;color:var(--dim);margin:0 0 26px;max-width:580px}
+.cta{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:17px;text-decoration:none;padding:14px 22px;border-radius:10px;margin-bottom:8px}
+.cta:hover{filter:brightness(1.08)}
+.sub{color:var(--dim);font-size:13px;margin:0 0 36px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px 24px;margin-bottom:24px}
+.card h2{font-size:15px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin:0 0 14px}
+ul.feat{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+ul.feat li{padding-left:22px;position:relative}
+ul.feat li::before{content:"";position:absolute;left:0;top:9px;width:8px;height:8px;border-radius:2px;background:var(--accent)}
+.faq dt{font-weight:700;margin-top:16px}
+.faq dd{color:var(--dim);margin:4px 0 0}
+.stat{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:28px}
+.stat b{display:block;font-size:22px;color:var(--accent);font-family:'JetBrains Mono',monospace}
+.stat span{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.04em}
+.more{margin-top:40px}
+.more h2{font-size:15px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);margin:0 0 12px}
+.more ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.more a{text-decoration:none;font-size:14px;font-weight:600;display:block;padding:9px 12px;background:var(--panel);border:1px solid var(--line);border-radius:8px}
+footer{margin-top:40px;color:var(--dim);font-size:13px}
+footer a{color:var(--dim)}</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+<a class="brand" href="/">the<b>beat</b>synth</a>
+<nav><a href="/">Open the app</a></nav>
+</header>
+
+<h1>Drum &amp; Bass Beat Maker</h1>
+<p class="lede">A fast, rolling breakbeat under a growling reese bassline — thebeatsynth's DNB kit is built for the energy and low-end weight the genre needs.</p>
+<div class="stat"><div><b>172 BPM</b><span>starter tempo</span></div><div><b>Free</b><span>no account, no install</span></div></div>
+<a class="cta" href="/?starter=dnb">Start a Drum and Bass beat →</a>
+<p class="sub">Opens thebeatsynth with a Drum and Bass starter already loaded. Multiple channels, custom time signatures, imported audio and pre-loaded drum/piano sounds — a free alternative to heavier DAWs like FL Studio and Ableton, right in your browser.</p>
+
+<div class="card">
+<h2>What's in the Drum and Bass starter</h2>
+<ul class="feat">
+<li>A reese-style custom synth bass, pre-voiced and pre-programmed into a rolling DNB bassline.</li>
+<li>A fast breakbeat-driven drum kit built for 170+ BPM programming.</li>
+<li>Wide string pad layering for atmosphere behind the bass and drums.</li>
+<li>Full synth editor if you want to shape your own reese or sub bass from scratch.</li>
+</ul>
+</div>
+
+<div class="card faq">
+<h2>FAQ</h2>
+<dl>
+<dt>What BPM is drum and bass?</dt><dd>DNB is almost always 160–180 BPM. thebeatsynth's starter loads at 172 BPM.</dd>
+<dt>Can I design my own bass sound?</dt><dd>Yes — there's a full synth editor for custom instruments, including reese-style basses, alongside the pre-loaded presets.</dd>
+</dl>
+</div>
+
+<div class="more">
+<h2>More beat makers</h2>
+<ul>
+<li><a href="/lofi-beat-maker">Lo-fi beat maker</a></li>
+<li><a href="/trap-beat-maker">Trap beat maker</a></li>
+<li><a href="/house-beat-maker">House beat maker</a></li>
+<li><a href="/boom-bap-beat-maker">Boom Bap beat maker</a></li>
+<li><a href="/drill-beat-maker">Drill beat maker</a></li>
+<li><a href="/afrobeats-beat-maker">Afrobeats beat maker</a></li>
+<li><a href="/techno-beat-maker">Techno beat maker</a></li>
+<li><a href="/reggaeton-beat-maker">Reggaeton beat maker</a></li>
+<li><a href="/drum-and-bass-beat-maker">Drum and Bass beat maker</a></li>
+<li><a href="/phonk-beat-maker">Phonk beat maker</a></li>
+</ul>
+</div>
+
+<footer>thebeatsynth — a free, browser-based beat maker. <a href="/">Open the full app</a> · <a href="/privacy.html">Privacy</a></footer>
+</div>
+</body>
+</html>

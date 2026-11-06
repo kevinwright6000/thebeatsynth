@@ -10032,13 +10032,13 @@ const confirmBeat=()=>true; // makeBeat saves the current beat to the Library fi
 })();
 const TEMPLATES=[
  {n:'Blank beat',d:'No channels',c:COLORS[2],f:()=>{}},
- {n:'Lo-fi live kit',d:'78 BPM · layered kit, sampled piano',c:COLORS[4],f:()=>{S.bars=2;loadKit('lofi');
+ {n:'Lo-fi live kit',key:'lofi',d:'78 BPM · layered kit, sampled piano',c:COLORS[4],f:()=>{S.bars=2;loadKit('lofi');
    nt(addChannel({sound:'bass',vol:.7}),[[0,38,4],[8,38,2],[12,41,2],[16,36,4],[24,36,2],[28,43,2]]);
    chd(addChannel({sound:'grand',vol:.6}),[[0,[62,65,69,72],7],[8,[62,65,69,72],3],[16,[60,64,67,71],7],[24,[60,64,67,71],3]]);}},
- {n:'Trap live kit',d:'140 BPM · layered kit, 808, soft piano',c:COLORS[0],f:()=>{S.bars=2;loadKit('trap');
+ {n:'Trap live kit',key:'trap',d:'140 BPM · layered kit, 808, soft piano',c:COLORS[0],f:()=>{S.bars=2;loadKit('trap');
    nt(addChannel({sound:'bass808',vol:.85}),[[0,36,3],[6,36,2],[10,34,3],[16,36,3],[22,39,2],[26,34,3]]);
    chd(addChannel({sound:'grand',vol:.5}),[[0,[60,63,67],6],[8,[58,62,65],6],[16,[56,60,63],6],[24,[58,62,65],6]]);}},
- {n:'House live kit',d:'124 BPM · layered kit, pumping piano stabs',c:COLORS[1],f:()=>{S.bars=2;loadKit('house');
+ {n:'House live kit',key:'house',d:'124 BPM · layered kit, pumping piano stabs',c:COLORS[1],f:()=>{S.bars=2;loadKit('house');
    nt(addChannel({sound:'bass',vol:.8}),[[2,36],[6,36],[10,39],[14,36],[18,34],[22,34],[26,31],[30,34]]);
    const p=addChannel({sound:'grand',vol:.6});chd(p,[[0,[57,60,64,67],2],[3,[57,60,64,67],1],[6,[57,60,64,67],2],[16,[53,57,60,64],2],[19,[53,57,60,64],1],[22,[53,57,60,64],2]]);duckKick(p);}},
  {n:'Trap starter',d:'140 BPM · 808 and bell',c:COLORS[0],f:()=>{S.bars=2;genBeat('trap');
@@ -10048,19 +10048,19 @@ const TEMPLATES=[
    nt(addChannel({sound:'bass',vol:.8}),[[2,36],[6,36],[10,39],[14,36],[18,34],[22,34],[26,31],[30,34]]);
    const p=addChannel({sound:'epiano',vol:.55});chd(p,[[0,[57,60,64,67],2],[3,[57,60,64,67],1],[6,[57,60,64,67],2],[16,[53,57,60,64],2],[19,[53,57,60,64],1],[22,[53,57,60,64],2]]);
    duckKick(p);}},
- {n:'Techno pulse',d:'132 BPM · acid line',c:COLORS[5],f:()=>{S.bars=2;genBeat('techno');
+ {n:'Techno pulse',key:'techno',d:'132 BPM · acid line',c:COLORS[5],f:()=>{S.bars=2;genBeat('techno');
    nt(addChannel({sound:'acid',vol:.6}),[[2,36],[3,36],[5,43],[6,36],[10,36],[11,39],[13,36],[14,48],[18,36],[19,36],[21,43],[22,36],[26,34],[27,36],[29,43],[30,46]]);
    const p=addChannel({sound:'pad',vol:.45});chd(p,[[0,[48,55,58],14,80],[16,[46,53,58],14,80]]);duckKick(p);}},
- {n:'Boom bap',d:'90 BPM · dusty keys',c:COLORS[3],f:()=>{S.bars=2;genBeat('boombap');
+ {n:'Boom bap',key:'boombap',d:'90 BPM · dusty keys',c:COLORS[3],f:()=>{S.bars=2;genBeat('boombap');
    nt(addChannel({sound:'bass',vol:.8}),[[0,36,3],[6,36,1],[8,39,3],[14,34,2],[16,36,3],[22,36,1],[24,41,3],[30,39,2]]);
    chd(addChannel({sound:'piano',vol:.6}),[[0,[60,63,67,70],6],[8,[58,62,65,69],6],[16,[56,60,63,67],6],[24,[58,62,65,69],6]]);}},
  {n:'Lo-fi chill',d:'78 BPM · soft keys, swing',c:COLORS[4],f:()=>{S.bars=2;genBeat('lofi');
    nt(addChannel({sound:'bass',vol:.7}),[[0,38,4],[8,38,2],[12,41,2],[16,36,4],[24,36,2],[28,43,2]]);
    chd(addChannel({sound:'epiano',vol:.6}),[[0,[62,65,69,72],7],[8,[62,65,69,72],3],[16,[60,64,67,71],7],[24,[60,64,67,71],3]]);}},
- {n:'Reggaeton',d:'95 BPM · dembow, 808',c:COLORS[6],f:()=>{S.bars=2;genBeat('reggaeton');
+ {n:'Reggaeton',key:'reggaeton',d:'95 BPM · dembow, 808',c:COLORS[6],f:()=>{S.bars=2;genBeat('reggaeton');
    nt(addChannel({sound:'bass808',vol:.85}),[[0,36,3],[3,36,1],[6,38,2],[8,36,3],[11,36,1],[14,41,2],[16,36,3],[19,36,1],[22,38,2],[24,34,3],[27,34,1],[30,31,2]]);
    chd(addChannel({sound:'pluck',vol:.55}),[[0,[57,60,64],2],[3,[57,60,64],1],[6,[57,60,64],2],[16,[53,57,60],2],[19,[53,57,60],1],[22,[55,59,62],2]]);}},
- {n:'Drill',d:'142 BPM · sliding 808',c:COLORS[0],f:()=>{S.bars=2;genBeat('drill');
+ {n:'Drill',key:'drill',d:'142 BPM · sliding 808',c:COLORS[0],f:()=>{S.bars=2;genBeat('drill');
    nt(addChannel({sound:'bass808',vol:.85}),[[0,36,4],[6,36,2],[8,39,2,100,1],[10,34,3,100,1],[16,36,4],[22,41,2],[24,39,2,100,1],[26,34,4,100,1]]);
    nt(addChannel({sound:'bell',vol:.45}),[[0,75,3],[8,72,3],[16,70,3],[24,67,3],[28,70,2]]);}},
  {n:'UK garage',d:'130 BPM · shuffle, organ stabs',c:COLORS[2],f:()=>{S.bars=2;genBeat('ukg');
@@ -10070,10 +10070,10 @@ const TEMPLATES=[
    const bs=addChannel({sound:'bass',vol:.75});[33,29,36,31].forEach((r,k)=>[0,2,4,6].forEach(j=>bs.notes.push({i:k*8+j,m:r,l:2,v:100})));
    nt(addChannel({sound:'lead',vol:.45}),[[0,69,3],[4,72,3],[8,76,4],[16,74,3],[20,72,3],[24,67,4]]);
    const p=addChannel({sound:'pad',vol:.45});chd(p,[[0,[57,60,64],8,70],[8,[53,57,60],8,70],[16,[48,52,55],8,70],[24,[55,59,62],8,70]]);duckKick(p);}},
- {n:'Afrobeats',d:'105 BPM · plucks, bounce',c:COLORS[3],f:()=>{S.bars=2;genBeat('afrobeats');
+ {n:'Afrobeats',key:'afrobeats',d:'105 BPM · plucks, bounce',c:COLORS[3],f:()=>{S.bars=2;genBeat('afrobeats');
    nt(addChannel({sound:'bass',vol:.8}),[[0,36,2],[3,36,1],[6,38,2],[10,36,2],[16,36,2],[19,36,1],[22,41,2],[26,38,3]]);
    chd(addChannel({sound:'pluck',vol:.55}),[[0,[60,64,67],1],[3,[60,64,67],1],[6,[62,65,69],1],[10,[60,64,67],1],[16,[57,60,64],1],[19,[57,60,64],1],[22,[53,57,60],1],[26,[55,59,62],1]]);}},
- {n:'Drum and bass',d:'172 BPM · reese bass',c:COLORS[7],f:()=>{S.bars=2;genBeat('dnb');
+ {n:'Drum and bass',key:'dnb',d:'172 BPM · reese bass',c:COLORS[7],f:()=>{S.bars=2;genBeat('dnb');
    const b=addChannel({sound:'custom',name:'Reese',vol:.7});b.syn=Object.assign({},SYN_DEF,PRESETS['Reese bass']);
    nt(b,[[0,38,6],[8,38,2],[12,41,3],[16,38,6],[24,36,3],[28,34,3]]);
    chd(addChannel({sound:'strings',vol:.4}),[[0,[57,60,64],15,80],[16,[53,57,60],15,80]]);}},
@@ -10081,7 +10081,7 @@ const TEMPLATES=[
    const b=addChannel({sound:'custom',name:'Reese',vol:.75});b.syn=Object.assign({},SYN_DEF,PRESETS['Reese bass']);
    nt(b,[[0,38,8],[8,38,4],[12,41,3],[16,41,8],[24,36,6]]);
    nt(addChannel({sound:'lead',vol:.4}),[[4,74,1],[6,77,1],[12,81,2],[20,74,1],[22,77,1],[28,79,2]]);}},
- {n:'Phonk',d:'130 BPM · cowbell, gritty 808',c:COLORS[0],f:()=>{S.bars=2;genBeat('phonk');
+ {n:'Phonk',key:'phonk',d:'130 BPM · cowbell, gritty 808',c:COLORS[0],f:()=>{S.bars=2;genBeat('phonk');
    const cb=addChannel({sound:'cowbell',vol:.55});[0,3,6,10,16,19,22,26].forEach(i=>{if(i<cb.steps.length)cb.steps[i]=100;});
    nt(addChannel({sound:'bass808',vol:.85}),[[0,36,4],[6,36,2],[8,39,3],[16,34,4],[22,36,2],[24,31,4]]);
    nt(addChannel({sound:'bell',vol:.4}),[[0,75,2],[3,72,1],[8,70,3],[16,67,2],[19,70,1],[24,72,4]]);}},
@@ -10155,6 +10155,18 @@ $('#embedBtn').onclick=async()=>{
   $('#shareHint').textContent=v.includes('?s=')?'Short link embed. Audio you imported is not included.':'This embed uses the long link. Press Short link first for a neater, shorter code (needs the share server).';
 };
 $('#embedCopy').onclick=async()=>{const v=$('#embedOut').value;if(!v){toast('Press Embed code first.');return;}$('#embedOut').select();try{await navigator.clipboard.writeText(v);toast('Embed code copied.');}catch(e){toast('Press Ctrl+C to copy the selected code.');}};
+function openStarterParam(){
+  let key;try{key=new URLSearchParams(location.search).get('starter');}catch(e){return false;}
+  if(!key)return false;
+  const t=TEMPLATES.find(x=>x.key===key);
+  try{history.replaceState(null,'',location.pathname+location.hash);}catch(e){}
+  if(!t)return false;
+  const saved=backupCurrent();tplReset();t.f();
+  S.activeId=(S.channels.find(c=>c.kind==='inst')||S.channels[0]||{}).id||null;
+  histReset();markDirty();
+  toast(t.n+' loaded. Press play, or Space, to hear it.'+(saved?' Your previous beat was backed up in the library.':''));
+  return true;
+}
 async function openSharedHash(){
   const sid=new URLSearchParams(location.search).get('s');
   if(sid&&/^[\w\-]{4,20}$/.test(sid)){
@@ -10655,6 +10667,7 @@ function seed(){
   if(!EMBED&&p&&Array.isArray(p.channels)){try{await loadProject(p);}catch(e){S.channels=[];seed();}}else seed();
   const shared=await openSharedHash();
   if(EMBED)embedInit(shared);
+  if(!shared&&!EMBED)openStarterParam();
   if(!S.activeId)S.activeId=(S.channels.find(c=>c.kind==='inst')||S.channels[0]||{}).id||null;
   if(!S.title)S.title='Untitled Beat';syncTitle();
   render();updateKbInfo();histReset();requestAnimationFrame(frame);
