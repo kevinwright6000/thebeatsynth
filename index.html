@@ -3528,6 +3528,8 @@ header.transport {
       <select id="micBars" class="btn sm" aria-label="Mic loop length"><option value="1">1 bar</option><option value="2">2 bars</option><option value="4">4 bars</option><option value="8">8 bars</option></select>
       <button class="btn sm toggle" id="metroBtn" aria-pressed="false" title="Click track (M)">Metronome</button>
       <select id="countIn" class="btn sm" aria-label="Count-in before recording"><option value="0">No count-in</option><option value="1">1 bar count-in</option><option value="2">2 bars count-in</option></select>
+      <button class="btn sm toggle" id="repeatBtn" aria-pressed="false" title="Hold this (or hold the ` key) to stutter-repeat a short slice of the beat, FL Studio style. Release to carry on right after it.">⟲ Beat Repeat</button>
+      <select id="repeatDiv" class="btn sm" aria-label="Beat Repeat slice length" title="How much of a beat repeats while held"><option value=".25">1/4</option><option value=".125">1/8</option><option value=".0625" selected>1/16</option><option value=".03125">1/32</option></select>
     </div>
     <div class="egrp" data-tab="play" role="group" aria-label="Keyboard and MIDI"><span class="gt">Play live</span>
       <button class="btn sm toggle" id="keysBtn" aria-pressed="true" title="Play the active channel from your computer keyboard">Keys</button>
@@ -4746,6 +4748,22 @@ const lqOf=id=>{const q=patById(id);return (q&&q.lq)||launchQuant;};
 const stepAtQ=(q,pos,tm)=>q==='beat'?pos.step%tm.spb===0:pos.step%tm.pb===0;
 let launchQ=null,launchQuant='loop',takeArmed=false,takeLog=[],sceneQ=null,sceneTok=0;
 let playing=false,nextT=0,timer=null,queue=[],tick=0,pos=null,ending=false,endAt=0,lastClip=-2,pre=0,preTotal=0,lastStep=null;
+let beatRepeat=false,brAnchor=0,brLen=1;
+function setBeatRepeat(on){
+  if(on===beatRepeat)return;
+  if(on){
+    if(!playing||!pos)return;
+    const tm=tmOf(playPat());if(!tm||!tm.total)return;
+    let n=Math.max(1,Math.round((tm.spb||4)*(+($('#repeatDiv')&&$('#repeatDiv').value||.0625))));
+    n=Math.min(n,tm.total);
+    brAnchor=Math.floor(pos.step/n)*n;
+    brLen=Math.max(1,Math.min(n,tm.total-brAnchor));
+    beatRepeat=true;const b=$('#repeatBtn');if(b)b.setAttribute('aria-pressed','true');
+  }else{
+    beatRepeat=false;const b=$('#repeatBtn');if(b)b.setAttribute('aria-pressed','false');
+    if(playing&&pos){const tm=tmOf(playPat());pos.step=tm&&tm.total?(brAnchor+brLen)%tm.total:0;}
+  }
+}
 const playPat=()=>S.mode==='song'?patById(pos.pat):(sessOn&&pos&&patById(pos.pat))||curPat();
 function click(t,accent){
   const o=ctx.createOscillator(),g=ctx.createGain();o.type='square';o.frequency.value=accent?1800:1200;
@@ -4773,7 +4791,8 @@ function sched(){
     playStepAt(pat.id,st,tick,t,tm);clockStep(t,pat,tm);
     if(S.metro&&st%tm.spb===0)click(t,st%tm.pb===0);
     queue.push({pat:pat.id,i:st,tick,t,tm,ci:pos.ci,rep:pos.rep});
-    nextT+=sd;tick++;pos.step++;
+    nextT+=sd;tick++;
+    if(beatRepeat)pos.step=brAnchor+((pos.step-brAnchor+1)%brLen);else pos.step++;
     if(S.mode!=='song'&&launchQ!=null&&launchQ!==-1&&lqOf(launchQ)!=='loop'&&pos.step<tm.total&&stepAtQ(lqOf(launchQ),pos,tm)){takePush(pat.id);doLaunch(true);}
     if(S.mode!=='song'&&sceneQ&&launchQuant!=='loop'&&pos.step<tm.total&&stepAtQ(launchQuant,pos,tm))fireScene(nextT);
     if(pos.step>=tm.total){
@@ -4831,6 +4850,7 @@ function start(initStep){
   if(audArmed)audStart();
 }
 function stop(){
+  beatRepeat=false;{const b=$('#repeatBtn');if(b)b.setAttribute('aria-pressed','false');}
   sessRecFinish();midiPanic();clockStop();launchQ=null;sceneQ=null;sceneTok++;finishTake();audStop();
   sessOn=false;sessQ=[];S.channels.forEach(c=>{c.sp=null;});if(typeof renderSession==='function'&&vOn('session'))renderSession();
   if(timer)clearInterval(timer);timer=null;playing=false;ending=false;queue=[];pre=0;lastStep=null;recKey=null;
@@ -6354,6 +6374,13 @@ $('#autoBtn').onclick=e=>{S.autoRec=!S.autoRec;e.currentTarget.setAttribute('ari
 $('#autoClr').onclick=()=>{const ch=activeCh();if(!ch)return;const d=pd(ch,S.curPat);if(!d.au){toast('No automation on '+ch.name+' in this pattern.');return;}d.au=undefined;d.auCv=undefined;refreshSteps(ch);if(ctx){applyMix();autoClear(ch);applyFx(ch,false);}toast('Cleared automation on '+ch.name+'.');};
 document.addEventListener('pointerup',()=>{if(!autoTouched.size)return;autoTouched.forEach(c=>{if(byId(c.id))refreshSteps(c);});autoTouched.clear();scheduleCommit();markDirty();},true);
 $('#metroBtn').onclick=e=>{S.metro=!S.metro;e.currentTarget.setAttribute('aria-pressed',S.metro);};
+(()=>{
+  const b=$('#repeatBtn');
+  b.addEventListener('pointerdown',e=>{e.preventDefault();setBeatRepeat(true);});
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev,()=>setBeatRepeat(false)));
+  window.addEventListener('keydown',e=>{if(e.code==='Backquote'&&!e.repeat&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();setBeatRepeat(true);}});
+  window.addEventListener('keyup',e=>{if(e.code==='Backquote')setBeatRepeat(false);});
+})();
 $('#countIn').onchange=e=>{S.countIn=+e.target.value;};
 $('#recBtn').onclick=e=>{S.rec=!S.rec;e.currentTarget.setAttribute('aria-pressed',S.rec);setPlayUI();if(S.rec&&!playing)toast('Record is armed. Press play'+(S.countIn?' to start after the count-in':'')+', then play notes.');};
 $('#keysBtn').onclick=e=>{S.keys=!S.keys;e.currentTarget.setAttribute('aria-pressed',S.keys);};
@@ -9637,7 +9664,11 @@ const CHANGELOG=[
     'Automation: pick a curve shape per lane — Ease, Hold (stepped), Linear or S-curve.',
     'Gallery: fork a beat you opened, with lineage shown on cards; sort by Newest or Trending.',
     'Added a real privacy policy.',
-    'Fixed the Play button sometimes not responding to clicks, and welcome-tour/Guide "Show me" buttons that pointed off-screen.'
+    'Fixed the Play button sometimes not responding to clicks, and welcome-tour/Guide "Show me" buttons that pointed off-screen.',
+    'The Pause button now actually pauses and resumes, instead of acting like Stop.',
+    'Timeline: Alt-click anywhere to scan and play from that point. Plain mouse wheel now zooms the Audio Lane (no Ctrl needed).',
+    'New: Beat Repeat — hold the button (or the ` key) to stutter-repeat a slice of the beat, FL Studio style.',
+    'New genre starter-pack pages (lofi, trap, house, drill and more) for quick-starting a beat from a link.'
   ]}
 ];
 function openWhatsNew(){
@@ -9735,7 +9766,7 @@ $('#shortBtn').onclick=async()=>{
 };
 
 /* ---------- shortcuts ---------- */
-const SHORTCUTS=[['Transport',[['Space','Play or stop'],['Home','Stop and rewind'],['R','Arm recording'],['M','Metronome on or off']]],
+const SHORTCUTS=[['Transport',[['Space','Play or stop'],['Home','Stop and rewind'],['R','Arm recording'],['M','Metronome on or off'],['Hold `','Beat Repeat: stutter-repeat a slice of the beat']]],
  ['Editing',[['Ctrl+Z','Undo'],['Ctrl+Shift+Z or Ctrl+Y','Redo'],['Ctrl+C / Ctrl+V','Copy and paste steps'],['Delete','Clear the selected steps'],['Shift+click','Select a range of steps'],['Right-click a step','Chance and ratchet'],['Ctrl+S','Quick-save to the library']]],
  ['Playing',[['A W S E D F T G Y H U J K O L P ;','Piano keys for the active channel'],['Z / X','Octave down and up'],['In Pads view: 1 2 3 4 / Q W E R / A S D F / Z X C V','The 16 pads']]],
  ['Piano roll and Perform',[['Delete (roll, notes selected)','Delete the selected notes'],['Shift+click a note','Add or remove it from the selection'],['Ctrl+C, Ctrl+X (roll, notes selected)','Copy or cut the selected notes'],['Ctrl+V (roll)','Paste the notes at the orange marker'],['Ctrl+D (roll, notes selected)','Duplicate the selected notes to the right'],['1 to 9 (Perform view)','Launch the first nine patterns'],['Shift + 1 to 9 (Perform view)','Switch to a mute scene']]],
