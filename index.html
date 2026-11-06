@@ -4058,6 +4058,18 @@ const tmOf=(p,b)=>{const sp=SPB[p.den],pb=p.num*sp;return{spb:sp,pb,total:pb*p.b
 const clipBpmAt=(cl,p,k,N)=>{const b0=(cl&&cl.bpm)||p.bpm,b1=(cl&&cl.ramp)||0;return b1?b0+(b1-b0)*(k/Math.max(1,N)):b0;};
 const clipDur=(cl,p)=>{const t0=tmOf(p),N=t0.total*cl.reps;if(!(cl.bpm||cl.ramp))return N*t0.stepDur;let T=0;for(let k=0;k<N;k++)T+=tmOf(p,clipBpmAt(cl,p,k,N)).stepDur;return T;};
 const clipBpmTxt=(c,p)=>{const b=c.bpm||p.bpm;return c.ramp?b+'→'+c.ramp:String(b);};
+// How many seconds into the arrangement a {ci,rep,step} position sits at - used to
+// re-anchor the song audio lane (which tracks a beat position, not a clip index)
+// when resuming playback mid-song instead of from the top.
+function songElapsedSec(p){
+  let sec=0;
+  for(let i=0;i<p.ci;i++){const c=S.song[i],pat=patById(c.pat);if(pat)sec+=clipDur(c,pat);}
+  const c=S.song[p.ci],pat=c&&patById(c.pat);if(!c||!pat)return sec;
+  const t0=tmOf(pat),N=t0.total*c.reps,kDone=Math.max(0,Math.min(N,p.rep*t0.total+p.step));
+  if(!(c.bpm||c.ramp))sec+=kDone*t0.stepDur;
+  else for(let k=0;k<kDone;k++)sec+=tmOf(pat,clipBpmAt(c,pat,k,N)).stepDur;
+  return sec;
+}
 const LANES={
   vol:{name:'Volume',col:'#ff9a3c',def:1,map:(y)=>y,txt:y=>Math.round(y*100)+'%'},
   lp:{name:'Low-pass filter (muffle)',col:'#7aa7ff',def:1,map:(y,n)=>120*Math.pow(n/120,y),txt:y=>y>=.99?'open':Math.round(120*Math.pow(22050/120,y))+' Hz'},
@@ -4865,6 +4877,10 @@ function start(initStep){
   if(S.rec&&S.countIn>0)pre=preTotal=S.countIn*playPat().num;
   nextT=ctx.currentTime+.06;liveBpm=-1;clockStart(nextT);
   if(S.mode!=='song'&&vOn('timeline')&&S.alane&&S.alane.length)alStart(nextT);
+  // Song mode: the per-step scheduler only (re)starts the audio lane when it crosses
+  // ci===0 from the top, so resuming mid-song (pos.ci>0, or a step into clip 0) left
+  // it silent until the song looped back around. Re-anchor it to the resumed position.
+  else if(S.mode==='song'&&S.alane&&S.alane.length)alStartWin(nextT,songElapsedSec(pos)*abpm()/60,Infinity);
   if(ctx.state!=='running'){
     // The context was still suspended (common right after a page load/refresh) -
     // scheduling against its frozen currentTime silently drops the audio. Once it
