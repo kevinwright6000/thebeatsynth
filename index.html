@@ -2077,6 +2077,9 @@ header.transport {
       <button class="mb-dropdown-item" onclick="closeMbMenus();document.getElementById('kbBtn')&&document.getElementById('kbBtn').click()">
         Keyboard Shortcuts <span class="shortcut">?</span>
       </button>
+      <button class="mb-dropdown-item" onclick="closeMbMenus();if(typeof openWhatsNew==='function')openWhatsNew()">
+        What's New <span class="shortcut" id="wnDot" hidden>●</span>
+      </button>
       <a class="mb-dropdown-item" href="https://www.thebeatsynth.com" target="_blank" rel="noopener" onclick="closeMbMenus()">
         Website
       </a>
@@ -3826,7 +3829,7 @@ header.transport {
       <div class="lib-sec" id="galSec"><span class="lbl">Public gallery</span>
         <div class="lib-save" id="galForkRow" hidden><span class="hint">Forking <strong id="galForkTitle"></strong></span><button class="btn sm" id="galForkClear" title="Publish as a new, unrelated beat instead">Clear</button></div>
         <div class="lib-save"><input id="galTitle" maxlength="40" placeholder="Name your beat to publish it" aria-label="Title for the gallery"><input id="galTags" maxlength="60" placeholder="Tags: lofi, chill" aria-label="Tags, separated by commas"><button class="btn sm primary" id="galPub">Publish</button></div>
-        <div class="lib-save"><input id="galQ" type="search" placeholder="Search the gallery by name or tag" aria-label="Search the gallery"></div>
+        <div class="lib-save"><input id="galQ" type="search" placeholder="Search the gallery by name or tag" aria-label="Search the gallery"><select id="galSort" class="btn sm" aria-label="Sort the gallery"><option value="new">Newest</option><option value="trend">Trending</option></select></div>
         <span class="hint">Publishing shares the pattern and settings, not imported audio. Anyone can open it as their own copy. Opening someone else's beat from the gallery and publishing your version links it back to the original.</span>
         <div class="lib-list" id="galList"><span class="hint">Loading…</span></div></div>
       <div class="lib-sec"><span class="lbl">Share</span>
@@ -3962,6 +3965,12 @@ header.transport {
   <div class="modal-box">
     <div class="roll-bar"><strong id="auT">Automation</strong><select id="auParam" class="btn sm" aria-label="Parameter"><option value="vol">Volume</option><option value="pan">Pan</option><option value="cut">Filter cutoff</option></select><span class="lbl">Curve</span><select id="auCurve" class="btn sm" aria-label="Curve shape between automation points" title="How this lane moves when it hits a new value: Ease glides in smoothly then holds, Hold jumps instantly (stepped/robotic), Linear and S-curve ramp evenly over a short window."><option value="e">Ease</option><option value="h">Hold (stepped)</option><option value="l">Linear</option><option value="s">S-curve</option></select><span class="hint" id="auInfo"></span><span class="grow"></span><button class="btn sm" id="auClear">Clear lane</button><button class="btn sm" id="auClose">Close</button></div>
     <div class="lib-body"><canvas id="auCv" height="190" style="width:100%;touch-action:none;display:block;border-radius:6px"></canvas><p class="hint" style="margin:8px 0 0">Drag across the lane to draw values, one per step. Shift-drag or right-drag erases. Steps with no value keep the channel's own setting. Playback needs the pattern to run.</p></div>
+  </div>
+</div>
+<div class="modal" id="wnMod" hidden role="dialog" aria-modal="true" aria-labelledby="wnT">
+  <div class="modal-box">
+    <div class="roll-bar"><strong id="wnT">What's new</strong><span class="grow"></span><button class="btn sm" id="wnClose">Close</button></div>
+    <div class="lib-body" id="wnList"></div>
   </div>
 </div>
 <div class="modal" id="confirmMod" hidden role="dialog" aria-modal="true" aria-labelledby="confirmT">
@@ -9598,6 +9607,27 @@ $('#vidBtn').onclick=async()=>{
   finally{if(ac)ac.close();exporting=false;b.disabled=false;b.textContent='Video';}
 };
 
+/* ---------- what's new ---------- */
+const CHANGELOG=[
+  {v:'2026.11.05',items:[
+    'Sidechain ducking: a one-click "Duck all channels to this" button, plus a Duck hold control for the classic pump shape.',
+    'Sample editor: ÷2/×2 quick tempo correction, matching the Audio Lane.',
+    'Automation: pick a curve shape per lane — Ease, Hold (stepped), Linear or S-curve.',
+    'Gallery: fork a beat you opened, with lineage shown on cards; sort by Newest or Trending.',
+    'Added a real privacy policy.',
+    'Fixed the Play button sometimes not responding to clicks, and welcome-tour/Guide "Show me" buttons that pointed off-screen.'
+  ]}
+];
+function openWhatsNew(){
+  $('#wnList').innerHTML=CHANGELOG.map(e=>'<div class="lib-item" style="display:block;cursor:default"><span class="nm">'+esc(e.v)+'</span><ul style="margin:6px 0 0 18px;padding:0;color:var(--dim)">'+e.items.map(i=>'<li style="margin:0 0 4px">'+esc(i)+'</li>').join('')+'</ul></div>').join('');
+  $('#wnMod').hidden=false;
+  try{localStorage.setItem('beatsynth.wnseen',CHANGELOG[0].v);}catch(e){}
+  $('#wnDot').hidden=true;
+}
+$('#wnClose').onclick=()=>{$('#wnMod').hidden=true;};
+$('#wnMod').addEventListener('pointerdown',e=>{if(e.target===$('#wnMod'))$('#wnMod').hidden=true;});
+try{if(localStorage.getItem('beatsynth.wnseen')!==CHANGELOG[0].v)$('#wnDot').hidden=false;}catch(e){}
+
 /* ---------- gallery, error reports ---------- */
 const APP_V='1.0';
 const onWeb=/^https?:$/.test(location.protocol)&&!/^(localhost|127\.|\[::1\])/.test(location.hostname);
@@ -9612,12 +9642,16 @@ async function loadGallery(){
 let galItems=[],forkSrc=null;
 const ago=t=>{const m=Math.max(0,(Date.now()-t)/6e4);return m<2?'just now':m<60?Math.round(m)+' min ago':m<1440?Math.round(m/60)+' h ago':Math.round(m/1440)+' d ago';};
 function syncForkRow(){const on=!!forkSrc;$('#galForkRow').hidden=!on;if(on)$('#galForkTitle').textContent=forkSrc.title||'a gallery beat';}
+const trendScore=g=>((g.forks||0)+1)/Math.pow((Date.now()-(g.t||0))/3600000+2,1.3);
 function drawGallery(){
-  const box=$('#galList'),q=$('#galQ').value.trim().toLowerCase();
-  const a=galItems.filter(g=>!q||(g.title+' '+(g.tags||[]).join(' ')).toLowerCase().includes(q));
+  const box=$('#galList'),q=$('#galQ').value.trim().toLowerCase(),sort=$('#galSort').value;
+  let a=galItems.filter(g=>!q||(g.title+' '+(g.tags||[]).join(' ')).toLowerCase().includes(q));
+  if(sort==='trend')a=a.slice().sort((x,y)=>trendScore(y)-trendScore(x));
   box.innerHTML=a.length?a.map(g=>'<div class="lib-item"><span class="nm" title="'+esc(g.title)+'">'+esc(g.title)+'</span><span class="dt">'+g.bpm+' BPM · '+g.ch+' ch'+(g.t?' · '+ago(g.t):'')+(g.forkOf?' · forked from '+esc(g.forkOf.title):'')+(g.forks?' · '+g.forks+' fork'+(g.forks===1?'':'s'):'')+'</span><span class="tags">'+(g.tags||[]).map(t=>'<button class="tagchip" data-tag="'+esc(t)+'" aria-label="Show beats tagged '+esc(t)+'">#'+esc(t)+'</button>').join('')+'</span><button class="btn sm" data-prev="'+esc(g.id)+'" data-title="'+esc(g.title)+'" title="Listen without opening it">Listen</button><button class="btn sm" data-open="'+esc(g.id)+'" data-title="'+esc(g.title)+'">Open</button><button class="btn sm" data-rep="'+esc(g.id)+'" title="Report this beat">Report</button></div>').join(''):'<span class="hint">'+(galItems.length?'Nothing matches that search.':'Nothing published yet. Be the first.')+'</span>';
 }
 $('#galQ').addEventListener('input',drawGallery);
+$('#galSort').addEventListener('change',()=>{try{localStorage.setItem('beatsynth.galsort',$('#galSort').value);}catch(e){}drawGallery();});
+try{const sv=localStorage.getItem('beatsynth.galsort');if(sv)$('#galSort').value=sv;}catch(e){}
 (()=>{const m=$('#prevMod'),c=()=>{$('#prevFrame').src='about:blank';m.hidden=true;};$('#prevClose').onclick=c;m.addEventListener('pointerdown',e=>{if(e.target===m)c();});})();
 $('#libBtn').addEventListener('click',loadGallery);
 $('#galList').addEventListener('click',async e=>{
