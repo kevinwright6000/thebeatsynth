@@ -43,16 +43,6 @@
   ],
   "rewrites": [
     {
-      "source": "/",
-      "has": [
-        {
-          "type": "query",
-          "key": "s"
-        }
-      ],
-      "destination": "/api/page"
-    },
-    {
       "source": "/.well-known/security.txt",
       "destination": "/security.txt"
     }

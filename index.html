@@ -3732,7 +3732,7 @@ select option{background:var(--panel2);color:var(--fg)}
       <button class="btn primary" id="mmbBtn" title="Pick a mood and the app writes drums, chords, bass and a melody together in a key that fits">Make me a beat</button>
       <button class="btn" id="surpriseBtn" title="Instant random beat: picks a mood and writes drums, chords, bass and a melody, then plays it">Surprise me</button>
       <button class="btn" id="remixBtn" title="Make a variation of your beat in the same key, or swap the drum style">Remix this</button>
-      <button class="btn" id="tplBtn" title="Open the Library: ready-made beats in a style, your saved beats and the public gallery">Library</button>
+      <button class="btn" id="tplBtn" title="Open the Library: ready-made beats in a style, and your saved beats">Library</button>
       <button class="btn" id="kitBtn" title="Drum kits that react to velocity: pick a character and get the kit with a matching groove">Kits ▾</button>
       <button class="btn" id="midiInBtn" title="Open a .mid file as a new pattern">Import MIDI…</button><input type="file" id="midiFile" accept=".mid,.midi,audio/midi" hidden></div>
     <input type="file" id="file" accept="audio/*,.wav,.mp3,.ogg,.m4a,.flac,.aac" multiple hidden>
@@ -3849,16 +3849,10 @@ select option{background:var(--panel2);color:var(--fg)}
         <div class="lib-save"><input id="libName" maxlength="40" placeholder="Name this beat" aria-label="Project name"><button class="btn sm primary" id="libSave">Save current</button></div>
         <div class="lib-list" id="libList"></div></div>
       <div class="lib-foot">Free to use, no sign-up. If it helps you make music, <a class="coffee-link" href="https://buymeacoffee.com/kevin.wright" target="_blank" rel="noopener">☕ buy me a coffee</a>.</div>
-      <div class="lib-sec" id="galSec"><span class="lbl">Public gallery</span>
-        <div class="lib-save" id="galForkRow" hidden><span class="hint">Forking <strong id="galForkTitle"></strong></span><button class="btn sm" id="galForkClear" title="Publish as a new, unrelated beat instead">Clear</button></div>
-        <div class="lib-save"><input id="galTitle" maxlength="40" placeholder="Name your beat to publish it" aria-label="Title for the gallery"><input id="galTags" maxlength="60" placeholder="Tags: lofi, chill" aria-label="Tags, separated by commas"><button class="btn sm primary" id="galPub">Publish</button></div>
-        <div class="lib-save"><input id="galQ" type="search" placeholder="Search the gallery by name or tag" aria-label="Search the gallery"><select id="galSort" class="btn sm" aria-label="Sort the gallery"><option value="new">Newest</option><option value="trend">Trending</option></select></div>
-        <span class="hint">Publishing shares the pattern and settings, not imported audio. Anyone can open it as their own copy. Opening someone else's beat from the gallery and publishing your version links it back to the original.</span>
-        <div class="lib-list" id="galList"><span class="hint">Loading…</span></div></div>
       <div class="lib-sec"><span class="lbl">Share</span>
-        <div class="lib-save"><button class="btn sm" id="shareBtn">Create link</button><button class="btn sm" id="shortBtn" title="Needs the optional share server (see the server folder)">Short link</button><input id="shareOut" readonly placeholder="A link that opens this beat" aria-label="Share link"><button class="btn sm" id="shareCopy">Copy</button></div>
+        <div class="lib-save"><button class="btn sm" id="shareBtn">Create link</button><input id="shareOut" readonly placeholder="A link that opens this beat" aria-label="Share link"><button class="btn sm" id="shareCopy">Copy</button></div>
         <div class="lib-save"><button class="btn sm" id="embedBtn" title="Get HTML that puts a small player for this beat on any web page">Embed code</button><input id="embedOut" readonly placeholder="HTML for a player on your own page" aria-label="Embed code"><button class="btn sm" id="embedCopy">Copy</button></div>
-        <span class="hint" id="shareHint">The link contains the whole beat, so anyone who opens it gets their own copy. Imported audio files are not included.</span></div>
+        <span class="hint" id="shareHint">The link contains the whole beat, so anyone who opens it gets their own copy. Nothing is uploaded to any server — the whole beat lives in the link itself. Imported audio files are not included.</span></div>
     </div>
   </div>
 </div>
@@ -3874,9 +3868,6 @@ select option{background:var(--panel2);color:var(--fg)}
     <div class="lib-save"><button class="btn sm primary" id="humGo">Record</button><div class="meter"><i id="humLvl"></i></div><output id="humNow" class="lbl">—</output></div>
     <span class="hint" id="humMsg" role="status"></span></div></div></div>
 
-<div class="modal" id="prevMod" hidden role="dialog" aria-modal="true" aria-labelledby="prevT">
-  <div class="modal-box" style="width:min(560px,100%)"><div class="roll-bar"><strong id="prevT">Preview</strong><span class="grow"></span><button class="btn sm" id="prevClose">Close</button></div>
-  <div class="lib-body"><iframe id="prevFrame" title="Beat preview" allow="autoplay" style="width:100%;height:96px;border:0;border-radius:8px"></iframe><span class="hint">Press play to listen. Use Open on the card to edit your own copy.</span></div></div></div>
 <div class="modal" id="macroMod" hidden role="dialog" aria-modal="true" aria-labelledby="macroT">
   <div class="modal-box" id="macroBox"><div class="roll-bar"><strong id="macroT">Macro rack</strong><span class="grow"></span><button class="btn sm" id="macroFloat" aria-pressed="false" title="Float this window: drag it by its title bar, resize it from the corner, and keep working while it stays open. Press again to dock it.">⧉ Float</button><button class="btn sm" id="macroClose">Close</button></div>
   <div class="lib-body">
@@ -6091,7 +6082,7 @@ function newPattern(copyData){
 }
 function resetPatterns(){
   S.scenes=[];S.lanes={};sceneQ=null;
-  S.patterns=[{id:1,name:'Pattern 1',color:'#6c63ff',num:4,den:4,bars:1,bpm:120}];S.curPat=1;S.nextPat=2;S.song=[];S.selClip=-1;S.mode='pattern';S.asrc=[];S.alane=[];S.aref=0;S.alrip=false;S.als=false;S.alsnap=true;S.ahear=true;S.alm=false;S.alv=1;alSel=-1;alCur=null;S.title='Untitled Beat';forkSrc=null;if(typeof syncForkRow==='function')syncForkRow();if(typeof syncTitle==='function')syncTitle();if(typeof renderAudioLane==='function')renderAudioLane();syncMode();syncTransport();
+  S.patterns=[{id:1,name:'Pattern 1',color:'#6c63ff',num:4,den:4,bars:1,bpm:120}];S.curPat=1;S.nextPat=2;S.song=[];S.selClip=-1;S.mode='pattern';S.asrc=[];S.alane=[];S.aref=0;S.alrip=false;S.als=false;S.alsnap=true;S.ahear=true;S.alm=false;S.alv=1;alSel=-1;alCur=null;S.title='Untitled Beat';if(typeof syncTitle==='function')syncTitle();if(typeof renderAudioLane==='function')renderAudioLane();syncMode();syncTransport();
 }
 function syncMode(){
   {const b=$('#modeBtn');if(b){b.textContent=S.mode==='song'?'SONG':'PAT';b.dataset.m=S.mode==='song'?'song':'pat';}}
@@ -6400,7 +6391,7 @@ const pcOf=m=>((m-S.key)%12+12)%12;
 const inScale=m=>SCALES[S.scale].includes(pcOf(m));
 function snapNote(m){if(!S.lock||inScale(m))return m;for(let d=1;d<=6;d++){if(inScale(m-d))return m-d;if(inScale(m+d))return m+d;}return m;}
 $('#etBtn').onclick=e=>{const on=!$('.app').classList.contains('et-open');$('.app').classList.toggle('et-open',on);e.currentTarget.setAttribute('aria-pressed',on);};
-window.__bs={get alN(){return alNodes.length},alZoomTo,alView,get alZoom(){return alZoom},alRemoveAll,alEdSlice,alEdDelete,alEdCopy,alEdPaste,alEdMove,setAlSel(a,b,c){alSelR=a==null?null:{a,b};alCursor=c==null?null:c;alOverlay();},alSplit,alDup,alDel,alSnap,loadProject,warpMarkers,wkPoints,freezeChannel,unfreezeChannel,audioToNotes,audioToDrums,macroApply,macroRender,grooveFromLoop,grooveDef,openLaunchSet,followAction,captureMidi,get capBuf(){return capBuf},takeSave,takeSwap,takeDel,secGroups,secLabel,secMove,secDuplicate,normalizeLufs,measureLufs,loadKit,onMidi,recUndoTake,get recLog(){return recLog},get mset(){return mset},set msetV(v){mset=cleanSet(v);},mmApplyTpl,get midiMap(){return midiMap},get btnMap(){return btnMap},flToggle,coffeeNudge,get held(){return held},get snapshot(){return snapshot},get cleanMi(){return cleanMi},setMidiOut:o=>{midiOut=o;},setClk:m=>{clkMode=m;},addChannel,render,renderMixer,get shareCard(){return shareCard},get audTakes(){return audTakes},get audStartFn(){return audStart},get audStopNow(){return audStopNow},get planList(){return planList},get renderPlan(){return renderPlan},get clipDur(){return clipDur},get planFromUI(){return planFromUI},get encodeWav(){return encodeWav},parseProg,degTones,chordEvents,bassNotes,writeBass,writeProgression,get SOUNDS(){return SOUNDS},yinPitch,pitchTrack,framesToNotes,notesToSteps,detectKey,chordTones,chordLabel,importMidi,parseMidi,readZip,clipAuto,detectBpm,findHits,stretchBuf,measureLufs,normalizeLufs,renderOne,get PACKS(){return PACKS},get S(){return S},inScale,snapNote,midi:(a,ts)=>onMidi({data:a,timeStamp:ts}),padHit,renderPlan,foldLoop,planList,encodeMp3,PRESETS:()=>PRESETS,setView,get playing(){return playing},activeCh,applyFxPreset,toast,get FACTORY_FX(){return FACTORY_FX}};
+window.__bs={get alN(){return alNodes.length},alZoomTo,alView,get alZoom(){return alZoom},alRemoveAll,alEdSlice,alEdDelete,alEdCopy,alEdPaste,alEdMove,setAlSel(a,b,c){alSelR=a==null?null:{a,b};alCursor=c==null?null:c;alOverlay();},alSplit,alDup,alDel,alSnap,loadProject,warpMarkers,wkPoints,freezeChannel,unfreezeChannel,audioToNotes,audioToDrums,macroApply,macroRender,grooveFromLoop,grooveDef,openLaunchSet,followAction,captureMidi,get capBuf(){return capBuf},takeSave,takeSwap,takeDel,secGroups,secLabel,secMove,secDuplicate,normalizeLufs,measureLufs,loadKit,onMidi,recUndoTake,get recLog(){return recLog},get mset(){return mset},set msetV(v){mset=cleanSet(v);},mmApplyTpl,get midiMap(){return midiMap},get btnMap(){return btnMap},flToggle,coffeeNudge,get held(){return held},get snapshot(){return snapshot},get cleanMi(){return cleanMi},setMidiOut:o=>{midiOut=o;},setClk:m=>{clkMode=m;},addChannel,render,renderMixer,get audTakes(){return audTakes},get audStartFn(){return audStart},get audStopNow(){return audStopNow},get planList(){return planList},get renderPlan(){return renderPlan},get clipDur(){return clipDur},get planFromUI(){return planFromUI},get encodeWav(){return encodeWav},parseProg,degTones,chordEvents,bassNotes,writeBass,writeProgression,get SOUNDS(){return SOUNDS},yinPitch,pitchTrack,framesToNotes,notesToSteps,detectKey,chordTones,chordLabel,importMidi,parseMidi,readZip,clipAuto,detectBpm,findHits,stretchBuf,measureLufs,normalizeLufs,renderOne,get PACKS(){return PACKS},get S(){return S},inScale,snapNote,midi:(a,ts)=>onMidi({data:a,timeStamp:ts}),padHit,renderPlan,foldLoop,planList,encodeMp3,PRESETS:()=>PRESETS,setView,get playing(){return playing},activeCh,applyFxPreset,toast,get FACTORY_FX(){return FACTORY_FX}};
 function scaleChanged(){if(!$('#kbd').hidden)buildKbd();if(rollCh)drawRoll();if(typeof drawChordStrip==='function'&&document.querySelector('#chStrip'))drawChordStrip();}
 $('#keyRoot').onchange=e=>{S.key=+e.target.value;scaleChanged();markDirty();syncKey();};
 $('#keyScale').onchange=e=>{S.scale=e.target.value;scaleChanged();markDirty();syncKey();};
@@ -8896,7 +8887,7 @@ const GUIDE=(()=>{
     steps:['Keys plays the active channel from your computer keyboard. Z and X move the octave. With Keys follow scale on, A to ; play only notes in your key and scale. Piano shows an on-screen keyboard.','Connect MIDI links a keyboard or controller. MIDI learn links a knob to any slider: click the slider, then move the knob.','Record writes what you play into the active channel while the pattern runs. Use Metronome and Count-in for timing.','Loop rec records the mic or the whole mix for 1 to 8 bars, exactly in time. Mic loops get a vocal chain (clean, rap, sing or big space) that you can change or switch off. Reference lets you A/B against a finished track.','Open Settings, MIDI map, More for recording options: quantize every step, every 2 steps or every beat, and whether each loop pass layers on top of the last or replaces it. Undo last recorded take removes one pass. MPE controllers can be switched on there too.'],
     acts:[show('#keysBtn','Keys, MIDI, Record, Loop rec and the metronome are in the Play tools.',()=>{tools();tab('play');})]},
    {id:'save',t:'Save, export and share',sub:'Keep it, render it, send it',intro:'Project and Export sit at the top.',
-    steps:['Open the File menu: Save downloads your project, ZIP keeps imported audio inside it, and Library holds saved beats, templates and the public gallery.','Open the Export menu: Render makes a WAV, MP3 or loop-ready file. Pick a loudness target first if you want streaming level. Stems exports each channel on its own. Video and MIDI export too.','In Library, Share makes a link anyone can open as their own copy. Short link needs the share server. Embed code gives a small player to put on a web page.','Imported audio is not included in links. Use ZIP to move a beat that contains your own audio.'],
+    steps:['Open the File menu: Save downloads your project, ZIP keeps imported audio inside it, and Library holds saved beats and templates.','Open the Export menu: Render makes a WAV, MP3 or loop-ready file. Pick a loudness target first if you want streaming level. Stems exports each channel on its own. Video and MIDI export too.','In Library, Share makes a link anyone can open as their own copy — the whole beat lives in the link itself, nothing is uploaded anywhere. Embed code gives a small player to put on a web page.','Imported audio is not included in links. Use ZIP to move a beat that contains your own audio.'],
     acts:[show('#saveBtn','The File menu holds New, Open, Save and the Library.'),show('#expBtn','Render, Stems, Video and MIDI are in the Export menu.',null,'Show Export'),{l:'Open the Library',run:()=>{closeGuide();$('#libBtn').click();}}]},
    {id:'presets',t:'Presets',sub:'Save your sounds and reuse them',intro:'Save a channel\'s effects, a synth patch or a whole channel setup, then bring it back in any beat.',
     steps:['Open Presets from a channel\'s ⋯ menu, the FX panel (Presets) or the Synth designer (My presets).','Type a name and press Save effects, Save synth patch or Save channel setup. They are stored in this browser.','Apply to channel puts saved effects, or a patch, on the active channel. Add as new channel brings back a whole setup with its sound, volume, pan, pitch and effects.','Starter effects such as Lo-fi tape, Wide chorus and Dub echo are built in. Press one to apply it to the active channel.','Export my presets saves them to a file. Import presets loads that file in another browser or on another computer.','Imported audio files cannot be saved in a preset. Use ZIP to keep a beat that contains your own audio.'],
@@ -9817,89 +9808,15 @@ $('#wnClose').onclick=()=>{$('#wnMod').hidden=true;};
 $('#wnMod').addEventListener('pointerdown',e=>{if(e.target===$('#wnMod'))$('#wnMod').hidden=true;});
 try{if(localStorage.getItem('beatsynth.wnseen')!==CHANGELOG[0].v)$('#wnDot').hidden=false;}catch(e){}
 
-/* ---------- gallery, error reports ---------- */
+/* ---------- error reports ---------- */
 const APP_V='1.0';
 const onWeb=/^https?:$/.test(location.protocol)&&!/^(localhost|127\.|\[::1\])/.test(location.hostname);
-async function loadGallery(){
-  const box=$('#galList');
-  if(!/^https?:$/.test(location.protocol)){box.innerHTML='<span class="hint">The gallery is available on the website.</span>';return;}
-  try{
-    const r=await fetch(new URL('api/gallery',APP_BASE));if(!r.ok)throw 0;const a=await r.json();
-    galItems=a;drawGallery();
-  }catch(e){box.innerHTML='<span class="hint">The gallery is not available here.</span>';}
-}
-let galItems=[],forkSrc=null;
-const ago=t=>{const m=Math.max(0,(Date.now()-t)/6e4);return m<2?'just now':m<60?Math.round(m)+' min ago':m<1440?Math.round(m/60)+' h ago':Math.round(m/1440)+' d ago';};
-function syncForkRow(){const on=!!forkSrc;$('#galForkRow').hidden=!on;if(on)$('#galForkTitle').textContent=forkSrc.title||'a gallery beat';}
-const trendScore=g=>((g.forks||0)+1)/Math.pow((Date.now()-(g.t||0))/3600000+2,1.3);
-function drawGallery(){
-  const box=$('#galList'),q=$('#galQ').value.trim().toLowerCase(),sort=$('#galSort').value;
-  let a=galItems.filter(g=>!q||(g.title+' '+(g.tags||[]).join(' ')).toLowerCase().includes(q));
-  if(sort==='trend')a=a.slice().sort((x,y)=>trendScore(y)-trendScore(x));
-  box.innerHTML=a.length?a.map(g=>'<div class="lib-item"><span class="nm" title="'+esc(g.title)+'">'+esc(g.title)+'</span><span class="dt">'+g.bpm+' BPM · '+g.ch+' ch'+(g.t?' · '+ago(g.t):'')+(g.forkOf?' · forked from '+esc(g.forkOf.title):'')+(g.forks?' · '+g.forks+' fork'+(g.forks===1?'':'s'):'')+'</span><span class="tags">'+(g.tags||[]).map(t=>'<button class="tagchip" data-tag="'+esc(t)+'" aria-label="Show beats tagged '+esc(t)+'">#'+esc(t)+'</button>').join('')+'</span><button class="btn sm" data-prev="'+esc(g.id)+'" data-title="'+esc(g.title)+'" title="Listen without opening it">Listen</button><button class="btn sm" data-open="'+esc(g.id)+'" data-title="'+esc(g.title)+'">Open</button><button class="btn sm" data-rep="'+esc(g.id)+'" title="Report this beat">Report</button></div>').join(''):'<span class="hint">'+(galItems.length?'Nothing matches that search.':'Nothing published yet. Be the first.')+'</span>';
-}
-$('#galQ').addEventListener('input',drawGallery);
-$('#galSort').addEventListener('change',()=>{try{localStorage.setItem('beatsynth.galsort',$('#galSort').value);}catch(e){}drawGallery();});
-try{const sv=localStorage.getItem('beatsynth.galsort');if(sv)$('#galSort').value=sv;}catch(e){}
-(()=>{const m=$('#prevMod'),c=()=>{$('#prevFrame').src='about:blank';m.hidden=true;};$('#prevClose').onclick=c;m.addEventListener('pointerdown',e=>{if(e.target===m)c();});})();
-$('#libBtn').addEventListener('click',loadGallery);
-$('#galList').addEventListener('click',async e=>{
-  const o=e.target.closest('[data-open]'),rp=e.target.closest('[data-rep]'),pv=e.target.closest('[data-prev]'),tg=e.target.closest('[data-tag]');
-  if(tg){$('#galQ').value=tg.dataset.tag;drawGallery();return;}
-  if(pv){const u=new URL(location.href);u.hash='';u.search='?embed=1&s='+encodeURIComponent(pv.dataset.prev)+'&t='+encodeURIComponent(pv.dataset.title||'');$('#prevT').textContent=pv.dataset.title||'Preview';$('#prevFrame').src=u.href;$('#prevMod').hidden=false;return;}
-  try{
-    if(o){const r=await fetch(new URL('api/share/'+o.dataset.open,APP_BASE));if(!r.ok)throw 0;const p=await r.json();const saved=backupCurrent();await loadProject(p);forkSrc={id:o.dataset.open,title:o.dataset.title||''};syncForkRow();markDirty();closeLib();toast('Opened a gallery beat. Publishing your version will link back to it as a fork.'+(saved?' Your previous beat was backed up in the library.':''));}
-    else if(rp){const r=await fetch(new URL('api/gallery?report='+rp.dataset.rep,APP_BASE),{method:'POST'});toast(r.ok?'Thanks. Reported.':'Could not send the report.');if(r.ok)loadGallery();}
-  }catch(err){toast('Could not open that beat.');}
-});
-$('#galForkClear').onclick=()=>{forkSrc=null;syncForkRow();};
-$('#galPub').onclick=async()=>{
-  const title=$('#galTitle').value.trim();
-  if(!S.channels.length){toast('Add a channel first.');return;}
-  if(title.length<2){toast('Give your beat a name first.');return;}
-  try{
-    const r=await fetch(new URL('api/gallery',APP_BASE),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,tags:$('#galTags').value,project:snapshot(false),forkedFrom:forkSrc?forkSrc.id:undefined})});
-    const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Could not publish.');
-    $('#galTitle').value='';$('#galTags').value='';toast(j.forkOf?'Published as a fork of "'+j.forkOf.title+'".':'Published to the gallery.');forkSrc=null;syncForkRow();loadGallery();
-  }catch(err){toast(err.message||'Could not publish.');}
-};
 (()=>{
   if(!onWeb)return;let sent=0;
   const rep=(m,s2)=>{if(sent++>=5)return;try{navigator.sendBeacon(new URL('api/log',APP_BASE),new Blob([JSON.stringify({m:String(m).slice(0,300),s:String(s2||'').slice(0,400),w:location.pathname,u:navigator.userAgent.slice(0,160),v:APP_V})],{type:'application/json'}));}catch(e){}};
   window.addEventListener('error',e=>rep(e.message,(e.error&&e.error.stack)||e.filename+':'+e.lineno));
   window.addEventListener('unhandledrejection',e=>rep('rejection: '+(e.reason&&e.reason.message||e.reason),e.reason&&e.reason.stack));
 })();
-
-/* ---------- share preview card ---------- */
-const KEYN=NN;
-function shareCard(){
-  try{
-    const W=1200,H=630,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');
-    const gr=g.createLinearGradient(0,0,W,H);gr.addColorStop(0,'#14161d');gr.addColorStop(1,'#2a1d3a');g.fillStyle=gr;g.fillRect(0,0,W,H);
-    const cs=S.channels.filter(x=>x.kind!=='sample'||true).slice(0,8),pat=S.curPat,n=16,gx=70,gy=250,cw=(W-gx*2)/n,rh=Math.min(40,300/Math.max(cs.length,1));
-    cs.forEach((ch,ri)=>{const d=ch.pats[pat];g.fillStyle=ch.color||'#ff9a3c';
-      for(let i=0;i<n;i++){let on=false;if(d){if(ch.kind==='inst')on=d.notes.some(q=>Math.floor(q.i)===i);else on=!!d.steps[i];}
-        g.globalAlpha=on?1:.14;g.beginPath();g.roundRect(gx+i*cw+3,gy+ri*(rh+6),cw-6,rh,6);g.fill();}});
-    g.globalAlpha=1;g.fillStyle='#fff';g.font='700 64px system-ui,sans-serif';g.fillText('A beat on thebeatsynth',gx,130);
-    g.fillStyle='#b9bfd0';g.font='500 36px system-ui,sans-serif';
-    g.fillText(S.bpm+' BPM'+(S.key!=null?'  ·  '+KEYN[S.key]+' '+S.scale:'')+'  ·  '+S.channels.length+' channels',gx,190);
-    g.fillStyle='#ff9a3c';g.font='600 30px system-ui,sans-serif';g.fillText('Open it and press play  →  thebeatsynth.com',gx,H-40);
-    const o=document.createElement('canvas');o.width=600;o.height=315;o.getContext('2d').drawImage(c,0,0,600,315);
-    let u=o.toDataURL('image/jpeg',.82);return u.length<180000?u:null;
-  }catch(e){return null;}
-}
-/* ---------- optional share server ---------- */
-$('#shortBtn').onclick=async()=>{
-  try{
-    if(!S.channels.length)throw new Error('Add a channel first.');
-    if(!/^https?:$/.test(location.protocol))throw new Error('Short links need the share server. Open the app from your web server.');
-    const r=await fetch(new URL('api/share',APP_BASE),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({project:snapshot(false),card:shareCard(),meta:{bpm:S.bpm,key:S.key!=null?KEYN[S.key]+' '+S.scale:'',ch:S.channels.length}})});
-    if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.error||'The share server is not running here. Use "Create link" instead.');}
-    const {id}=await r.json(),url=new URL(APP_BASE);url.hash='';url.search='?s='+id;
-    $('#shareOut').value=url.href;$('#shareOut').select();$('#shareHint').textContent='Short link. Audio you imported is not included.';
-    try{await navigator.clipboard.writeText(url.href);toast('Short link copied.');}catch(e){toast('Short link created. Press Ctrl+C to copy it.');}
-  }catch(err){toast(err.message||'Could not create a short link.');}
-};
 
 /* ---------- shortcuts ---------- */
 const SHORTCUTS=[['Transport',[['Space','Play or stop'],['Home','Stop and rewind'],['R','Arm recording'],['M','Metronome on or off'],['Hold `','Beat Repeat: stutter-repeat a slice of the beat']]],
@@ -10315,11 +10232,11 @@ $('#embedBtn').onclick=async()=>{
   if(!$('#shareOut').value)await $('#shareBtn').onclick();
   const v=$('#shareOut').value;if(!v)return;
   if(!/^https?:/.test(v)){toast('Embedding needs the website, not this preview.');return;}
-  const u=new URL(v);u.searchParams.set('embed','1');const t=$('#libName').value.trim()||$('#galTitle').value.trim();if(t)u.searchParams.set('t',t.slice(0,60));
+  const u=new URL(v);u.searchParams.set('embed','1');const t=$('#libName').value.trim();if(t)u.searchParams.set('t',t.slice(0,60));
   const code='<iframe src="'+u.href.replace(/"/g,'%22')+'" width="100%" height="96" style="border:0;max-width:560px;border-radius:8px" allow="autoplay" loading="lazy" title="thebeatsynth beat"></iframe>';
   $('#embedOut').value=code;$('#embedOut').select();
   try{await navigator.clipboard.writeText(code);toast('Embed code copied.');}catch(e){toast('Press Ctrl+C to copy the selected code.');}
-  $('#shareHint').textContent=v.includes('?s=')?'Short link embed. Audio you imported is not included.':'This embed uses the long link. Press Short link first for a neater, shorter code (needs the share server).';
+  $('#shareHint').textContent='Nothing is uploaded anywhere — the whole beat is encoded in the link itself. Imported audio is not included.';
 };
 $('#embedCopy').onclick=async()=>{const v=$('#embedOut').value;if(!v){toast('Press Embed code first.');return;}$('#embedOut').select();try{await navigator.clipboard.writeText(v);toast('Embed code copied.');}catch(e){toast('Press Ctrl+C to copy the selected code.');}};
 function openStarterParam(){
@@ -10335,12 +10252,6 @@ function openStarterParam(){
   return true;
 }
 async function openSharedHash(){
-  const sid=new URLSearchParams(location.search).get('s');
-  if(sid&&/^[\w\-]{4,20}$/.test(sid)){
-    try{const r=await fetch(new URL('api/share/'+sid,APP_BASE));if(!r.ok)throw 0;const p=await r.json();const saved=backupCurrent();await loadProject(p);markDirty();
-      toast('Opened a shared beat.'+(saved?' Your previous beat was backed up in the library.':''));try{history.replaceState(null,'',location.pathname);}catch(e){}return true;}
-    catch(e){toast('That short link could not be opened.');return false;}
-  }
   const m=/^#b=([\w\-]+)$/.exec(location.hash);if(!m)return false;
   try{
     const p=await unpackLink(m[1]);if(!p||!Array.isArray(p.channels))throw 0;
