@@ -3988,6 +3988,16 @@ select option{background:var(--panel2);color:var(--fg)}
     <div class="lib-body" id="wnList"></div>
   </div>
 </div>
+<div class="modal" id="alFitMod" hidden role="dialog" aria-modal="true" aria-labelledby="alFitT" style="z-index:300">
+  <div class="modal-box" style="width:min(360px,100%);padding:20px 22px;text-align:center">
+    <strong id="alFitT" style="display:block;margin-bottom:4px">Matching tempo…</strong>
+    <div id="alFitModText" class="hint" style="margin-bottom:14px">Working…</div>
+    <div style="height:8px;border-radius:4px;background:var(--pad);overflow:hidden">
+      <div id="alFitModBar" style="height:100%;width:0%;background:var(--accent);border-radius:4px;transition:width .15s linear"></div>
+    </div>
+    <button class="btn sm" id="alFitCancelBtn" style="margin-top:16px">Cancel and remove import</button>
+  </div>
+</div>
 <div class="modal" id="confirmMod" hidden role="dialog" aria-modal="true" aria-labelledby="confirmT">
   <div class="modal-box" style="width:min(380px,100%)">
     <div class="roll-bar"><strong id="confirmT">Are you sure?</strong></div>
@@ -5672,10 +5682,10 @@ function warpMarkers(b,wk){
 /* Off-main-thread time-stretch: the correlation-search phase-vocoder below is
    billions of ops for a real song, so it runs in a Worker (search window
    trimmed too) instead of blocking the tab while it computes. */
-let stretchWorker=null,stretchReqId=0;
+let stretchWorker=null,stretchReqId=0,curStretchReject=null;
 function getStretchWorker(){
   if(stretchWorker)return stretchWorker;
-  const src="function stretchCh(src,ratio){"+
+  const src="function stretchCh(src,ratio,onP){"+
     "var N=4096,H=N/4,outLen=Math.max(N,Math.round(src.length*ratio));"+
     "var dst=new Float32Array(outLen),norm=new Float32Array(outLen),win=new Float32Array(N);"+
     "for(var i=0;i<N;i++)win[i]=.5-.5*Math.cos(2*Math.PI*i/N);"+
@@ -5687,36 +5697,51 @@ function getStretchWorker(){
         "ap+=best;}}"+
       "ap=Math.max(0,Math.min(src.length-N,ap));prev=ap;"+
       "for(var i2=0;i2<N&&o+i2<outLen;i2++){dst[o+i2]+=src[ap+i2]*win[i2];norm[o+i2]+=win[i2];}"+
+      "if(onP&&(k%20===0))onP(o/outLen);"+
     "}"+
     "for(var i3=0;i3<outLen;i3++)if(norm[i3]>1e-3)dst[i3]/=norm[i3];"+
     "return dst;}"+
-    "onmessage=function(e){var d=e.data,out=d.channels.map(function(ch){return stretchCh(ch,d.ratio);});postMessage({id:d.id,out:out},out.map(function(a){return a.buffer;}));};";
+    "onmessage=function(e){"+
+      "var d=e.data,chs=d.channels,outs=[];"+
+      "for(var ci=0;ci<chs.length;ci++){"+
+        "(function(ci){outs.push(stretchCh(chs[ci],d.ratio,function(p){postMessage({id:d.id,progress:(ci+p)/chs.length});}));})(ci);"+
+      "}"+
+      "postMessage({id:d.id,out:outs},outs.map(function(a){return a.buffer;}));"+
+    "};";
   const blob=new Blob([src],{type:'text/javascript'});
   stretchWorker=new Worker(URL.createObjectURL(blob));
   return stretchWorker;
 }
-function stretchWorkerRun(channels,ratio){
+function stretchWorkerRun(channels,ratio,onProgress){
   return new Promise((resolve,reject)=>{
     let w;try{w=getStretchWorker();}catch(e){reject(e);return;}
     const id=++stretchReqId;
-    const onMsg=e=>{if(e.data.id!==id)return;w.removeEventListener('message',onMsg);w.removeEventListener('error',onErr);resolve(e.data.out);};
-    const onErr=e=>{w.removeEventListener('message',onMsg);w.removeEventListener('error',onErr);reject(e);};
+    curStretchReject=reject;
+    const onMsg=e=>{
+      if(e.data.id!==id)return;
+      if(e.data.progress!=null){if(onProgress)onProgress(e.data.progress);return;}
+      w.removeEventListener('message',onMsg);w.removeEventListener('error',onErr);curStretchReject=null;resolve(e.data.out);
+    };
+    const onErr=e=>{w.removeEventListener('message',onMsg);w.removeEventListener('error',onErr);curStretchReject=null;reject(e);};
     w.addEventListener('message',onMsg);w.addEventListener('error',onErr);
     const copies=channels.map(ch=>{const c=new Float32Array(ch.length);c.set(ch);return c;});
     w.postMessage({id,channels:copies,ratio},copies.map(c=>c.buffer));
   });
 }
-async function stretchBufAsync(b,ratio){
+async function stretchBufAsync(b,ratio,onProgress){
   if(Math.abs(ratio-1)<.01)return b;
   if(b.length<4096*2)return b;
   try{
     const nc=b.numberOfChannels,channels=[];
     for(let c=0;c<nc;c++)channels.push(b.getChannelData(c));
-    const out=await stretchWorkerRun(channels,ratio);
+    const out=await stretchWorkerRun(channels,ratio,onProgress);
     const buf=new AudioBuffer({length:out[0].length,numberOfChannels:nc,sampleRate:b.sampleRate});
     for(let c=0;c<nc;c++)buf.copyToChannel(out[c],c);
     return buf;
-  }catch(e){return stretchBuf(b,ratio);} // Workers unavailable: fall back to the main-thread version
+  }catch(e){
+    if(e&&e.cancelled)throw e; // user cancelled: don't fall back to the blocking main-thread path
+    return stretchBuf(b,ratio); // Workers unavailable for some other reason
+  }
 }
 function stretchBuf(b,ratio){
   if(Math.abs(ratio-1)<.01)return b;
@@ -7608,6 +7633,31 @@ const alEndBeat=()=>S.alane.reduce((m,c)=>Math.max(m,c.a+c.l),0);
 const alEnd=()=>alEndBeat()*60/abpm();
 const alNeedFit=src=>!!src.bpm&&Math.abs(src.bpm-abpm())>.05;
 const alFitNeeded=()=>S.asrc.some(x=>alNeedFit(x)&&!(x._fit&&Math.abs(x._fit.bpm-abpm())<.01));
+let alFitGen=0,alFitCurSrc=null;
+function alFitShow(name,bpm){
+  const m=$('#alFitMod');if(!m)return;
+  $('#alFitModText').textContent='"'+name+'" to '+Math.round(bpm)+' BPM…';
+  $('#alFitModBar').style.width='0%';
+  m.hidden=false;
+}
+function alFitProg(p){const b=$('#alFitModBar');if(b)b.style.width=(Math.max(0,Math.min(1,p))*100)+'%';}
+function alFitHide(){const m=$('#alFitMod');if(m)m.hidden=true;}
+function alFitCancel(){
+  alFitGen++;
+  if(curStretchReject){const rj=curStretchReject;curStretchReject=null;try{rj({cancelled:true});}catch(e){}}
+  if(stretchWorker){try{stretchWorker.terminate();}catch(e){}stretchWorker=null;}
+  alBusy=false;
+  const src=alFitCurSrc;alFitCurSrc=null;
+  alFitHide();
+  if(src){
+    histMark();
+    S.alane=S.alane.filter(c=>c.s!==src.id);
+    S.asrc=S.asrc.filter(x=>x.id!==src.id);
+    alSel=-1;alCur=null;
+    alCommit('Import cancelled and removed.');
+  }
+}
+$('#alFitCancelBtn').onclick=alFitCancel;
 function alFitAsync(){
   if(alFitPromise)return alFitPromise;
   alFitPromise=alFit().then(()=>{if(playing)alResync();}).finally(()=>{
@@ -7618,18 +7668,23 @@ function alFitAsync(){
 }
 async function alFit(){
   if(alBusy)return;alBusy=true;
+  const myGen=alFitGen;
   try{
     for(const src of S.asrc){
+      if(myGen!==alFitGen)break; // cancelled
       if(!alNeedFit(src)){src._fit=null;continue;}
       const bpm=abpm();if(src._fit&&Math.abs(src._fit.bpm-bpm)<.01)continue;
+      alFitCurSrc=src;alFitShow(src.name,bpm);
       const el=$('#alInfo');if(el)el.textContent='Matching "'+src.name+'" to '+Math.round(bpm)+' BPM…';
       await new Promise(r=>setTimeout(r,30));
+      if(myGen!==alFitGen)break;
       const srcBpmAtStart=src.bpm,ratio=src.bpm/bpm;
-      const buf=await stretchBufAsync(src.buf,ratio);
+      const buf=await stretchBufAsync(src.buf,ratio,alFitProg);
+      if(myGen!==alFitGen)break; // cancelled mid-stretch
       if(src.bpm!==srcBpmAtStart||Math.abs(abpm()-bpm)>.01)continue; // stale: bpm changed mid-stretch, let the next pass redo it
       src._fit={bpm,buf};
     }
-  }catch(e){}finally{alBusy=false;alInfo();}
+  }catch(e){}finally{alBusy=false;alInfo();alFitCurSrc=null;if(!alFitNeeded())alFitHide();}
 }
 function alInfo(){
   const el=$('#alInfo');if(!el)return;
