@@ -7157,6 +7157,15 @@ function insertsHTML(c){
     h+=n?'<span class="on" '+(n[1]&&!more?'data-k="'+n[1]+'" draggable="true" ':'')+'title="'+(more?a.slice(3).map(x=>x[0]).join(', '):n[0]+(n[1]?' (drag to reorder, click to open)':''))+'">'+(more?'+'+(a.length-3)+' more':n[0])+'</span>':'<span>empty</span>';}
   return h;
 }
+function songStripHTML(){
+  const v=Math.max(0,Math.min(1,S.alv==null?1:S.alv));
+  return '<div class="strip song" data-id="__song" style="--c:#7aa7ff">'
+    +'<span class="sname" style="text-align:center" title="The imported song in the Timeline\'s audio lane">Song audio</span>'
+    +'<div class="fwrap"><div class="fader" data-act="svol" tabindex="0" role="slider" aria-label="Song audio volume" aria-valuemin="0" aria-valuemax="1" aria-valuenow="'+v.toFixed(2)+'"><i class="ftrack"></i><b class="fthumb" style="bottom:'+faderPos(v)+'"></b></div></div>'
+    +'<output class="vdb">'+fmtDb(v)+'</output>'
+    +'<div class="sbtns"><button class="tg m" data-act="smute" aria-pressed="'+!!S.alm+'" title="Mute the song audio">M</button><button class="tg s" data-act="ssolo" aria-pressed="'+!!S.als+'" title="Solo the song: hear only the song, and silence the channels">S</button></div>'
+    +'</div>';
+}
 function stripHTML(c){
   return '<div class="strip'+(S.activeId===c.id?' active':'')+'" data-id="'+c.id+'" style="--c:'+c.color+'">'
     +'<button class="sname" data-act="mpick" title="Select and preview '+esc(c.name)+'">'+esc(c.name)+'</button>'
@@ -7177,7 +7186,7 @@ function renderMixer(){
   const el=$('#mixer');
   const nCh=S.channels.length,dense=nCh>=10,cols=Math.min(10,Math.ceil(nCh/2));
   el.classList.toggle('dense',dense);
-  el.innerHTML='<div class="fl-bar"><b>Mixer</b><span class="grow"></span><button class="btn sm flbtn" title="Dock the mixer back into the page">Dock ⧉</button></div><div class="mxin"><div class="strips"'+(dense?' style="width:'+(cols*76+(cols-1)*5)+'px"':'')+'>'+S.channels.map(stripHTML).join('')+'</div>'
+  el.innerHTML='<div class="fl-bar"><b>Mixer</b><span class="grow"></span><button class="btn sm flbtn" title="Dock the mixer back into the page">Dock ⧉</button></div><div class="mxin"><div class="strips"'+(dense?' style="width:'+(cols*76+(cols-1)*5)+'px"':'')+'>'+S.channels.map(stripHTML).join('')+(S.alane.length?songStripHTML():'')+'</div>'
     +'<div class="specbox"><span class="lbl">Spectrum</span><canvas id="spec" aria-label="Output spectrum"></canvas></div>'
     +'<div class="mfx"><span class="lbl">Master polish</span><button class="btn sm toggle" data-polish aria-pressed="'+S.polish+'" title="One-click gentle master EQ, compression and limiting. Press again to hear your original mix (A/B).">Polish: '+(S.polish?'on':'off')+'</button><span class="lbl">Master EQ</span>'+[['lo','Low',-12,12,.5,S.mEq[0]],['mid','Mid',-12,12,.5,S.mEq[1]],['hi','High',-12,12,.5,S.mEq[2]]].map(r=>'<label class="fxr"><span class="lbl">'+r[1]+'</span><input type="range" data-m="'+r[0]+'" min="'+r[2]+'" max="'+r[3]+'" step="'+r[4]+'" value="'+r[5]+'"><output>'+r[5].toFixed(1)+' dB</output></label>').join('')
     +'<details'+(S.grpOpen?' open':'')+' id="grpBox"><summary class="lbl">Groups A to D</summary>'+S.groups.map((q,k)=>'<span class="lbl">Group '+'ABCD'[k]+'</span><label class="fxr"><span class="lbl">Level</span><input type="range" data-g="'+k+':vol" min="0" max="1.2" step="0.01" value="'+q.vol+'"><label class="chk"><input type="checkbox" data-g="'+k+':mute"'+(q.mute?' checked':'')+'> Mute</label></label><label class="fxr"><span class="lbl">Filter</span><input type="range" data-g="'+k+':cut" min="0.1" max="1" step="0.01" value="'+q.cut+'"><span></span></label><label class="fxr"><span class="lbl">Glue</span><input type="range" data-g="'+k+':comp" min="0" max="1" step="0.01" value="'+q.comp+'"><span></span></label><label class="fxr"><span class="lbl">Reverb</span><input type="range" data-g="'+k+':rev" min="0" max="1" step="0.01" value="'+q.rev+'"><span></span></label>').join('')+'<span class="hint">Assign channels to a group in their FX panel under Routing.</span></details>'
@@ -7255,6 +7264,7 @@ $('#viewRack').onclick=()=>setView('rack');$('#viewSession').onclick=()=>setView
   const faderVal=(f,e)=>{const r=f.getBoundingClientRect();return Math.max(0,Math.min(1,1-((e.clientY-r.top-7)/(r.height-14))));};
   function applyFader(f,v){
     if(f.dataset.act==='mmaster'){S.master=v;if(master)master.gain.setTargetAtTime(v,ctx.currentTime,.01);$('#master').value=v;}
+    else if(f.dataset.act==='svol'){S.alv=v;markDirty();}
     else{const ch=chOf(f);if(!ch)return;ch.vol=v;applyMix();autoRec(ch,'vol',v);}
     setFader(f,v);
   }
@@ -7288,6 +7298,12 @@ $('#viewRack').onclick=()=>setView('rack');$('#viewSession').onclick=()=>setView
   });
   mx.addEventListener('change',e=>{const r=e.target.closest('[data-act="mduck"]');if(!r)return;const ch=chOf(r);if(ch){ch.fx.duckBy=r.value?+r.value:null;applyFx(ch);}});
   mx.addEventListener('input',e=>{const r=e.target.closest('[data-act="mpan"]');if(!r)return;const ch=chOf(r);if(ch){ch.pan=+r.value;applyMix();autoRec(ch,'pan',ch.pan);}});
+  mx.addEventListener('click',e=>{
+    const b=e.target.closest('[data-act="smute"],[data-act="ssolo"]');if(!b)return;
+    if(b.dataset.act==='smute'){S.alm=!S.alm;alStop();}
+    else{S.als=!S.als;applyMix();}
+    markDirty();scheduleCommit();render();
+  });
   mx.addEventListener('click',e=>{
     const b=e.target.closest('[data-act]');if(!b)return;const ch=chOf(b);if(!ch)return;const a=b.dataset.act;
     if(a==='mmute'){ch.mute=!ch.mute;b.setAttribute('aria-pressed',ch.mute);applyMix();}
@@ -7743,7 +7759,7 @@ function alRegionBuf(cl){
   const out=new AudioBuffer({length:i1-i0,numberOfChannels:b.numberOfChannels,sampleRate:sr});
   for(let c=0;c<b.numberOfChannels;c++)out.getChannelData(c).set(b.getChannelData(c).subarray(i0,i1));return out;
 }
-function alCommit(msg){markDirty();scheduleCommit();renderAudioLane();alResync();if(msg)toast(msg);}
+function alCommit(msg){markDirty();scheduleCommit();renderAudioLane();if(vOn('mixer'))renderMixer();alResync();if(msg)toast(msg);}
 const AL_BTNS=['alSplit','alDup','alMute','alDel','alCh','alBpm','alHalf','alDbl','alGain'];
 function alSyncBar(){
   const c=S.alane[alSel],src=c&&alSrc(c.s);
@@ -7886,7 +7902,7 @@ function alRemoveAll(){
   if(!S.alane.length)return;histMark();S.alane=[];S.aref=0;S.als=false;alZoom=1;alVs=null;alSelR=null;alCursor=null;alClipbd=null;alStop();applyMix();
   alAfter();toastUndo('Song audio removed.');
 }
-function alAfter(msg){alSel=-1;alCur=null;markDirty();scheduleCommit();renderAudioLane();alResync();if(msg)toast(msg);}
+function alAfter(msg){alSel=-1;alCur=null;markDirty();scheduleCommit();renderAudioLane();if(vOn('mixer'))renderMixer();alResync();if(msg)toast(msg);}
 function alEdSlice(){
   const at=alCursor!=null?alCursor:(alSelR?alSelR.a:null);if(at==null){toast('Click the waveform to place the marker first.');return;}
   histMark();const did=alCutAt(at);if(alSelR&&alCursor==null){alCutAt(alSelR.b);}
