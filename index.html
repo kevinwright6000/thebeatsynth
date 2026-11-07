@@ -2233,6 +2233,7 @@ select option{background:var(--panel2);color:var(--fg)}
   <nav class="sl-tab-nav" id="slTabNav">
     <button class="sl-tab-btn active" data-sl-tab="instruments">Instruments</button>
     <button class="sl-tab-btn" data-sl-tab="effects">Effects</button>
+    <button class="sl-tab-btn" data-sl-tab="imported">Imported</button>
   </nav>
   <!-- Instruments tab -->
   <div class="sl-tab-pane" id="slPaneInstruments">
@@ -2270,6 +2271,15 @@ select option{background:var(--panel2);color:var(--fg)}
     </div>
     <div class="sl-list" id="slFxList"></div>
     <div class="sl-fx-hint">Click to apply to selected channel</div>
+  </div>
+  <!-- Imported tab -->
+  <div class="sl-tab-pane" id="slPaneImported" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+    <div class="sl-search">
+      <span class="sl-search-icon">🔍</span>
+      <input type="text" id="slImpSearch" placeholder="Search your library…" autocomplete="off">
+    </div>
+    <div class="sl-b" style="padding:0 14px 10px"><button class="btn sm" id="slImpBtn" style="width:100%">Import audio…</button></div>
+    <div class="sl-list" id="slImpList"></div>
   </div>
 </div>
 
@@ -2658,6 +2668,7 @@ select option{background:var(--panel2);color:var(--fg)}
     const tabNav = document.getElementById('slTabNav');
     const paneInstruments = document.getElementById('slPaneInstruments');
     const paneEffects = document.getElementById('slPaneEffects');
+    const paneImported = document.getElementById('slPaneImported');
     let activeTab = 'instruments';
 
     function switchTab(tab) {
@@ -2667,6 +2678,8 @@ select option{background:var(--panel2);color:var(--fg)}
       });
       if (paneInstruments) paneInstruments.style.display = tab === 'instruments' ? 'flex' : 'none';
       if (paneEffects) paneEffects.style.display = tab === 'effects' ? 'flex' : 'none';
+      if (paneImported) paneImported.style.display = tab === 'imported' ? 'flex' : 'none';
+      if (tab === 'imported') populateImported(impQ);
     }
 
     if (tabNav) {
@@ -2897,6 +2910,58 @@ select option{background:var(--panel2);color:var(--fg)}
         }
       }
     });
+
+    // ── Imported tab (songs saved to the Library) ──────────────────────
+    function esc(x){return String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+    function populateImported(filter) {
+      const list = document.getElementById('slImpList');
+      if (!list || !window.__bs || !window.__bs.songLibGet) return;
+      let lib = window.__bs.songLibGet();
+      if (filter && filter.trim()) {
+        const q = filter.trim().toLowerCase();
+        lib = lib.filter(x => x.name.toLowerCase().includes(q));
+      }
+      if (!lib.length) {
+        list.innerHTML = '<div style="padding:20px 14px;color:var(--dim);font:500 12px Rajdhani,sans-serif">No songs saved yet. Import audio and choose "Add to Library" to keep it here for later.</div>';
+        return;
+      }
+      list.innerHTML = lib.map(x =>
+        '<div class="sl-sound-item" data-lib-id="'+x.id+'">' +
+          '<span class="sl-name" title="'+esc(x.name)+'">'+esc(x.name)+(x.bpm?' · '+x.bpm+' BPM':'')+'</span>' +
+          '<button class="sl-add-btn" data-lib-load="'+x.id+'" title="Load into the Timeline">Load</button>' +
+          '<button class="sl-play-btn" data-lib-del="'+x.id+'" title="Remove from the library">×</button>' +
+        '</div>'
+      ).join('');
+    }
+
+    let impQ = '';
+    const impSearch = document.getElementById('slImpSearch');
+    if (impSearch) impSearch.addEventListener('input', function() { impQ = this.value; populateImported(impQ); });
+
+    const impBtn = document.getElementById('slImpBtn');
+    if (impBtn) impBtn.addEventListener('click', () => {
+      const fileInput = document.getElementById('alFile');
+      if (fileInput) fileInput.click();
+    });
+
+    const impList = document.getElementById('slImpList');
+    if (impList) impList.addEventListener('click', function(e) {
+      const loadBtn = e.target.closest('[data-lib-load]');
+      if (loadBtn && window.__bs && window.__bs.songLibLoadToTimeline) {
+        window.__bs.songLibLoadToTimeline(loadBtn.dataset.libLoad);
+        return;
+      }
+      const delBtn = e.target.closest('[data-lib-del]');
+      if (delBtn && window.__bs && window.__bs.songLibRemove) {
+        window.__bs.songLibRemove(delBtn.dataset.libDel);
+        populateImported(impQ);
+        return;
+      }
+    });
+
+    // Let code outside this closure (importing elsewhere, e.g. drag-drop
+    // anywhere on the page) refresh this tab if it's the one showing.
+    window.__slRefreshImported = () => populateImported(impQ);
 
     // ── Drag from library ──────────────────────────────────────────────
     // Custom ghost element
@@ -3903,7 +3968,7 @@ select option{background:var(--panel2);color:var(--fg)}
     </div>
   </div>
 </div>
-<aside class="sb" id="sbPanel" hidden aria-label="Sound browser"><div class="sb-h"><input id="sbQ" type="search" placeholder="Search sounds and packs" aria-label="Search sounds"><button class="btn sm" id="sbClose" aria-label="Close sound browser">Close</button></div><div class="sb-t"><div class="seg" id="sbTabs" role="group" aria-label="Browser sections"><button data-st="sounds" aria-pressed="true">Sounds</button><button data-st="presets" aria-pressed="false">Presets</button><button data-st="project" aria-pressed="false">Project</button><button data-st="imported" aria-pressed="false">Imported</button></div></div><div class="sb-l" id="sbList"></div></aside>
+<aside class="sb" id="sbPanel" hidden aria-label="Sound browser"><div class="sb-h"><input id="sbQ" type="search" placeholder="Search sounds and packs" aria-label="Search sounds"><button class="btn sm" id="sbClose" aria-label="Close sound browser">Close</button></div><div class="sb-t"><div class="seg" id="sbTabs" role="group" aria-label="Browser sections"><button data-st="sounds" aria-pressed="true">Sounds</button><button data-st="presets" aria-pressed="false">Presets</button><button data-st="project" aria-pressed="false">Project</button></div></div><div class="sb-l" id="sbList"></div></aside>
 <div class="modal" id="gmMod" hidden role="dialog" aria-modal="true" aria-labelledby="gmT">
   <div class="modal-box"><div class="roll-bar"><strong id="gmT">Real instruments</strong><input id="gmQ" type="search" placeholder="Search instruments" aria-label="Search instruments"><span class="grow"></span><button class="btn sm" id="gmClose">Close</button></div>
   <div class="lib-body"><div class="sb-l" id="gmList" style="max-height:60vh"></div><p class="hint" id="gmCred" style="margin:8px 0 0"></p></div></div></div>
@@ -4063,7 +4128,7 @@ select option{background:var(--panel2);color:var(--fg)}
       <p id="acMsg" style="margin:0 0 16px;color:var(--fg);line-height:1.4"></p>
       <div style="display:flex;flex-direction:column;gap:8px">
         <button class="btn" id="acTimeline" style="width:100%">Add to Timeline</button>
-        <button class="btn" id="acLibrary" style="width:100%" title="Save it for later. Load it into the Timeline whenever you want from Browse sounds → Imported.">Add to Library</button>
+        <button class="btn" id="acLibrary" style="width:100%" title="Save it for later. Load it into the Timeline whenever you want from Library → Imported (top right).">Add to Library</button>
       </div>
       <div style="text-align:center;margin-top:12px"><button class="btn sm" id="acCancel">Cancel</button></div>
     </div>
@@ -6484,7 +6549,7 @@ const pcOf=m=>((m-S.key)%12+12)%12;
 const inScale=m=>SCALES[S.scale].includes(pcOf(m));
 function snapNote(m){if(!S.lock||inScale(m))return m;for(let d=1;d<=6;d++){if(inScale(m-d))return m-d;if(inScale(m+d))return m+d;}return m;}
 $('#etBtn').onclick=e=>{const on=!$('.app').classList.contains('et-open');$('.app').classList.toggle('et-open',on);e.currentTarget.setAttribute('aria-pressed',on);};
-window.__bs={get alN(){return alNodes.length},alZoomTo,alView,get alZoom(){return alZoom},alRemoveAll,alEdSlice,alEdDelete,alEdCopy,alEdPaste,alEdMove,setAlSel(a,b,c){alSelR=a==null?null:{a,b};alCursor=c==null?null:c;alOverlay();},alSplit,alDup,alDel,alSnap,loadProject,warpMarkers,wkPoints,freezeChannel,unfreezeChannel,audioToNotes,audioToDrums,macroApply,macroRender,grooveFromLoop,grooveDef,openLaunchSet,followAction,captureMidi,get capBuf(){return capBuf},takeSave,takeSwap,takeDel,secGroups,secLabel,secMove,secDuplicate,normalizeLufs,measureLufs,loadKit,onMidi,recUndoTake,get recLog(){return recLog},get mset(){return mset},set msetV(v){mset=cleanSet(v);},mmApplyTpl,get midiMap(){return midiMap},get btnMap(){return btnMap},flToggle,coffeeNudge,get held(){return held},get snapshot(){return snapshot},get cleanMi(){return cleanMi},setMidiOut:o=>{midiOut=o;},setClk:m=>{clkMode=m;},addChannel,render,renderMixer,get audTakes(){return audTakes},get audStartFn(){return audStart},get audStopNow(){return audStopNow},get planList(){return planList},get renderPlan(){return renderPlan},get clipDur(){return clipDur},get planFromUI(){return planFromUI},get encodeWav(){return encodeWav},parseProg,degTones,chordEvents,bassNotes,writeBass,writeProgression,get SOUNDS(){return SOUNDS},yinPitch,pitchTrack,framesToNotes,notesToSteps,detectKey,chordTones,chordLabel,importMidi,parseMidi,readZip,clipAuto,detectBpm,findHits,stretchBuf,measureLufs,normalizeLufs,renderOne,get PACKS(){return PACKS},get S(){return S},inScale,snapNote,midi:(a,ts)=>onMidi({data:a,timeStamp:ts}),padHit,renderPlan,foldLoop,planList,encodeMp3,PRESETS:()=>PRESETS,setView,get playing(){return playing},activeCh,applyFxPreset,toast,get FACTORY_FX(){return FACTORY_FX}};
+window.__bs={get alN(){return alNodes.length},alZoomTo,alView,get alZoom(){return alZoom},alRemoveAll,alEdSlice,alEdDelete,alEdCopy,alEdPaste,alEdMove,setAlSel(a,b,c){alSelR=a==null?null:{a,b};alCursor=c==null?null:c;alOverlay();},alSplit,alDup,alDel,alSnap,loadProject,warpMarkers,wkPoints,freezeChannel,unfreezeChannel,audioToNotes,audioToDrums,macroApply,macroRender,grooveFromLoop,grooveDef,openLaunchSet,followAction,captureMidi,get capBuf(){return capBuf},takeSave,takeSwap,takeDel,secGroups,secLabel,secMove,secDuplicate,normalizeLufs,measureLufs,loadKit,onMidi,recUndoTake,get recLog(){return recLog},get mset(){return mset},set msetV(v){mset=cleanSet(v);},mmApplyTpl,get midiMap(){return midiMap},get btnMap(){return btnMap},flToggle,coffeeNudge,get held(){return held},get snapshot(){return snapshot},get cleanMi(){return cleanMi},setMidiOut:o=>{midiOut=o;},setClk:m=>{clkMode=m;},addChannel,render,renderMixer,get audTakes(){return audTakes},get audStartFn(){return audStart},get audStopNow(){return audStopNow},get planList(){return planList},get renderPlan(){return renderPlan},get clipDur(){return clipDur},get planFromUI(){return planFromUI},get encodeWav(){return encodeWav},parseProg,degTones,chordEvents,bassNotes,writeBass,writeProgression,get SOUNDS(){return SOUNDS},yinPitch,pitchTrack,framesToNotes,notesToSteps,detectKey,chordTones,chordLabel,importMidi,parseMidi,readZip,clipAuto,detectBpm,findHits,stretchBuf,measureLufs,normalizeLufs,renderOne,get PACKS(){return PACKS},get S(){return S},inScale,snapNote,midi:(a,ts)=>onMidi({data:a,timeStamp:ts}),padHit,renderPlan,foldLoop,planList,encodeMp3,PRESETS:()=>PRESETS,setView,get playing(){return playing},activeCh,applyFxPreset,toast,get FACTORY_FX(){return FACTORY_FX},songLibGet,songLibLoadToTimeline,songLibRemove,alImportChoose};
 function scaleChanged(){if(!$('#kbd').hidden)buildKbd();if(rollCh)drawRoll();if(typeof drawChordStrip==='function'&&document.querySelector('#chStrip'))drawChordStrip();}
 $('#keyRoot').onchange=e=>{S.key=+e.target.value;scaleChanged();markDirty();syncKey();};
 $('#keyScale').onchange=e=>{S.scale=e.target.value;scaleChanged();markDirty();syncKey();};
@@ -7196,18 +7261,10 @@ $('#songBld').onclick=buildSong;
     h+='<div class="sb-g">Channels</div>'+S.channels.filter(c=>c.kind!=='sample').map(c=>'<div class="sb-it" data-ch="'+c.id+'"><span class="nm">'+esc(c.name)+'</span><button class="btn sm" data-a="sel">Select</button></div>').join('');
     return h;
   }
-  function drawImported(s){
-    const lib=songLibGet().filter(x=>!s||x.name.toLowerCase().includes(s));
-    let h='<div class="sb-b"><button class="btn sm" data-a="imp">Import audio…</button></div>';
-    h+='<div class="sb-g">Song library</div>';
-    h+=lib.length?lib.map(x=>'<div class="sb-it" data-lib="'+x.id+'"><span class="nm" title="'+esc(x.name)+'">'+esc(x.name)+(x.bpm?' · '+x.bpm+' BPM':'')+'</span><button class="btn sm" data-a="libload">Load to Timeline</button><button class="btn sm" data-a="libdel" aria-label="Remove '+esc(x.name)+' from the library">×</button></div>').join(''):'<div class="sb-g" style="text-transform:none;letter-spacing:0;opacity:.8">No songs saved yet. When you import audio, choose "Add to Library" to keep it here for later.</div>';
-    return h;
-  }
   function draw(){
     const s=q.value.trim().toLowerCase();let h='',last='';
     if(tab==='presets'){list.innerHTML=drawPresets(s);return;}
     if(tab==='project'){list.innerHTML=drawProject(s);return;}
-    if(tab==='imported'){list.innerHTML=drawImported(s);return;}
     items.filter(it=>!s||(it.label+' '+it.g+' '+it.id).toLowerCase().includes(s)).forEach(it=>{
       if(it.g!==last){h+='<div class="sb-g">'+esc(it.g)+'</div>';last=it.g;}
       h+='<div class="sb-it" draggable="true" data-id="'+it.id+'"><button class="btn sm" data-a="pv" aria-label="Preview '+esc(it.label)+'">▶</button><span class="nm">'+esc(it.label)+'</span><button class="btn sm" data-a="add" aria-label="Add '+esc(it.label)+' as a channel">+ Channel</button><button class="btn sm" data-a="pad" aria-label="Put '+esc(it.label)+' on the next free pad">→ Pad</button></div>';
@@ -7217,7 +7274,7 @@ $('#songBld').onclick=buildSong;
     list.innerHTML=h||'<div class="sb-g">Nothing matches.</div>';
   }
   const toggle=on=>{panel.hidden=!on;document.body.classList.toggle('sbdock',on);$('#browserBtn').setAttribute('aria-pressed',on);if(on){draw();q.focus();}};
-  $('#sbTabs').addEventListener('click',e=>{const b=e.target.closest('[data-st]');if(!b)return;tab=b.dataset.st;$('#sbTabs').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));q.placeholder=tab==='sounds'?'Search sounds and packs':tab==='presets'?'Search presets':tab==='imported'?'Search your library':'Search your samples';draw();});
+  $('#sbTabs').addEventListener('click',e=>{const b=e.target.closest('[data-st]');if(!b)return;tab=b.dataset.st;$('#sbTabs').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));q.placeholder=tab==='sounds'?'Search sounds and packs':tab==='presets'?'Search presets':'Search your samples';draw();});
   window.sbRefresh=()=>{if(!panel.hidden&&tab!=='sounds')draw();};
   $('#browserBtn').onclick=()=>toggle(panel.hidden);
   $('#sbBtn').onclick=()=>toggle(panel.hidden);$('#sbClose').onclick=()=>toggle(false);q.addEventListener('input',draw);
@@ -8247,8 +8304,9 @@ async function alImportChoose(files){
       try{toast('Reading '+f.name+'…');await songLibAdd(await f.arrayBuffer(),f.name);}
       catch(err){toast('Could not read '+f.name+'. Try an MP3, WAV, M4A or OGG file.');}
     }
-    toast(files.length>1?'Added '+files.length+' songs to the library.':'Added to the library. Find it under Browse sounds → Imported.');
+    toast(files.length>1?'Added '+files.length+' songs to the library.':'Added to the library. Find it in Library → Imported.');
     if(window.sbRefresh)window.sbRefresh();
+    if(window.__slRefreshImported)window.__slRefreshImported();
   }
 }
 function alSplit(i,beat){
