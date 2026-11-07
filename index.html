@@ -1243,6 +1243,7 @@ body { padding-top:calc(var(--menubar-h) + 2px) !important; }
 .sl-sound-item[draggable="true"]{cursor:grab;}
 .row.fx-drop-target>.head{box-shadow:0 0 0 2px var(--accent) inset;background:rgba(108,99,255,.12)!important;}
 .rack-scroll.fx-drop-active{outline:2px dashed var(--accent);outline-offset:-3px;border-radius:4px;}
+#timeline.libsong-drop-active{outline:2px dashed var(--accent);outline-offset:-3px;}
 .sl-drag-ghost{position:fixed;pointer-events:none;z-index:9999;padding:6px 12px;background:var(--accent);color:#fff;border-radius:6px;font:700 11px 'Rajdhani',sans-serif;white-space:nowrap;opacity:.92;box-shadow:0 4px 16px rgba(0,0,0,.4);}
 
 #sound-library-sidebar {
@@ -2926,7 +2927,7 @@ select option{background:var(--panel2);color:var(--fg)}
         return;
       }
       list.innerHTML = lib.map(x =>
-        '<div class="sl-sound-item" data-lib-id="'+x.id+'">' +
+        '<div class="sl-sound-item" draggable="true" data-lib-id="'+x.id+'" title="Drag onto the Timeline, or use Load">' +
           '<span class="sl-name" title="'+esc(x.name)+'">'+esc(x.name)+(x.bpm?' · '+x.bpm+' BPM':'')+'</span>' +
           '<button class="sl-add-btn" data-lib-load="'+x.id+'" title="Load into the Timeline">Load</button>' +
           '<button class="sl-play-btn" data-lib-del="'+x.id+'" title="Remove from the library">×</button>' +
@@ -3019,6 +3020,56 @@ select option{background:var(--panel2);color:var(--fg)}
         document.querySelectorAll('.rack-scroll.fx-drop-active').forEach(r => r.classList.remove('fx-drop-active'));
       });
     }
+
+    // Imported songs — emit text/x-bs-libsong; drop on the Timeline loads it
+    const slImpListEl = document.getElementById('slImpList');
+    if (slImpListEl) {
+      slImpListEl.addEventListener('dragstart', e => {
+        const item = e.target.closest('.sl-sound-item[data-lib-id]');
+        if (!item) return;
+        const id = item.dataset.libId;
+        const name = item.querySelector('.sl-name') && item.querySelector('.sl-name').textContent;
+        e.dataTransfer.setData('text/x-bs-libsong', id);
+        e.dataTransfer.effectAllowed = 'copy';
+        const g = makeDragGhost('🎵 ' + (name || 'Song'));
+        try { e.dataTransfer.setDragImage(g, 0, -8); } catch(_) {}
+        item.classList.add('dragging');
+      });
+      slImpListEl.addEventListener('dragend', e => {
+        const item = e.target.closest('.sl-sound-item');
+        if (item) item.classList.remove('dragging');
+        removeDragGhost();
+        const tl = document.getElementById('timeline');
+        if (tl) tl.classList.remove('libsong-drop-active');
+      });
+    }
+
+    // Timeline drop target for imported-song drags
+    (function setupLibSongDrop() {
+      const tl = document.getElementById('timeline');
+      if (!tl) return;
+      function hasLibSongDrag(e) {
+        return [...(e.dataTransfer.types || [])].includes('text/x-bs-libsong');
+      }
+      tl.addEventListener('dragover', e => {
+        if (!hasLibSongDrag(e)) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+        tl.classList.add('libsong-drop-active');
+      });
+      tl.addEventListener('dragleave', e => {
+        if (!hasLibSongDrag(e)) return;
+        if (!tl.contains(e.relatedTarget)) tl.classList.remove('libsong-drop-active');
+      });
+      tl.addEventListener('drop', e => {
+        const id = e.dataTransfer.getData('text/x-bs-libsong');
+        if (!id) return;
+        e.preventDefault();
+        e.stopPropagation();
+        tl.classList.remove('libsong-drop-active');
+        if (window.__bs && window.__bs.songLibLoadToTimeline) window.__bs.songLibLoadToTimeline(id);
+      });
+    })();
 
     // Rack drop target for FX drags
     (function setupFxDrop() {
