@@ -3903,7 +3903,7 @@ select option{background:var(--panel2);color:var(--fg)}
     </div>
   </div>
 </div>
-<aside class="sb" id="sbPanel" hidden aria-label="Sound browser"><div class="sb-h"><input id="sbQ" type="search" placeholder="Search sounds and packs" aria-label="Search sounds"><button class="btn sm" id="sbClose" aria-label="Close sound browser">Close</button></div><div class="sb-t"><div class="seg" id="sbTabs" role="group" aria-label="Browser sections"><button data-st="sounds" aria-pressed="true">Sounds</button><button data-st="presets" aria-pressed="false">Presets</button><button data-st="project" aria-pressed="false">Project</button></div></div><div class="sb-l" id="sbList"></div></aside>
+<aside class="sb" id="sbPanel" hidden aria-label="Sound browser"><div class="sb-h"><input id="sbQ" type="search" placeholder="Search sounds and packs" aria-label="Search sounds"><button class="btn sm" id="sbClose" aria-label="Close sound browser">Close</button></div><div class="sb-t"><div class="seg" id="sbTabs" role="group" aria-label="Browser sections"><button data-st="sounds" aria-pressed="true">Sounds</button><button data-st="presets" aria-pressed="false">Presets</button><button data-st="project" aria-pressed="false">Project</button><button data-st="imported" aria-pressed="false">Imported</button></div></div><div class="sb-l" id="sbList"></div></aside>
 <div class="modal" id="gmMod" hidden role="dialog" aria-modal="true" aria-labelledby="gmT">
   <div class="modal-box"><div class="roll-bar"><strong id="gmT">Real instruments</strong><input id="gmQ" type="search" placeholder="Search instruments" aria-label="Search instruments"><span class="grow"></span><button class="btn sm" id="gmClose">Close</button></div>
   <div class="lib-body"><div class="sb-l" id="gmList" style="max-height:60vh"></div><p class="hint" id="gmCred" style="margin:8px 0 0"></p></div></div></div>
@@ -4063,7 +4063,7 @@ select option{background:var(--panel2);color:var(--fg)}
       <p id="acMsg" style="margin:0 0 16px;color:var(--fg);line-height:1.4"></p>
       <div style="display:flex;flex-direction:column;gap:8px">
         <button class="btn" id="acTimeline" style="width:100%">Add to Timeline</button>
-        <button class="btn" id="acLibrary" style="width:100%" title="Save it for later. Load it into the Timeline whenever you want from Browse sounds → Project.">Add to Library</button>
+        <button class="btn" id="acLibrary" style="width:100%" title="Save it for later. Load it into the Timeline whenever you want from Browse sounds → Imported.">Add to Library</button>
       </div>
       <div style="text-align:center;margin-top:12px"><button class="btn sm" id="acCancel">Cancel</button></div>
     </div>
@@ -7194,7 +7194,11 @@ $('#songBld').onclick=buildSong;
     const smp=S.channels.filter(c=>c.kind==='sample'&&(!s||c.name.toLowerCase().includes(s)));
     h+=smp.length?smp.map(c=>'<div class="sb-it" data-ch="'+c.id+'"><button class="btn sm" data-a="spv" aria-label="Preview '+esc(c.name)+'">▶</button><span class="nm">'+esc(c.name)+'</span><button class="btn sm" data-a="sel">Select</button></div>').join(''):'<div class="sb-g" style="text-transform:none;letter-spacing:0;opacity:.8">No samples yet. Import audio, or drop a file anywhere on the page.</div>';
     h+='<div class="sb-g">Channels</div>'+S.channels.filter(c=>c.kind!=='sample').map(c=>'<div class="sb-it" data-ch="'+c.id+'"><span class="nm">'+esc(c.name)+'</span><button class="btn sm" data-a="sel">Select</button></div>').join('');
+    return h;
+  }
+  function drawImported(s){
     const lib=songLibGet().filter(x=>!s||x.name.toLowerCase().includes(s));
+    let h='<div class="sb-b"><button class="btn sm" data-a="imp">Import audio…</button></div>';
     h+='<div class="sb-g">Song library</div>';
     h+=lib.length?lib.map(x=>'<div class="sb-it" data-lib="'+x.id+'"><span class="nm" title="'+esc(x.name)+'">'+esc(x.name)+(x.bpm?' · '+x.bpm+' BPM':'')+'</span><button class="btn sm" data-a="libload">Load to Timeline</button><button class="btn sm" data-a="libdel" aria-label="Remove '+esc(x.name)+' from the library">×</button></div>').join(''):'<div class="sb-g" style="text-transform:none;letter-spacing:0;opacity:.8">No songs saved yet. When you import audio, choose "Add to Library" to keep it here for later.</div>';
     return h;
@@ -7203,6 +7207,7 @@ $('#songBld').onclick=buildSong;
     const s=q.value.trim().toLowerCase();let h='',last='';
     if(tab==='presets'){list.innerHTML=drawPresets(s);return;}
     if(tab==='project'){list.innerHTML=drawProject(s);return;}
+    if(tab==='imported'){list.innerHTML=drawImported(s);return;}
     items.filter(it=>!s||(it.label+' '+it.g+' '+it.id).toLowerCase().includes(s)).forEach(it=>{
       if(it.g!==last){h+='<div class="sb-g">'+esc(it.g)+'</div>';last=it.g;}
       h+='<div class="sb-it" draggable="true" data-id="'+it.id+'"><button class="btn sm" data-a="pv" aria-label="Preview '+esc(it.label)+'">▶</button><span class="nm">'+esc(it.label)+'</span><button class="btn sm" data-a="add" aria-label="Add '+esc(it.label)+' as a channel">+ Channel</button><button class="btn sm" data-a="pad" aria-label="Put '+esc(it.label)+' on the next free pad">→ Pad</button></div>';
@@ -7212,7 +7217,7 @@ $('#songBld').onclick=buildSong;
     list.innerHTML=h||'<div class="sb-g">Nothing matches.</div>';
   }
   const toggle=on=>{panel.hidden=!on;document.body.classList.toggle('sbdock',on);$('#browserBtn').setAttribute('aria-pressed',on);if(on){draw();q.focus();}};
-  $('#sbTabs').addEventListener('click',e=>{const b=e.target.closest('[data-st]');if(!b)return;tab=b.dataset.st;$('#sbTabs').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));q.placeholder=tab==='sounds'?'Search sounds and packs':tab==='presets'?'Search presets':'Search your samples';draw();});
+  $('#sbTabs').addEventListener('click',e=>{const b=e.target.closest('[data-st]');if(!b)return;tab=b.dataset.st;$('#sbTabs').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));q.placeholder=tab==='sounds'?'Search sounds and packs':tab==='presets'?'Search presets':tab==='imported'?'Search your library':'Search your samples';draw();});
   window.sbRefresh=()=>{if(!panel.hidden&&tab!=='sounds')draw();};
   $('#browserBtn').onclick=()=>toggle(panel.hidden);
   $('#sbBtn').onclick=()=>toggle(panel.hidden);$('#sbClose').onclick=()=>toggle(false);q.addEventListener('input',draw);
@@ -8242,7 +8247,7 @@ async function alImportChoose(files){
       try{toast('Reading '+f.name+'…');await songLibAdd(await f.arrayBuffer(),f.name);}
       catch(err){toast('Could not read '+f.name+'. Try an MP3, WAV, M4A or OGG file.');}
     }
-    toast(files.length>1?'Added '+files.length+' songs to the library.':'Added to the library. Find it under Browse sounds → Project.');
+    toast(files.length>1?'Added '+files.length+' songs to the library.':'Added to the library. Find it under Browse sounds → Imported.');
     if(window.sbRefresh)window.sbRefresh();
   }
 }
