@@ -2400,7 +2400,17 @@ select option{background:var(--panel2);color:var(--fg)}
     document.querySelectorAll('.mb-menu.open').forEach(m => m.classList.remove('open'));
   }
   window.closeMbMenus = closeMbMenus;
-  {const mb=document.getElementById('daw-menubar');if(mb)mb.addEventListener('scroll',closeMbMenus,{passive:true});}
+  {const mb=document.getElementById('daw-menubar');if(mb){
+    // A tap on a touch device can nudge the bar's scroll position by a
+    // sub-pixel amount as the touch settles, firing a 'scroll' event even
+    // though the user never dragged. Only treat it as an intentional scroll
+    // (and close the open menu) once it moves more than a few pixels.
+    let mbLastX=mb.scrollLeft;
+    mb.addEventListener('scroll',()=>{
+      const dx=Math.abs(mb.scrollLeft-mbLastX);mbLastX=mb.scrollLeft;
+      if(dx>3)closeMbMenus();
+    },{passive:true});
+  }}
 
   document.addEventListener('click', function(e) {
     if (!e.target.closest('.mb-menu')) closeMbMenus();
