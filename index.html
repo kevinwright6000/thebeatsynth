@@ -4056,6 +4056,19 @@ select option{background:var(--panel2);color:var(--fg)}
     </div>
   </div>
 </div>
+<div class="modal" id="audioChoiceMod" hidden role="dialog" aria-modal="true" aria-labelledby="acT" style="z-index:300">
+  <div class="modal-box" style="width:min(380px,100%)">
+    <div class="roll-bar"><strong id="acT">Add this audio</strong></div>
+    <div style="padding:16px 18px">
+      <p id="acMsg" style="margin:0 0 16px;color:var(--fg);line-height:1.4"></p>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn" id="acTimeline" style="width:100%">Add to Timeline</button>
+        <button class="btn" id="acLibrary" style="width:100%" title="Save it for later. Load it into the Timeline whenever you want from Browse sounds → Project.">Add to Library</button>
+      </div>
+      <div style="text-align:center;margin-top:12px"><button class="btn sm" id="acCancel">Cancel</button></div>
+    </div>
+  </div>
+</div>
 <div class="modal" id="help" hidden role="dialog" aria-modal="true" aria-labelledby="helpT">
   <div class="modal-box">
     <div class="roll-bar"><strong id="helpT">Keyboard shortcuts</strong><button class="btn sm" id="helpClose">Close</button></div>
@@ -5299,7 +5312,7 @@ let dragDepth=0;
 window.addEventListener('dragenter',e=>{if(e.dataTransfer&&[...e.dataTransfer.types].includes('Files')){dragDepth++;$('#drop').classList.add('show');}});
 window.addEventListener('dragleave',()=>{dragDepth=Math.max(0,dragDepth-1);if(!dragDepth)$('#drop').classList.remove('show');});
 window.addEventListener('dragover',e=>e.preventDefault());
-window.addEventListener('drop',e=>{e.preventDefault();dragDepth=0;if(e.defaultPrevented&&e.__pad)return;$('#drop').classList.remove('show');if(e.dataTransfer.files.length)alImport([...e.dataTransfer.files]);});
+window.addEventListener('drop',e=>{e.preventDefault();dragDepth=0;if(e.defaultPrevented&&e.__pad)return;$('#drop').classList.remove('show');if(e.dataTransfer.files.length)alImportChoose([...e.dataTransfer.files]);});
 
 /* ---------- panels: piano roll, effects, sample editor ---------- */
 const VH=56;
@@ -7181,6 +7194,9 @@ $('#songBld').onclick=buildSong;
     const smp=S.channels.filter(c=>c.kind==='sample'&&(!s||c.name.toLowerCase().includes(s)));
     h+=smp.length?smp.map(c=>'<div class="sb-it" data-ch="'+c.id+'"><button class="btn sm" data-a="spv" aria-label="Preview '+esc(c.name)+'">▶</button><span class="nm">'+esc(c.name)+'</span><button class="btn sm" data-a="sel">Select</button></div>').join(''):'<div class="sb-g" style="text-transform:none;letter-spacing:0;opacity:.8">No samples yet. Import audio, or drop a file anywhere on the page.</div>';
     h+='<div class="sb-g">Channels</div>'+S.channels.filter(c=>c.kind!=='sample').map(c=>'<div class="sb-it" data-ch="'+c.id+'"><span class="nm">'+esc(c.name)+'</span><button class="btn sm" data-a="sel">Select</button></div>').join('');
+    const lib=songLibGet().filter(x=>!s||x.name.toLowerCase().includes(s));
+    h+='<div class="sb-g">Song library</div>';
+    h+=lib.length?lib.map(x=>'<div class="sb-it" data-lib="'+x.id+'"><span class="nm" title="'+esc(x.name)+'">'+esc(x.name)+(x.bpm?' · '+x.bpm+' BPM':'')+'</span><button class="btn sm" data-a="libload">Load to Timeline</button><button class="btn sm" data-a="libdel" aria-label="Remove '+esc(x.name)+' from the library">×</button></div>').join(''):'<div class="sb-g" style="text-transform:none;letter-spacing:0;opacity:.8">No songs saved yet. When you import audio, choose "Add to Library" to keep it here for later.</div>';
     return h;
   }
   function draw(){
@@ -7202,11 +7218,13 @@ $('#songBld').onclick=buildSong;
   $('#sbBtn').onclick=()=>toggle(panel.hidden);$('#sbClose').onclick=()=>toggle(false);q.addEventListener('input',draw);
   q.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Escape')toggle(false);});
   const freePad=()=>S.pads.findIndex(x=>x==null||!byId(x));
-  list.addEventListener('click',e=>{
+  list.addEventListener('click',async e=>{
     const b=e.target.closest('button[data-a]');if(!b)return;const row=b.closest('.sb-it'),id=row&&row.dataset.id,a=b.dataset.a;
     if(a==='imp'){$('#alFile').click();return;}if(a==='impmidi'){$('#midiInBtn').click();return;}if(a==='gm'){$('#gmBtn').click();return;}
     if(a==='fx'){const ch=activeCh();if(!ch){toast('Select a channel first.');return;}const k=b.dataset.i,src=k[0]==='f'?FACTORY_FX[+k.slice(1)]:null,u=k[0]==='u'?presets.filter(x=>x.type==='fx')[+k.slice(1)]:null,data=src?src[1]:u&&u.data;if(!data)return;applyFxPreset(ch,data);toast((src?src[0]:u.name)+' applied to '+ch.name+'.');return;}
     if(a==='spv'||a==='sel'){const c=byId(+row.dataset.ch);if(!c)return;if(a==='spv')preview(c,c.note);else{setActive(c.id);render();toast(c.name+' selected.');}return;}
+    if(a==='libload'){await songLibLoadToTimeline(row.dataset.lib);return;}
+    if(a==='libdel'){songLibRemove(row.dataset.lib);draw();return;}
     if(a==='pv'){ensureCtx();const def=SOUNDS[id],tmp={kind:def.kind,sound:id,pitch:0,note:def.root||60,syn:Object.assign({},SYN_DEF),chain:{in:master},fx:{}};trigger(tmp,ctx.currentTime+.01,tmp.note,def.len||1,100);}
     else if(a==='add'){const ch=addChannel({sound:id});render();markDirty();toast('Added '+ch.name+'.');}
     else if(a==='pad'){const k=freePad();if(k<0){toast('All pads are taken. Clear one first.');return;}const ch=addChannel({sound:id});S.pads[k]=ch.id;render();renderPads();markDirty();toast(ch.name+' is on pad '+(k+1)+'.');}
@@ -8167,6 +8185,67 @@ async function alImport(files){
     catch(err){toast('Could not read '+f.name+'. Try an MP3, WAV, M4A or OGG file.');}
   }
 }
+// ── Song library: audio saved for reuse, independent of the current
+// project's Timeline. Metadata lives in localStorage; the raw audio bytes
+// live in the same IndexedDB "audio" store alImportBuf already uses.
+const SONGLIB_KEY='beatsynth.songlib';
+function songLibGet(){try{const a=JSON.parse(localStorage.getItem(SONGLIB_KEY)||'[]');return Array.isArray(a)?a:[];}catch(e){return [];}}
+function songLibSave(a){try{localStorage.setItem(SONGLIB_KEY,JSON.stringify(a));return true;}catch(e){toast('Could not save to the library (browser storage is blocked or full).');return false;}}
+async function idbDel(k){try{const d=await idb();d.transaction('audio','readwrite').objectStore('audio').delete(k);}catch(e){}}
+async function songLibAdd(ab,name){
+  let buf=null,bpm=null;
+  try{buf=await decode(ab.slice(0));}catch(e){}
+  if(buf){try{if(buf.duration>=3)bpm=detectBpm(buf,0,1);}catch(e){}}
+  const detected=bpm&&bpm>=40&&bpm<=240?Math.round(bpm*10)/10:null;
+  const key=uid();await idbPut(key,ab);
+  const a=songLibGet();
+  a.unshift({id:uid(),name:String(name||'Song').replace(/\.[^.]+$/,'').slice(0,28),key,bpm:detected,dur:buf?Math.round(buf.duration):null,added:Date.now()});
+  if(a.length>30){a.splice(30).forEach(x=>idbDel(x.key));}
+  songLibSave(a);
+}
+async function songLibLoadToTimeline(id){
+  const entry=songLibGet().find(x=>x.id===id);if(!entry)return;
+  toast('Loading '+entry.name+'…');
+  const raw=await idbGet(entry.key);
+  if(!raw){toast('Could not find that audio - it may have been cleared from this browser.');return;}
+  await alImportBuf(raw,entry.name);
+}
+function songLibRemove(id){
+  const a=songLibGet(),entry=a.find(x=>x.id===id);
+  songLibSave(a.filter(x=>x.id!==id));
+  if(entry)idbDel(entry.key);
+  toast('Removed from the library.');
+}
+// ── Import choice prompt: dragged/picked audio asks whether to drop it
+// straight into the Timeline or save it to the Library for later.
+let acResolve=null;
+function askImportChoice(files){
+  return new Promise(res=>{
+    acResolve=res;const n=files.length;
+    $('#acMsg').textContent=(n===1?'"'+files[0].name+'"':n+' files')+' — add to the Timeline to play it now, or save to your Library to use later.';
+    $('#audioChoiceMod').hidden=false;
+    setTimeout(()=>$('#acTimeline').focus(),0);
+  });
+}
+function closeImportChoice(v){const fn=acResolve;acResolve=null;$('#audioChoiceMod').hidden=true;if(fn)fn(v);}
+$('#acTimeline').onclick=()=>closeImportChoice('timeline');
+$('#acLibrary').onclick=()=>closeImportChoice('library');
+$('#acCancel').onclick=()=>closeImportChoice(null);
+$('#audioChoiceMod').addEventListener('pointerdown',e=>{if(e.target===$('#audioChoiceMod'))closeImportChoice(null);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#audioChoiceMod').hidden)closeImportChoice(null);});
+async function alImportChoose(files){
+  if(!files.length)return;
+  const choice=await askImportChoice(files);
+  if(choice==='timeline')await alImport(files);
+  else if(choice==='library'){
+    for(const f of files){
+      try{toast('Reading '+f.name+'…');await songLibAdd(await f.arrayBuffer(),f.name);}
+      catch(err){toast('Could not read '+f.name+'. Try an MP3, WAV, M4A or OGG file.');}
+    }
+    toast(files.length>1?'Added '+files.length+' songs to the library.':'Added to the library. Find it under Browse sounds → Project.');
+    if(window.sbRefresh)window.sbRefresh();
+  }
+}
 function alSplit(i,beat){
   const c=S.alane[i];if(!c)return false;
   if(beat==null)beat=alCur&&alCur.i===i?alCur.b:c.a+c.l/2;
@@ -8227,7 +8306,7 @@ async function alToChannel(i){
 }
 $('#alImport').onclick=()=>$('#alFile').click();
 $('#importSong').onclick=()=>$('#alFile').click();
-$('#alFile').onchange=e=>{const f=[...e.target.files];e.target.value='';if(f.length)alImport(f);};
+$('#alFile').onchange=e=>{const f=[...e.target.files];e.target.value='';if(f.length)alImportChoose(f);};
 // Import dropdown in topbar
 $('#importAudioBtn').onclick=()=>$('#alFile').click();
 $('#importMidiTopBtn').onclick=()=>$('#midiFile').click();
