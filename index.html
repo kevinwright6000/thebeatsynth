@@ -224,11 +224,11 @@ body.embed #embedBar{display:flex!important;align-items:center;gap:14px;position
 .pop select{background:var(--field);border:1px solid var(--line);border-radius:4px;padding:3px 6px;font-weight:700}
 .au{position:absolute;width:5px;height:5px;border-radius:50%;z-index:1;pointer-events:none;border:1px solid #000;text-decoration:none}
 .au.oth{left:27px}.au.vol{left:3px;background:#ffd23f}.au.pan{left:11px;background:#ff6fa8}.au.cut{left:19px;background:#6fa0ff}
-.sb{position:fixed;left:12px;top:12px;bottom:12px;width:min(310px,calc(100vw - 24px));z-index:70;background:var(--panel);border:1px solid var(--line);border-radius:8px;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.sb{position:fixed;left:12px;top:calc(var(--menubar-h) + 12px);bottom:12px;width:min(310px,calc(100vw - 24px));z-index:70;background:var(--panel);border:1px solid var(--line);border-radius:8px;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.5)}
 .sb[hidden]{display:none}
 @media (min-width:1000px){body.sbdock .app{margin-left:334px}body.sbdock .topbar{flex-wrap:wrap}body.sbdock .topbar>.grow{display:none}}
 .topbar .btn{white-space:nowrap}
-@media (max-width:999px){.sb{top:60px}}
+@media (max-width:999px){.sb{top:calc(var(--menubar-h) + 10px)}}
 .sb-t{display:flex;padding:6px 8px 0}.sb-t .seg{flex:1}.sb-t .seg button{flex:1}
 .sb-b{display:flex;gap:6px;flex-wrap:wrap;padding:6px 8px}.sb-h{display:flex;gap:6px;align-items:center;padding:8px;border-bottom:1px solid var(--line)}.sb-h input{flex:1;min-width:0}
 .sb-l{overflow:auto;padding:4px 0}.sb-g{padding:8px 10px 3px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.65}
@@ -388,7 +388,7 @@ html.native .topbar::-webkit-scrollbar{display:none}
  .chstrip button{min-width:48px;min-height:44px}
 }
 @media (pointer:coarse){.btn.sm,.rollbtn,.fxbtn,.tg{min-height:32px}.tg{min-width:32px}.pad-grid{gap:12px;max-width:none}.pad{border-radius:14px;min-height:76px}.step{height:56px}.sb-it .btn{min-height:36px}}
-@media (orientation:landscape) and (max-height:520px){.app{gap:5px;padding-block:5px}.transport,.editbar{gap:4px}.btn,.btn.sm{padding-block:3px;min-height:28px}.rack-scroll{flex:none;min-height:calc(100vh - 12px)}.padsv,.tlv{min-height:calc(100vh - 12px)}.step{height:40px}.pad-grid{grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}.pad{aspect-ratio:auto;min-height:64px;padding:5px}.sb{top:8px}.modal-box{max-height:98vh}.kbd .wk{height:84px}}
+@media (orientation:landscape) and (max-height:520px){.app{gap:5px;padding-block:5px}.transport,.editbar{gap:4px}.btn,.btn.sm{padding-block:3px;min-height:28px}.rack-scroll{flex:none;min-height:calc(100vh - 12px)}.padsv,.tlv{min-height:calc(100vh - 12px)}.step{height:40px}.pad-grid{grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}.pad{aspect-ratio:auto;min-height:64px;padding:5px}.sb{top:calc(var(--menubar-h) + 6px)}.modal-box{max-height:98vh}.kbd .wk{height:84px}}
 @media (max-width:700px){.kbd-bar .sep{display:none}}
 @media (max-width:520px){
   .row{flex-direction:column;align-items:flex-start}
@@ -1243,7 +1243,7 @@ body { padding-top:calc(var(--menubar-h) + 2px) !important; }
 .sl-sound-item[draggable="true"]{cursor:grab;}
 .row.fx-drop-target>.head{box-shadow:0 0 0 2px var(--accent) inset;background:rgba(108,99,255,.12)!important;}
 .rack-scroll.fx-drop-active{outline:2px dashed var(--accent);outline-offset:-3px;border-radius:4px;}
-#timeline.libsong-drop-active{outline:2px dashed var(--accent);outline-offset:-3px;}
+#timeline.libsong-drop-active,.rack-scroll.libsong-drop-active{outline:2px dashed var(--accent);outline-offset:-3px;}
 .sl-drag-ghost{position:fixed;pointer-events:none;z-index:9999;padding:6px 12px;background:var(--accent);color:#fff;border-radius:6px;font:700 11px 'Rajdhani',sans-serif;white-space:nowrap;opacity:.92;box-shadow:0 4px 16px rgba(0,0,0,.4);}
 
 #sound-library-sidebar {
@@ -2927,7 +2927,7 @@ select option{background:var(--panel2);color:var(--fg)}
         return;
       }
       list.innerHTML = lib.map(x =>
-        '<div class="sl-sound-item" draggable="true" data-lib-id="'+x.id+'" title="Drag onto the Timeline, or use Load">' +
+        '<div class="sl-sound-item" draggable="true" data-lib-id="'+x.id+'" title="Drag onto the Timeline to load it as the song, or onto the Channel Rack to make a sample channel. Or use Load.">' +
           '<span class="sl-name" title="'+esc(x.name)+'">'+esc(x.name)+(x.bpm?' · '+x.bpm+' BPM':'')+'</span>' +
           '<button class="sl-add-btn" data-lib-load="'+x.id+'" title="Load into the Timeline">Load</button>' +
           '<button class="sl-play-btn" data-lib-del="'+x.id+'" title="Remove from the library">×</button>' +
@@ -3041,6 +3041,8 @@ select option{background:var(--panel2);color:var(--fg)}
         removeDragGhost();
         const tl = document.getElementById('timeline');
         if (tl) tl.classList.remove('libsong-drop-active');
+        const scroll = document.getElementById('scroll');
+        if (scroll) scroll.classList.remove('libsong-drop-active');
       });
     }
 
@@ -3068,6 +3070,33 @@ select option{background:var(--panel2);color:var(--fg)}
         e.stopPropagation();
         tl.classList.remove('libsong-drop-active');
         if (window.__bs && window.__bs.songLibLoadToTimeline) window.__bs.songLibLoadToTimeline(id);
+      });
+    })();
+
+    // Rack drop target for imported-song drags (drops the song in as a new sample channel)
+    (function setupLibSongRackDrop() {
+      const scroll = document.getElementById('scroll');
+      if (!scroll) return;
+      function hasLibSongDrag(e) {
+        return [...(e.dataTransfer.types || [])].includes('text/x-bs-libsong');
+      }
+      scroll.addEventListener('dragover', e => {
+        if (!hasLibSongDrag(e)) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+        scroll.classList.add('libsong-drop-active');
+      });
+      scroll.addEventListener('dragleave', e => {
+        if (!hasLibSongDrag(e)) return;
+        if (!scroll.contains(e.relatedTarget)) scroll.classList.remove('libsong-drop-active');
+      });
+      scroll.addEventListener('drop', e => {
+        const id = e.dataTransfer.getData('text/x-bs-libsong');
+        if (!id) return;
+        e.preventDefault();
+        e.stopPropagation();
+        scroll.classList.remove('libsong-drop-active');
+        if (window.__bs && window.__bs.songLibToChannel) window.__bs.songLibToChannel(id);
       });
     })();
 
@@ -6600,7 +6629,7 @@ const pcOf=m=>((m-S.key)%12+12)%12;
 const inScale=m=>SCALES[S.scale].includes(pcOf(m));
 function snapNote(m){if(!S.lock||inScale(m))return m;for(let d=1;d<=6;d++){if(inScale(m-d))return m-d;if(inScale(m+d))return m+d;}return m;}
 $('#etBtn').onclick=e=>{const on=!$('.app').classList.contains('et-open');$('.app').classList.toggle('et-open',on);e.currentTarget.setAttribute('aria-pressed',on);};
-window.__bs={get alN(){return alNodes.length},alZoomTo,alView,get alZoom(){return alZoom},alRemoveAll,alEdSlice,alEdDelete,alEdCopy,alEdPaste,alEdMove,setAlSel(a,b,c){alSelR=a==null?null:{a,b};alCursor=c==null?null:c;alOverlay();},alSplit,alDup,alDel,alSnap,loadProject,warpMarkers,wkPoints,freezeChannel,unfreezeChannel,audioToNotes,audioToDrums,macroApply,macroRender,grooveFromLoop,grooveDef,openLaunchSet,followAction,captureMidi,get capBuf(){return capBuf},takeSave,takeSwap,takeDel,secGroups,secLabel,secMove,secDuplicate,normalizeLufs,measureLufs,loadKit,onMidi,recUndoTake,get recLog(){return recLog},get mset(){return mset},set msetV(v){mset=cleanSet(v);},mmApplyTpl,get midiMap(){return midiMap},get btnMap(){return btnMap},flToggle,coffeeNudge,get held(){return held},get snapshot(){return snapshot},get cleanMi(){return cleanMi},setMidiOut:o=>{midiOut=o;},setClk:m=>{clkMode=m;},addChannel,render,renderMixer,get audTakes(){return audTakes},get audStartFn(){return audStart},get audStopNow(){return audStopNow},get planList(){return planList},get renderPlan(){return renderPlan},get clipDur(){return clipDur},get planFromUI(){return planFromUI},get encodeWav(){return encodeWav},parseProg,degTones,chordEvents,bassNotes,writeBass,writeProgression,get SOUNDS(){return SOUNDS},yinPitch,pitchTrack,framesToNotes,notesToSteps,detectKey,chordTones,chordLabel,importMidi,parseMidi,readZip,clipAuto,detectBpm,findHits,stretchBuf,measureLufs,normalizeLufs,renderOne,get PACKS(){return PACKS},get S(){return S},inScale,snapNote,midi:(a,ts)=>onMidi({data:a,timeStamp:ts}),padHit,renderPlan,foldLoop,planList,encodeMp3,PRESETS:()=>PRESETS,setView,get playing(){return playing},activeCh,applyFxPreset,toast,get FACTORY_FX(){return FACTORY_FX},songLibGet,songLibLoadToTimeline,songLibRemove,alImportChoose};
+window.__bs={get alN(){return alNodes.length},alZoomTo,alView,get alZoom(){return alZoom},alRemoveAll,alEdSlice,alEdDelete,alEdCopy,alEdPaste,alEdMove,setAlSel(a,b,c){alSelR=a==null?null:{a,b};alCursor=c==null?null:c;alOverlay();},alSplit,alDup,alDel,alSnap,loadProject,warpMarkers,wkPoints,freezeChannel,unfreezeChannel,audioToNotes,audioToDrums,macroApply,macroRender,grooveFromLoop,grooveDef,openLaunchSet,followAction,captureMidi,get capBuf(){return capBuf},takeSave,takeSwap,takeDel,secGroups,secLabel,secMove,secDuplicate,normalizeLufs,measureLufs,loadKit,onMidi,recUndoTake,get recLog(){return recLog},get mset(){return mset},set msetV(v){mset=cleanSet(v);},mmApplyTpl,get midiMap(){return midiMap},get btnMap(){return btnMap},flToggle,coffeeNudge,get held(){return held},get snapshot(){return snapshot},get cleanMi(){return cleanMi},setMidiOut:o=>{midiOut=o;},setClk:m=>{clkMode=m;},addChannel,render,renderMixer,get audTakes(){return audTakes},get audStartFn(){return audStart},get audStopNow(){return audStopNow},get planList(){return planList},get renderPlan(){return renderPlan},get clipDur(){return clipDur},get planFromUI(){return planFromUI},get encodeWav(){return encodeWav},parseProg,degTones,chordEvents,bassNotes,writeBass,writeProgression,get SOUNDS(){return SOUNDS},yinPitch,pitchTrack,framesToNotes,notesToSteps,detectKey,chordTones,chordLabel,importMidi,parseMidi,readZip,clipAuto,detectBpm,findHits,stretchBuf,measureLufs,normalizeLufs,renderOne,get PACKS(){return PACKS},get S(){return S},inScale,snapNote,midi:(a,ts)=>onMidi({data:a,timeStamp:ts}),padHit,renderPlan,foldLoop,planList,encodeMp3,PRESETS:()=>PRESETS,setView,get playing(){return playing},activeCh,applyFxPreset,toast,get FACTORY_FX(){return FACTORY_FX},songLibGet,songLibLoadToTimeline,songLibToChannel,songLibRemove,alImportChoose};
 function scaleChanged(){if(!$('#kbd').hidden)buildKbd();if(rollCh)drawRoll();if(typeof drawChordStrip==='function'&&document.querySelector('#chStrip'))drawChordStrip();}
 $('#keyRoot').onchange=e=>{S.key=+e.target.value;scaleChanged();markDirty();syncKey();};
 $('#keyScale').onchange=e=>{S.scale=e.target.value;scaleChanged();markDirty();syncKey();};
@@ -8322,6 +8351,19 @@ async function songLibLoadToTimeline(id){
   const raw=await idbGet(entry.key);
   if(!raw){toast('Could not find that audio - it may have been cleared from this browser.');return;}
   await alImportBuf(raw,entry.name);
+}
+async function songLibToChannel(id){
+  const entry=songLibGet().find(x=>x.id===id);if(!entry)return;
+  toast('Loading '+entry.name+'…');
+  const raw=await idbGet(entry.key);
+  if(!raw){toast('Could not find that audio - it may have been cleared from this browser.');return;}
+  ensureCtx();
+  let buf;try{buf=await decode(raw.slice(0));}catch(e){toast('Could not read '+entry.name+'.');return;}
+  const key=uid();await idbPut(key,raw);
+  const nc=addChannel({kind:'sample',name:entry.name,buf,peaks:peaksOf(buf),raw,audioKey:key});
+  S.activeId=nc.id;render();markDirty();scheduleCommit();
+  $('#scroll').scrollTop=$('#scroll').scrollHeight;
+  toast(entry.name+' added to the Channel Rack.');
 }
 function songLibRemove(id){
   const a=songLibGet(),entry=a.find(x=>x.id===id);
